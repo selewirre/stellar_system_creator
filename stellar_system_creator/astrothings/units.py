@@ -2,14 +2,12 @@
 
 from pint import registry
 import pint
-import numpy as np
-
 from stellar_system_creator.astrothings.constants import solar_luminosity, solar_mass, solar_radius, solar_surface_area, solar_volume, \
     solar_density, solar_lifetime, solar_flux, \
     earth_mass, earth_volumetric_radius, earth_surface_area, earth_volume, earth_density, \
     earth_gravitational_acceleration, earth_orbital_speed, earth_escape_velocity, \
     jup_mass, jup_volumetric_radius, jup_surface_area, jup_volume, jup_density, \
-    stefan_boltzmann_constant, gravitational_constant, speed_of_light, plank_constant
+    stefan_boltzmann_constant, gravitational_constant
 
 ureg = registry.UnitRegistry()
 
@@ -60,9 +58,6 @@ Q_ = ureg.Quantity
 # setting constants with units
 stefan_boltzmann_constant: Q_ = stefan_boltzmann_constant * ureg.watt / (ureg.kelvin ** 4 * ureg.meter ** 2)
 gravitational_constant: Q_ = gravitational_constant * ureg.m ** 3 / (ureg.kg * ureg.second ** 2)
-speed_of_light: Q_ = speed_of_light * ureg.m / ureg.s
-plank_constant: Q_ = plank_constant * ureg.J * ureg.s
-h_bar_constant: Q_ = plank_constant / (2 * np.pi)
 
 # a = ureg.Quantity(1, 'M_s')
 # b = ureg.Quantity(1, 'M_j')

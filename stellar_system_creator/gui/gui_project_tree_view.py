@@ -3,144 +3,220 @@ from typing import Dict, List, Union
 
 import numpy as np
 
-from PyQt5.QtCore import Qt, QModelIndex
-from PyQt5.QtWidgets import QTreeView, QVBoxLayout
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QTreeView
 from PyQt5.Qt import QStandardItemModel
 
 from stellar_system_creator.filing import load
-from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
-from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem, MultiStellarSystemSType
-from stellar_system_creator.stellar_system_elements.stellar_body import StellarBody
-from stellar_system_creator.stellar_system_elements.binary_system import BinarySystem
+from stellar_system_creator.solar_system_elements.planetary_system import PlanetarySystem
+from stellar_system_creator.solar_system_elements.solar_system import SolarSystem
+from stellar_system_creator.solar_system_elements.stellar_body import StellarBody
+from stellar_system_creator.solar_system_elements.binary_system import BinarySystem
 
 
-def set_multi_stellar_system_tree_model_from_ssc_object(tree_model, ssc_object: MultiStellarSystemSType):
-    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
-        import TreeViewItemFromStellarSystemElement as tvifsse, TreeViewItemFromString
-    tree_model: Union[TreeViewItemFromString, QStandardItemModel]
+def get_accumulated_dict(list_of_dicts: List[Dict], target_keys):
+    for dictionary in list_of_dicts:
+        for target_key in target_keys:
+            if target_key not in dictionary.keys():
+                dictionary[target_key] = None
 
-    treeview_dict = {
-        'S-type Binary': {'TreeViewItem': TreeViewItemFromString('S-type Binary', ssc_object),
-                          'Children': {ssc_object.parent: tvifsse(ssc_object.parent)},
-                          'Binary Children': {}},
-        'Stellar Systems': {'TreeViewItem': TreeViewItemFromString('Stellar Systems', ssc_object),
-                            'Children': {}}
-    }
+    returning_dict = {key: [d[key] for d in list_of_dicts] for key in target_keys}
 
-    for stellar_system in ssc_object.children:
-        treeview_dict['Stellar Systems']['Children'][stellar_system] = tvifsse(stellar_system)
-        set_stellar_system_tree_model_from_ssc_object(
-            treeview_dict['Stellar Systems']['Children'][stellar_system], stellar_system)
+    if len(returning_dict['Object']):
+        if 'semi_major_axis' in returning_dict['Object'][0].__dict__:
+            sorted_index_by_semi_major_axis = np.argsort([
+                obj.semi_major_axis.to('au').m for obj in returning_dict['Object']])
+            return {key: np.array(returning_dict[key])[sorted_index_by_semi_major_axis] for key in returning_dict}
 
-    # if isinstance(ssc_object.parent, BinarySystem):
-    #     treeview_dict['Stellar Parent']['Binary Children'] = {
-    #         ssc_object.parent.primary_body: tvifsse(ssc_object.parent.primary_body),
-    #         ssc_object.parent.secondary_body: tvifsse(ssc_object.parent.secondary_body)}
-
-    set_tree_view_model_from_tree_view_dict(tree_model, treeview_dict)
+    sorted_index_by_name = np.argsort(returning_dict['Name'])
+    return {key: np.array(returning_dict[key])[sorted_index_by_name] for key in returning_dict}
 
 
-def set_stellar_system_tree_model_from_ssc_object(tree_model, ssc_object: StellarSystem):
-    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
-        import TreeViewItemFromStellarSystemElement as tvifsse, TreeViewItemFromString
-    tree_model: Union[TreeViewItemFromString, QStandardItemModel]
-
-    treeview_dict = {
-        'Stellar Parent': {'TreeViewItem': TreeViewItemFromString('Stellar Parent', ssc_object),
-                           'Children': {ssc_object.parent: tvifsse(ssc_object.parent)},
-                           'Binary Children': {}},
-        'Planetary Systems': {'TreeViewItem': TreeViewItemFromString('Planetary Systems', ssc_object),
-                              'Children': {}},
-        'Asteroid Belts': {'TreeViewItem': TreeViewItemFromString('Asteroid Belts', ssc_object),
-                           'Children': {ab: tvifsse(ab) for ab in ssc_object.asteroid_belts}}}
-
-    for ps in ssc_object.planetary_systems:
-        treeview_dict['Planetary Systems']['Children'][ps] = tvifsse(ps)
-        set_planetary_system_tree_model_from_ssc_object(
-            treeview_dict['Planetary Systems']['Children'][ps], ps)
-
-    if isinstance(ssc_object.parent, BinarySystem):
-        treeview_dict['Stellar Parent']['Binary Children'] = {
-            ssc_object.parent.primary_body: tvifsse(ssc_object.parent.primary_body),
-            ssc_object.parent.secondary_body: tvifsse(ssc_object.parent.secondary_body)}
-
-    set_tree_view_model_from_tree_view_dict(tree_model, treeview_dict)
+def get_stellar_body_dict(stellar_body: StellarBody) -> Dict:
+    from solar_system_element_context_menus.standard_items import TreeViewItemFromSolarSystemElement
+    stellar_body_item = TreeViewItemFromSolarSystemElement(stellar_body)
+    stellar_body_dict = {'Name': stellar_body.name, 'Object': stellar_body, 'TreeViewItem': stellar_body_item}
+    return stellar_body_dict
 
 
-def set_planetary_system_tree_model_from_ssc_object(tree_model, ssc_object: PlanetarySystem):
-    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
-        import TreeViewItemFromStellarSystemElement as tvifsse, TreeViewItemFromString
-    tree_model: Union[TreeViewItemFromString, QStandardItemModel]
+def get_binary_system_dict(binary_system: BinarySystem) -> Dict:
 
-    treeview_dict = {
-        'Planetary Parent': {'TreeViewItem': TreeViewItemFromString('Planetary Parent', ssc_object),
-                             'Children': {ssc_object.parent: tvifsse(ssc_object.parent)},
-                             'Binary Children': {}},
-        'Satellites': {'TreeViewItem': TreeViewItemFromString('Satellites', ssc_object),
-                       'Children': {sat: tvifsse(sat) for sat in ssc_object.satellite_list}},
-        'Trojans': {'TreeViewItem': TreeViewItemFromString('Trojans', ssc_object),
-                    'Children': {trj: tvifsse(trj) for trj in ssc_object.trojans_list}}}
+    primary_dict = {}
+    if isinstance(binary_system.primary_body, StellarBody):
+        primary_dict = get_stellar_body_dict(binary_system.primary_body)
+    elif isinstance(binary_system.primary_body, BinarySystem):
+        primary_dict = get_binary_system_dict(binary_system.primary_body)
 
-    if isinstance(ssc_object.parent, BinarySystem):
-        treeview_dict['Planetary Parent']['Binary Children'] = {
-            ssc_object.parent.primary_body: tvifsse(ssc_object.parent.primary_body),
-            ssc_object.parent.secondary_body: tvifsse(ssc_object.parent.secondary_body)}
+    secondary_dict = {}
+    if isinstance(binary_system.secondary_body, StellarBody):
+        secondary_dict = get_stellar_body_dict(binary_system.secondary_body)
+    elif isinstance(binary_system.secondary_body, BinarySystem):
+        secondary_dict = get_binary_system_dict(binary_system.secondary_body)
 
-    set_tree_view_model_from_tree_view_dict(tree_model, treeview_dict)
+    target_keys = ['Name', 'Object', 'TreeViewItem', 'BinaryChildren']
+    children_dicts = get_accumulated_dict([primary_dict, secondary_dict], target_keys)
+
+    from stellar_system_creator.gui.solar_system_element_context_menus.standard_items import TreeViewItemFromSolarSystemElement
+    binary_system_item = TreeViewItemFromSolarSystemElement(binary_system)
+    binary_system_dict = {'Name': binary_system.name, 'Object': binary_system,
+                          'TreeViewItem': binary_system_item, 'BinaryChildren': children_dicts}
+
+    return binary_system_dict
 
 
-def set_tree_view_model_from_tree_view_dict(tree_model: QStandardItemModel, treeview_dict: Dict):
-    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
-        import TreeViewItemFromStellarSystemElement as tvifsse, TreeViewItemFromString
+def get_planetary_system_dict(planetary_system: PlanetarySystem) -> Dict:
 
-    for key in treeview_dict:
-        temp_tree_item: TreeViewItemFromString = treeview_dict[key]['TreeViewItem']
-        tree_model.appendRow(temp_tree_item)
-        for child_key in treeview_dict[key]['Children']:
-            temp_child_item: tvifsse = treeview_dict[key]['Children'][child_key]
-            temp_tree_item.appendRow(temp_child_item)
-            if 'Binary Children' in treeview_dict[key].keys():
-                temp_child_item.appendRows([tvi for tvi in treeview_dict[key]['Binary Children'].values()])
+    keys = ['Name',  'Object', 'TreeViewItem']
+    satellite_dicts = get_accumulated_dict([get_stellar_body_dict(satellite)
+                                            for satellite in planetary_system.satellite_list], keys)
+
+    trojan_dicts = get_accumulated_dict([get_stellar_body_dict(trojan)
+                                         for trojan in planetary_system.trojans_list], keys)
+
+    parent_dict = {}
+    if isinstance(planetary_system.parent, StellarBody):
+        parent_dict = get_stellar_body_dict(planetary_system.parent)
+    elif isinstance(planetary_system.parent, BinarySystem):
+        parent_dict = get_binary_system_dict(planetary_system.parent)
+
+    from solar_system_element_context_menus.standard_items import TreeViewItemFromSolarSystemElement
+    planetary_system_item = TreeViewItemFromSolarSystemElement(planetary_system)
+    planetary_system_dict = {'Name': planetary_system.name, 'Object': planetary_system,
+                             'TreeViewItem': planetary_system_item, 'Parent': parent_dict,
+                             'Satellites': satellite_dicts, 'Trojans': trojan_dicts}
+
+    return planetary_system_dict
+
+
+def get_solar_system_dict(solar_system: SolarSystem) -> Dict:
+
+    keys = ['Name', 'Object', 'TreeViewItem', 'Parent', 'Satellites', 'Trojans']
+    planetary_dicts = get_accumulated_dict([get_planetary_system_dict(planetary_system)
+                                            for planetary_system in solar_system.planetary_systems], keys)
+
+    keys = ['Name', 'Object', 'TreeViewItem']
+    asteroid_belt_dicts = get_accumulated_dict([get_stellar_body_dict(asteroid_belt)
+                                                for asteroid_belt in solar_system.asteroid_belts], keys)
+
+    parent_dict = {}
+    if isinstance(solar_system.parent, StellarBody):
+        parent_dict = get_stellar_body_dict(solar_system.parent)
+    elif isinstance(solar_system.parent, BinarySystem):
+        parent_dict = get_binary_system_dict(solar_system.parent)
+
+    from solar_system_element_context_menus.standard_items import TreeViewItemFromSolarSystemElement
+    solar_system_item = TreeViewItemFromSolarSystemElement(solar_system)
+    solar_system_dict = {'Name': solar_system.name, 'Object': solar_system,
+                         'TreeViewItem': solar_system_item, 'Parent': parent_dict,
+                         'Planets': planetary_dicts, 'Asteroid Belts': asteroid_belt_dicts}
+
+    return solar_system_dict
+
+
+def set_system_parent_tree_model_from_dict(parent_dict, tree_model):
+    from solar_system_element_context_menus.standard_items import TreeViewItemFromSolarSystemElement
+    if parent_dict != {}:
+        parent_tree_item: TreeViewItemFromSolarSystemElement = parent_dict['TreeViewItem']
+        tree_model.appendRow(parent_tree_item)
+
+        # set parent's children branches if parent is binary
+        if 'BinaryChildren' in parent_dict.keys():
+            primary_child_tree_item: TreeViewItemFromSolarSystemElement = \
+                parent_dict['BinaryChildren'][0]['TreeViewItem']
+            parent_tree_item.appendRow(primary_child_tree_item)
+
+            secondary_child_tree_item: TreeViewItemFromSolarSystemElement = \
+                parent_dict['BinaryChildren'][1]['TreeViewItem']
+            parent_tree_item.appendRow(secondary_child_tree_item)
+
+
+def set_system_element_tree_model_from_dict(element_string: str, system_dict, tree_model, subsystem_function=None):
+    element_dict = system_dict[element_string]
+    from solar_system_element_context_menus.standard_items import TreeViewItemFromString
+
+    element_tree_item = TreeViewItemFromString(element_string)
+    tree_model.appendRow(element_tree_item)
+    if len(element_dict['TreeViewItem']):
+        element_tree_item.appendRows(element_dict['TreeViewItem'])
+        if subsystem_function is not None:
+            for i in range(len(element_dict['TreeViewItem'])):
+                subsystem_function(element_dict['TreeViewItem'][i], element_dict['Object'][i])
+
+
+def set_planetary_system_tree_model_from_ssc_object(tree_model, file):
+    planetary_system_dict = get_planetary_system_dict(file)
+
+    # set parent root
+    parent_dict: Dict = planetary_system_dict['Parent']
+    set_system_parent_tree_model_from_dict(parent_dict, tree_model)
+
+    # set satellite root and branches if there are satellites
+    set_system_element_tree_model_from_dict('Satellites', planetary_system_dict, tree_model)
+
+    # set trojan root and branches if there are trojans
+    set_system_element_tree_model_from_dict('Trojans', planetary_system_dict, tree_model)
+
+    return planetary_system_dict
+
+
+def set_solar_system_tree_model_from_ssc_object(tree_model, file):
+    solar_system_dict = get_solar_system_dict(file)
+
+    # set parent root
+    parent_dict: Dict = solar_system_dict['Parent']
+    set_system_parent_tree_model_from_dict(parent_dict, tree_model)
+
+    # set planet root and branches if there are planets
+    set_system_element_tree_model_from_dict('Planets', solar_system_dict, tree_model,
+                                            set_planetary_system_tree_model_from_ssc_object)
+
+    # set asteroid belt root and branches if there are asteroid belts
+    set_system_element_tree_model_from_dict('Asteroid Belts', solar_system_dict, tree_model)
+
+    return solar_system_dict
 
 
 class ProjectTreeView(QTreeView):
 
-    def __init__(self, ssc_object, filename):
+    def __init__(self, filename):
         super().__init__()
-        self.ssc_object = ssc_object
-        self.replica_ssc_object = ssc_object.copy()
         self.filename = filename
+
+        self._get_scc_object_from_file()
         self._get_system_tree()
 
         self.setHeaderHidden(True)
+
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.open_context_menu)
 
+        # self.setIconSize(QSize(50, 50))
+
     def open_context_menu(self, position):
 
-        from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
-            import TreeViewItemFromStellarSystemElement, TreeViewItemFromString
+        from solar_system_element_context_menus.standard_items import TreeViewItemFromSolarSystemElement, \
+            TreeViewItemFromString
 
         index = self.selectedIndexes()[0]
-        project_tree_view_item: Union[TreeViewItemFromStellarSystemElement,
+        project_tree_view_item: Union[TreeViewItemFromSolarSystemElement,
                                       TreeViewItemFromString] = index.model().itemFromIndex(index)
 
         project_tree_view_item.context_menu.exec_(self.viewport().mapToGlobal(position))
 
+    def update_scc_object_from_file(self, filename):
+        self.filename = filename
+        self._get_file()
+
+    def _get_scc_object_from_file(self):
+        self.scc_object = load(self.filename)
+
     def _get_system_tree(self):
         tree_model = QStandardItemModel(self)
-        # tree_model.dataChanged.connect(self.tree_model_data_changed_process)
-        # tree_model.rowsInserted.connect(self.tree_model_row_inserted_process)
-        # tree_model.objectNameChanged
-        # tree_model.rowsRemoved.connect(self.tree_model_data_changed_process)
-        # tree_model.rowsAboutToBeMoved.connect(self.tree_model_row_inserted_process)
 
-        if self.ssc_object.__class__ == MultiStellarSystemSType:
-            set_multi_stellar_system_tree_model_from_ssc_object(tree_model, self.ssc_object)
-        elif self.ssc_object.__class__ == StellarSystem:
-            set_stellar_system_tree_model_from_ssc_object(tree_model, self.ssc_object)
-        elif self.ssc_object.__class__ == PlanetarySystem:
-            set_planetary_system_tree_model_from_ssc_object(tree_model, self.ssc_object)
+        if self.scc_object.__class__ == SolarSystem:
+            self.system_dict = set_solar_system_tree_model_from_ssc_object(tree_model, self.scc_object)
+        elif self.scc_object.__class__ == PlanetarySystem:
+            self.system_dict = set_planetary_system_tree_model_from_ssc_object(tree_model, self.scc_object)
 
         self.setModel(tree_model)
         self.expandAll()
@@ -151,64 +227,3 @@ class ProjectTreeView(QTreeView):
             self.collapse_recursively(child_item)
             self.collapse(child_item.index())
         self.collapse(item.index())
-
-    def tree_model_row_inserted_process(self, index, start, end):
-        if self.parent() is not None:
-            from stellar_system_creator.gui.gui_image_rendering import SystemImageWidget
-            siw = self.parent().parent().findChild(SystemImageWidget)
-            print('bb', index, start, end)
-            # TODO: I need to update the combobox of image dialog every time treeview changes
-
-    def tree_model_data_changed_process(self):
-        if self.parent() is not None:
-            from stellar_system_creator.gui.gui_image_rendering import SystemImageWidget
-            siw = self.parent().parent().findChild(SystemImageWidget)
-            print('aa')
-            # TODO: I need to update the combobox of image dialog every time treeview changes
-            # make sure to check the old name and then change it (if the name of the tree view was altered.
-            # siw.rendering_settings_dialog
-            # siw.rendering_settings_dialog._set_available_systems_drop_down()
-
-    def getAllRoots(self):
-        main_roots = []
-        tree_model = self.model()
-        for row_index in range(tree_model.rowCount()):
-            index = tree_model.index(row_index, 0)
-            main_roots.append(tree_model.itemFromIndex(index))
-
-        all_root_items = []
-        for root in main_roots:
-            root_items = [item for item in self.iterItems(root)]
-            all_root_items = all_root_items + root_items
-
-        return all_root_items
-
-    @staticmethod
-    def iterItems(root):
-        # https://stackoverflow.com/questions/41949370/collect-all-items-in-qtreeview-recursively
-        def recurse(parent):
-            for row in range(parent.rowCount()):
-                for column in range(parent.columnCount()):
-                    child = parent.child(row, column)
-                    yield child
-                    if child.hasChildren():
-                        yield from recurse(child)
-
-        if root is not None:
-            yield from recurse(root)
-
-    def update_tab_title(self):
-        from stellar_system_creator.gui.gui_central_widget import CentralWidget
-        central_widget: CentralWidget = self.parent().parent().parent().parent()
-        # print(central_widget.widget(central_widget.currentIndex()))
-        text = central_widget.tabText(central_widget.currentIndex())
-        # TODO: find a way to properly correct them
-        if not self.ssc_object == self.replica_ssc_object:
-            if not text.startswith('*'):
-                central_widget.setTabText(central_widget.currentIndex(), f'*{text}')
-        else:
-            if text.startswith('*'):
-                central_widget.setTabText(central_widget.currentIndex(), text[1:])
-
-    def update_replica_ssc_object(self):
-        self.replica_ssc_object = self.ssc_object
