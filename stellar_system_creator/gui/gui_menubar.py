@@ -1,4 +1,4 @@
-import pkgutil
+import pkg_resources
 import sys
 from functools import partial
 
@@ -6,7 +6,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMenu, QAction, QFileDialog, QMenuBar, QMessageBox
 
 from stellar_system_creator.filing import save as save_ssc_object, add_extension_if_necessary
-from gui_central_widget import CentralWidget
+from stellar_system_creator.gui.gui_central_widget import CentralWidget
 from stellar_system_creator.solar_system_elements.planetary_system import PlanetarySystem
 from stellar_system_creator.solar_system_elements.solar_system import SolarSystem
 
@@ -233,8 +233,8 @@ def exit_application(parent):
 
 
 def open_documentation():
-    folder = pkgutil.extend_path(['stellar_body_creator'], name='documentation')[1]
-    filename = f'{folder}/stellar_system_creator_documentation.pdf'
+    filename = pkg_resources.resource_filename('stellar_system_creator',
+                                               'documentation/stellar_system_creator_documentation.pdf')
     import subprocess, os, platform
     if platform.system() == 'Darwin':  # macOS
         subprocess.call(('open', filename))
@@ -243,5 +243,3 @@ def open_documentation():
         # subprocess.call(('start', filename), shell=True)
     else:  # linux variants
         subprocess.call(('xdg-open', filename))
-
-open_documentation()

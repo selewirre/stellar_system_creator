@@ -2,7 +2,6 @@ import setuptools
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
-
 setuptools.setup(
     name="stellar_system_creator",
     version="0.0.1.0",
@@ -15,7 +14,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     package_dir={'stellar_system_creator': 'stellar_system_creator'},
     package_data={'stellar_system_creator': ['astrothings/data/*.csv',
-                                             'documentation/stellar_system_creator_documentation.pdf'
+                                             'documentation/*.pdf',
                                              'examples/output_files/*',
                                              'visualization/default_images/*.png']},
     install_requires=['matplotlib',
@@ -31,3 +30,4 @@ setuptools.setup(
     ],
     python_requires='>=3.8',
 )
+
