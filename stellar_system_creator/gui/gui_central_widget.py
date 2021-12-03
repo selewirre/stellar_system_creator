@@ -3,8 +3,8 @@ from typing import Union
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QSplitter, QMessageBox
 
-from gui_project_tree_view import ProjectTreeView
-from gui_image_rendering import SystemImageWidget
+from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
+from stellar_system_creator.gui.gui_image_rendering import SystemImageWidget
 from PyQt5.Qt import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel
 
 from stellar_system_creator.solar_system_elements.planetary_system import PlanetarySystem
@@ -21,9 +21,6 @@ class CentralWidget(QTabWidget):
         self.setTabsClosable(True)
         self.tabBarDoubleClicked.connect(self.toggle_hide_tab_contents)
         self.tabCloseRequested.connect(self.close_tab)
-
-        self.add_new_tab('../examples/output_files/CroomskSystem.ssc')
-        self.add_new_tab('../examples/output_files/Planet1System.ssc')
 
     def add_new_tab(self, filename):
         tree_view = ProjectTreeView(filename)
