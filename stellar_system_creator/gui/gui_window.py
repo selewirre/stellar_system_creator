@@ -14,23 +14,13 @@
 # example on qdialog (popup windows) https://www.tutorialspoint.com/pyqt5/pyqt5_qdialog_class.htm
 # example on dialogbuttonbox with tabwidget https://codetorial.net/en/pyqt5/widget/qtabwidget_advanced.html
 # example on radiobutton https://pythonbasics.org/pyqt-radiobutton/
-# example on qthread https://stackoverflow.com/questions/6783194/background-thread-with-qthread-in-pyqt
-import datetime
-import glob
-import logging
-# import pathlib
+
 import sys
-import os
 
-from PyQt5 import QtGui, QtWidgets, QtCore
+from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication, QMainWindow
-
-# from stellar_system_creator.filing import load
-from stellar_system_creator.gui.gui_theme import get_dark_theme_pallet, get_light_theme_pallet
-from stellar_system_creator.gui.gui_menubar import MenuBar
-from stellar_system_creator.gui.gui_central_widget import CentralWidget
-QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)  # enable highdpi scaling
-QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)  # use highdpi icons
+from gui_menubar import MenuBar
+from gui_central_widget import CentralWidget
 
 
 class Window(QMainWindow):
@@ -39,8 +29,8 @@ class Window(QMainWindow):
     def __init__(self, parent=None):
         """Initializer."""
         super().__init__(parent)
-        self.setWindowTitle("Stellar System Creator")
-        self.resize(1000, 600)
+        self.setWindowTitle("Solar System Creator")
+        self.resize(1000, 1000)
         self.setWindowIcon(QtGui.QIcon('logo.ico'))
 
         # for drag and drop events
@@ -48,10 +38,6 @@ class Window(QMainWindow):
 
         self._create_central_widget()
         self._create_menubar()
-        temp_files_name = '~.tempfile*'
-        temp_file_names = glob.glob(temp_files_name)
-        for file_name in temp_file_names:
-            os.remove(file_name)
 
     def _create_central_widget(self):
         self.central_widget = CentralWidget()
@@ -62,44 +48,12 @@ class Window(QMainWindow):
         self.setMenuBar(self.menubar)
 
 
-def run(filename=None):
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
-    app.setPalette(get_dark_theme_pallet())
+    # app.setPalette(get_dark_theme_pallet())
     win = Window()
-    if filename is not None:
-        win.central_widget.add_new_tab(filename)
+    # print(type(win))
     win.show()
     # win.showMaximized()
     sys.exit(app.exec_())
-
-
-def main(filename=None, divert_errors_to_log=False):
-    if divert_errors_to_log:
-        try:
-            run(filename)
-        except Exception:
-            time = str(datetime.datetime.now())
-            time = time.replace(' ', '_')
-            time = time.replace('-', '_')
-            time = time.replace(':', '_')
-            time = time.replace('.', 'p')
-            logging.basicConfig(filename=f'../Error_Report_{time}.log', level=logging.DEBUG,
-                                format='%(asctime)s %(message)s')
-            logging.error('A critical error occurred.', exc_info=True)
-    else:
-        run(filename)
-
-
-if __name__ == "__main__":
-    # https://stackoverflow.com/questions/162291/how-to-check-if-a-process-is-running-via-a-batch-script
-    if len(sys.argv) == 1:
-        filename = None
-    else:
-        filename = sys.argv[1]
-        filename = os.path.abspath(filename)
-        # if len(filename.split('\\')) > 1:
-        #     filename = '/'.join(filename.split('\\'))
-
-    # filename = '../examples/output_files/QuezuliferhWideBinarySystem.ssc'
-    main(filename)

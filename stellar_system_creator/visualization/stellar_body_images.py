@@ -1,8 +1,7 @@
 import io
 import os
-from zipfile import ZipFile
+import pkgutil
 
-import pkg_resources
 import numpy as np
 from PIL import Image
 
@@ -22,20 +21,22 @@ class StellarBodyMarkerDict:
 
     def __init__(self):
         super().__init__()
+        self.folder = pkgutil.extend_path(['stellar_body_creator'], name='visualization')[1]
         self._dict = {}
 
     def __getitem__(self, item):
         if item not in self._dict:
-            for filename in pkg_resources.resource_listdir('stellar_system_creator', 'visualization/default_images'):
+            for filename in os.listdir(self.folder + '/default_images'):
                 if filename.split('.')[0] == item:
-                    image_packaged_data = pkg_resources.resource_filename('stellar_system_creator',
-                                                                          f'visualization/default_images/{filename}')
-                    image_array = np.array(Image.open(image_packaged_data))
+                    image_packaged_data = pkgutil.get_data('visualization', f"default_images/{filename}")
+                    image_array = np.array(Image.open(io.BytesIO(image_packaged_data)))
                     self._dict[item] = image_array
         return self._dict[item]
 
 
 stellar_body_marker_dict = StellarBodyMarkerDict()
+
+# a = stellar_body_marker_dict['patata']
 
 kelvin_table = {
     3000: (255, 56, 0),
@@ -81,11 +82,4 @@ def adjust_star_image_by_temp(image, temp):
 
 
 def load_user_image(filename):
-    directory = os.path.dirname(filename)
-    if not os.path.isfile(directory):
-        return np.array(Image.open(filename))
-    else:
-        with ZipFile(directory) as archive:
-            basename = os.path.basename(filename)
-            with archive.open(basename) as image_file:
-                return np.array(Image.open(image_file))
+    return np.array(Image.open(filename))
