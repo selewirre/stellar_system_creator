@@ -4,6 +4,11 @@ import blosc
 import _pickle as cPickle
 # https://stackoverflow.com/questions/57983431/whats-the-most-space-efficient-way-to-compress-serialized-python-data
 
+from stellar_system_creator.solar_system_elements.binary_system import BinarySystem
+from stellar_system_creator.solar_system_elements.planetary_system import PlanetarySystem
+from stellar_system_creator.solar_system_elements.solar_system import SolarSystem
+from stellar_system_creator.solar_system_elements.stellar_body import StellarBody
+
 
 def add_extension_if_necessary(filename, extension):
     if extension[0] != '.':
@@ -16,12 +21,9 @@ def add_extension_if_necessary(filename, extension):
     return filename
 
 
-def save(obj: Union[
-    stellar_system_creator.solar_system_elements.stellar_body.StellarBody, stellar_system_creator.solar_system_elements.binary_system.BinarySystem,
-    stellar_system_creator.solar_system_elements.planetary_system.PlanetarySystem, stellar_system_creator.solar_system_elements.solar_system.SolarSystem], filename: str) -> bool:
+def save(obj: Union[StellarBody, BinarySystem, PlanetarySystem, SolarSystem], filename: str) -> bool:
     """Saving object (can be any class) via pickling under filename with extension .scc"""
-    supported_classes = [stellar_system_creator.solar_system_elements.stellar_body.StellarBody, stellar_system_creator.solar_system_elements.binary_system.BinarySystem,
-                         stellar_system_creator.solar_system_elements.planetary_system.PlanetarySystem, stellar_system_creator.solar_system_elements.solar_system.SolarSystem]
+    supported_classes = [StellarBody, BinarySystem, PlanetarySystem, SolarSystem]
 
     if any([isinstance(obj, cl) for cl in supported_classes]):
         filename = add_extension_if_necessary(filename, 'ssc')
@@ -37,9 +39,7 @@ def save(obj: Union[
         return False
 
 
-def load(filename: str) -> Union[
-    stellar_system_creator.solar_system_elements.stellar_body.StellarBody, stellar_system_creator.solar_system_elements.binary_system.BinarySystem,
-    stellar_system_creator.solar_system_elements.planetary_system.PlanetarySystem, stellar_system_creator.solar_system_elements.solar_system.SolarSystem]:
+def load(filename: str) -> Union[StellarBody, BinarySystem, PlanetarySystem, SolarSystem]:
     """Loading scc pickled files"""
     # filename = add_extension_if_necessary(filename, 'ssc')
 

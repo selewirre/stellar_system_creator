@@ -33,7 +33,7 @@ def get_accumulated_dict(list_of_dicts: List[Dict], target_keys):
 
 
 def get_stellar_body_dict(stellar_body: StellarBody) -> Dict:
-    from solar_system_element_context_menus.standard_items import TreeViewItemFromSolarSystemElement
+    from stellar_system_creator.gui.solar_system_element_context_menus.standard_items import TreeViewItemFromSolarSystemElement
     stellar_body_item = TreeViewItemFromSolarSystemElement(stellar_body)
     stellar_body_dict = {'Name': stellar_body.name, 'Object': stellar_body, 'TreeViewItem': stellar_body_item}
     return stellar_body_dict
@@ -79,7 +79,7 @@ def get_planetary_system_dict(planetary_system: PlanetarySystem) -> Dict:
     elif isinstance(planetary_system.parent, BinarySystem):
         parent_dict = get_binary_system_dict(planetary_system.parent)
 
-    from solar_system_element_context_menus.standard_items import TreeViewItemFromSolarSystemElement
+    from stellar_system_creator.gui.solar_system_element_context_menus.standard_items import TreeViewItemFromSolarSystemElement
     planetary_system_item = TreeViewItemFromSolarSystemElement(planetary_system)
     planetary_system_dict = {'Name': planetary_system.name, 'Object': planetary_system,
                              'TreeViewItem': planetary_system_item, 'Parent': parent_dict,
@@ -104,7 +104,7 @@ def get_solar_system_dict(solar_system: SolarSystem) -> Dict:
     elif isinstance(solar_system.parent, BinarySystem):
         parent_dict = get_binary_system_dict(solar_system.parent)
 
-    from solar_system_element_context_menus.standard_items import TreeViewItemFromSolarSystemElement
+    from stellar_system_creator.gui.solar_system_element_context_menus.standard_items import TreeViewItemFromSolarSystemElement
     solar_system_item = TreeViewItemFromSolarSystemElement(solar_system)
     solar_system_dict = {'Name': solar_system.name, 'Object': solar_system,
                          'TreeViewItem': solar_system_item, 'Parent': parent_dict,
@@ -114,7 +114,7 @@ def get_solar_system_dict(solar_system: SolarSystem) -> Dict:
 
 
 def set_system_parent_tree_model_from_dict(parent_dict, tree_model):
-    from solar_system_element_context_menus.standard_items import TreeViewItemFromSolarSystemElement
+    from stellar_system_creator.gui.solar_system_element_context_menus.standard_items import TreeViewItemFromSolarSystemElement
     if parent_dict != {}:
         parent_tree_item: TreeViewItemFromSolarSystemElement = parent_dict['TreeViewItem']
         tree_model.appendRow(parent_tree_item)
@@ -132,7 +132,7 @@ def set_system_parent_tree_model_from_dict(parent_dict, tree_model):
 
 def set_system_element_tree_model_from_dict(element_string: str, system_dict, tree_model, subsystem_function=None):
     element_dict = system_dict[element_string]
-    from solar_system_element_context_menus.standard_items import TreeViewItemFromString
+    from stellar_system_creator.gui.solar_system_element_context_menus.standard_items import TreeViewItemFromString
 
     element_tree_item = TreeViewItemFromString(element_string)
     tree_model.appendRow(element_tree_item)
@@ -194,7 +194,7 @@ class ProjectTreeView(QTreeView):
 
     def open_context_menu(self, position):
 
-        from solar_system_element_context_menus.standard_items import TreeViewItemFromSolarSystemElement, \
+        from stellar_system_creator.gui.solar_system_element_context_menus.standard_items import TreeViewItemFromSolarSystemElement, \
             TreeViewItemFromString
 
         index = self.selectedIndexes()[0]

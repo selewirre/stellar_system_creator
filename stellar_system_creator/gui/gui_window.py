@@ -19,8 +19,8 @@ import sys
 
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication, QMainWindow
-from gui_menubar import MenuBar
-from gui_central_widget import CentralWidget
+from stellar_system_creator.gui.gui_menubar import MenuBar
+from stellar_system_creator.gui.gui_central_widget import CentralWidget
 
 
 class Window(QMainWindow):
