@@ -108,8 +108,6 @@ class BasicDetailsDialog(QDialog):
                                                 'Suggested Spin Period': UnitLabel(sse, 'suggested_spin_period'),
                                                 'Suggested Age': UnitLabel(sse, 'suggested_age'),
                                                 'Lifetime': UnitLabel(sse, 'lifetime'),
-                                                'Rough Inner Orbit Limit': UnitLabel(sse, 'rough_inner_orbit_limit'),
-                                                'Rough Outer Orbit Limit': UnitLabel(sse, 'rough_outer_orbit_limit'),
                                                 'Tidal Locking Radius': UnitLabel(sse, 'tidal_locking_radius'),
                                                 'Hill Sphere': UnitLabel(sse, 'hill_sphere'),
                                                 'Inner Orbit Limit': UnitLabel(sse, 'inner_orbit_limit'),

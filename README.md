@@ -6,10 +6,10 @@ This is a package to create custom, scientifically plausible stellar systems.
 # Installation
 To install this package, run:
 
-````
+```
 python3 setup.py sdist bdist_wheel
 pip3 install dist/stellar_system_creator-0.0.1.0.tar.gz
-````
+```
 
 If you want to check out the example code, look in the folder `examples/...`
 
@@ -27,7 +27,8 @@ if __name__ == "__main__":
     app.setStyle("Fusion")
     # app.setPalette(get_dark_theme_pallet())
     win = Window()
-    filename = pkg_resources.resource_filename('stellar_system_creator', 'examples/output_files/CroomskSystem.ssc')
+    filename = pkg_resources.resource_filename(
+        'stellar_system_creator', 'examples/output_files/TrakunaStellarSystem.ssc')
     win.central_widget.add_new_tab(filename)
 
     win.show()

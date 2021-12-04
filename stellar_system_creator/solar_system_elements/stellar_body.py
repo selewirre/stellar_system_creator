@@ -1,4 +1,7 @@
+import warnings
+
 import pandas as pd
+from pint import UnitStrippedWarning
 
 from stellar_system_creator.astrothings.astromechanical_calculations import *
 from stellar_system_creator.astrothings.habitability_calculations import *
@@ -10,7 +13,9 @@ from stellar_system_creator.astrothings.radius_models.planetary_radius_model imp
     planet_chemical_abundance_ratios
 from stellar_system_creator.astrothings.radius_models.solar_radius_model import calculate_main_sequence_radius
 from stellar_system_creator.astrothings.rotation_models.planetary_rotation_model import calculate_planetary_rotation_period
-from stellar_system_creator.astrothings.insolation_models.insolation_models import InsolationByKopparapu, InsolationBySelsis
+from stellar_system_creator.astrothings.insolation_models.insolation_models import InsolationByKopparapu, \
+    InsolationBySelsis, InsolationForWaterFrostline, BinaryInsolationForWaterFrostLine, InsolationForRockLine, \
+    BinaryInsolationForRockLine
 from stellar_system_creator.astrothings.units import Q_, ureg
 from stellar_system_creator.visualization.stellar_body_images import adjust_star_image_by_temp, stellar_body_marker_dict, load_user_image
 import numpy as np
@@ -36,6 +41,9 @@ class StellarBody:
 
     def __post_init__(self):
 
+        from stellar_system_creator.solar_system_elements.binary_system import BinarySystem
+        self.part_of_binary = isinstance(self.parent, BinarySystem)
+
         self.farthest_parent = self.get_farthest_parent()
         self._get_radius()
         self._set_geometrical_values()
@@ -54,9 +62,6 @@ class StellarBody:
         self.habitability, self.habitability_violations = self.check_habitability()
 
         self._get_image()
-
-        from stellar_system_creator.solar_system_elements.binary_system import BinarySystem
-        self.part_of_binary = isinstance(self.parent, BinarySystem)
 
     def __repr__(self, precision=4) -> str:
         string = ''
@@ -154,15 +159,7 @@ class StellarBody:
         self.density = calculate_density(self.mass, self.volume)
 
     def _set_orbit_values(self) -> None:
-        self.rough_inner_orbit_limit = calculate_rough_inner_orbit_limit(self.mass)
-        self.rough_outer_orbit_limit = calculate_rough_outer_orbit_limit(self.mass)
-        self.frost_line = calculate_frost_line(self.luminosity)
-        self.hill_sphere = self.calculate_hill_sphere()
-
-        self.inner_orbit_limit = self.rough_inner_orbit_limit
-        self.outer_orbit_limit = self.rough_outer_orbit_limit
-
-        self.tidal_locking_radius = self.calculate_tidal_locking_radius()
+        pass
 
     def _get_image(self):
         # self.suggested_image_filename = None
@@ -176,7 +173,7 @@ class StellarBody:
                 self.image_array = self.get_image_array()
 
     def calculate_tidal_locking_radius(self):
-        return calculate_tidal_locking_radius(self.mass, self.lifetime / 2)
+        return calculate_tidal_locking_radius(self.mass, self.age)
 
     def _set_other_characteristics(self):
         print(f'The _set_other_characteristics function for {self.name} was not defined')
@@ -214,8 +211,15 @@ class StellarBody:
             return np.nan * ureg.au
 
     def calculate_hill_sphere(self) -> Q_:
+        from .binary_system import StellarBinary
         if self.parent is not None:
-            return calculate_hill_sphere(self, self.parent)
+            if not isinstance(self.parent, StellarBinary):
+                return calculate_hill_sphere(self, self.parent)
+            else:
+                if self.parent.primary_body == self:
+                    return calculate_hill_sphere(self, self.parent.secondary_body)
+                else:
+                    return calculate_hill_sphere(self, self.parent.primary_body)
         else:
             return 2 * ureg.lightyears
 
@@ -313,12 +317,12 @@ class Star(StellarBody):
         from stellar_system_creator.solar_system_elements.binary_system import StellarBinary
         if isinstance(self.parent, StellarBinary):
             if self.parent.primary_body == self:
-                companion_star = self.parent.secondary_body
+                companion_body = self.parent.secondary_body
             else:
-                companion_star = self.parent.primary_body
-            self.set_habitable_zone('RHZ', companion_star)
-            self.set_habitable_zone('PHZ', companion_star)
-            self.set_habitable_zone('AHZ', companion_star)
+                companion_body = self.parent.primary_body
+            self.set_habitable_zone('RHZ', companion_body)
+            self.set_habitable_zone('PHZ', companion_body)
+            self.set_habitable_zone('AHZ', companion_body)
 
     def check_habitability(self) -> Tuple[bool, str]:
         habitability = True
@@ -338,10 +342,10 @@ class Star(StellarBody):
                 < self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name]:
             habitability = False
             habitability_violations.append('There are no habitable zones in this system.')
-        elif self.rough_inner_orbit_limit > self.habitable_zone_limits[relevant_zone_type][model.relaxed_max_name] \
+        elif self.inner_orbit_limit > self.habitable_zone_limits[relevant_zone_type][model.relaxed_max_name] \
                 or self.outer_orbit_limit < self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name]:
             habitability = False
-            habitability_violations.append('No overlap between the relaxed habitable zone and the rough orbit'
+            habitability_violations.append('No overlap between the relaxed habitable zone and the orbit'
                                            ' boundaries.')
 
         # from https://link.springer.com/article/10.1007/BF00160399
@@ -355,11 +359,98 @@ class Star(StellarBody):
 
         return habitability, ' '.join(habitability_violations)
 
+    def calculate_water_frost_lines(self):
+        # setting single star frost zone
+        model = InsolationForWaterFrostline(self.temperature, self.luminosity)
+        ss_water_frost_lines = {name: calculate_single_star_habitable_orbital_threshold(
+            model.swl[name]) for name in model.names}
+
+        # setting average frost zone for S-type binary
+        from stellar_system_creator.solar_system_elements.binary_system import StellarBinary
+        if isinstance(self.parent, StellarBinary):
+            if self.parent.primary_body == self:
+                companion_body = self.parent.secondary_body
+            else:
+                companion_body = self.parent.primary_body
+            if isinstance(companion_body, StellarBinary):
+                comp_prim_insolation_model = InsolationForWaterFrostline(companion_body.primary_body.temperature,
+                                                                         companion_body.primary_body.luminosity)
+                comp_model_swl = BinaryInsolationForWaterFrostLine(companion_body.water_frost_lines,
+                                                                   comp_prim_insolation_model).swl
+            else:
+                comp_model_swl = InsolationForWaterFrostline(companion_body.temperature, companion_body.luminosity).swl
+
+            mean_distance = self.parent.mean_distance
+            eccentricity = self.parent.eccentricity
+
+            water_frost_lines_in_binary = {name: calculate_stype_average_habitable_limit(
+                model.swl[name], comp_model_swl[name], mean_distance, eccentricity) for name in model.names}
+        else:
+            water_frost_lines_in_binary = None
+
+        return ss_water_frost_lines, water_frost_lines_in_binary
+
+    def calculate_rock_lines(self):
+        # setting single star frost zone
+        model = InsolationForRockLine(self.temperature, self.luminosity)
+        ss_rock_lines = {name: calculate_single_star_habitable_orbital_threshold(
+            model.swl[name]) for name in model.names}
+
+        # setting average frost zone for S-type binary
+        from stellar_system_creator.solar_system_elements.binary_system import StellarBinary
+        if isinstance(self.parent, StellarBinary):
+            if self.parent.primary_body == self:
+                companion_body = self.parent.secondary_body
+            else:
+                companion_body = self.parent.primary_body
+            if isinstance(companion_body, StellarBinary):
+                comp_prim_insolation_model = InsolationForRockLine(companion_body.primary_body.temperature,
+                                                                   companion_body.primary_body.luminosity)
+                comp_model_swl = BinaryInsolationForRockLine(companion_body.rock_lines, comp_prim_insolation_model).swl
+            else:
+                comp_model_swl = InsolationForRockLine(companion_body.temperature, companion_body.luminosity).swl
+
+            mean_distance = self.parent.mean_distance
+            eccentricity = self.parent.eccentricity
+
+            rock_lines_in_binary = {name: calculate_stype_average_habitable_limit(
+                model.swl[name], comp_model_swl[name], mean_distance, eccentricity) for name in model.names}
+        else:
+            rock_lines_in_binary = None
+
+        return ss_rock_lines, rock_lines_in_binary
+
     def calculate_temperature(self) -> Q_:
         return calculate_temperature(self.luminosity, self.radius)  # in Kelvin
 
     def calculate_spectrum_peak_wavelength(self) -> Q_:
         return calculate_spectrum_peak_wavelength(self.temperature)  # in nanometers
+
+    def _set_orbit_values(self) -> None:
+        self.rough_inner_orbit_limit = calculate_rough_inner_orbit_limit(self.mass)
+        self.rough_outer_orbit_limit = calculate_rough_outer_orbit_limit(self.mass)
+        self.hill_sphere = self.calculate_hill_sphere()
+        self.tidal_locking_radius = self.calculate_tidal_locking_radius()
+
+        self.water_frost_lines, self.water_frost_lines_in_binary = self.calculate_water_frost_lines()
+        self.rock_lines, self.rock_lines_in_binary = self.calculate_rock_lines()
+        if self.part_of_binary:
+            self.water_frost_line = self.water_frost_lines_in_binary['Sol Equivalent']
+            self.rock_line = self.rock_lines_in_binary['Outer Limit']
+            self.prevailing_water_frost_lines = self.water_frost_lines_in_binary
+            self.prevailing_rock_lines = self.rock_lines_in_binary
+        else:
+            self.water_frost_line = self.water_frost_lines['Sol Equivalent']
+            self.rock_line = self.rock_lines['Outer Limit']
+            self.prevailing_water_frost_lines = self.water_frost_lines
+            self.prevailing_rock_lines = self.rock_lines
+
+        warnings.filterwarnings("ignore", category=UnitStrippedWarning)
+        self_inner_limits = np.array([self.rough_inner_orbit_limit, self.rock_line], dtype=Q_)
+        self_maximum_inner_limit_index = np.nanargmax(self_inner_limits)
+        self.inner_orbit_limit = self_inner_limits[self_maximum_inner_limit_index]
+
+        self.outer_orbit_limit = self.rough_outer_orbit_limit
 
     def _set_other_characteristics(self):
         self.luminosity_class = self.get_luminosity_class()
@@ -375,6 +466,7 @@ class Star(StellarBody):
 
     def reset_insolation_model_and_habitability(self, model_name='Kopparapu'):
         self._set_insolation_model(model_name)
+        self._set_orbit_values()  # here for cause the frost lines also depend on the binary
         self.habitable_zone_limits = {}
         self.set_habitable_zones()
         self.habitability, self.habitability_violations = self.check_habitability()
@@ -560,16 +652,29 @@ class Planet(StellarBody):
 
     def calculate_induced_tides(self) -> Tuple[Q_, Q_]:
         if self.parent is not None:
-            to_self = calculate_tide_height(self.parent.mass, self.mass, self.radius, self.semi_major_axis)
-            to_parent = calculate_tide_height(self.mass, self.parent.mass, self.parent.radius, self.semi_major_axis)
+            from .binary_system import StellarBinary
+            if not isinstance(self.parent, StellarBinary):
+                to_self = calculate_tide_height(self.parent.mass, self.mass, self.radius, self.semi_major_axis)
+                to_parent = calculate_tide_height(self.mass, self.parent.mass, self.parent.radius, self.semi_major_axis)
+            else:
+                to_self = calculate_tide_height(self.parent.mass, self.mass, self.radius, self.semi_major_axis)
+                to_parent = {calculate_tide_height(
+                    self.mass, parent_body.mass, parent_body.radius, self.semi_major_axis)
+                             for parent_body in [self.parent.primary_body, self.parent.secondary_body]}
         else:
             to_self = to_parent = np.nan * ureg.meter
         return to_self, to_parent
 
     def calculate_angular_diameters(self) -> Tuple[Q_, Q_]:
         if self.parent is not None:
-            of_parent = calculate_angular_diameter(self.parent.radius, self.semi_major_axis)
-            from_parent = calculate_angular_diameter(self.radius, self.semi_major_axis)
+            from .binary_system import StellarBinary
+            if not isinstance(self.parent, StellarBinary):
+                of_parent = calculate_angular_diameter(self.parent.radius, self.semi_major_axis)
+                from_parent = calculate_angular_diameter(self.radius, self.semi_major_axis)
+            else:
+                of_parent = {calculate_angular_diameter(parent_body.radius, self.semi_major_axis)
+                             for parent_body in [self.parent.primary_body, self.parent.secondary_body]}
+                from_parent = calculate_angular_diameter(self.radius, self.semi_major_axis)
         else:
             of_parent = np.nan * ureg.degrees
             from_parent = np.nan * ureg.degrees
@@ -740,7 +845,7 @@ class Planet(StellarBody):
 class AsteroidBelt(Planet):
 
     def __init__(self, name, mass: Q_ = 0.0004 * ureg.M_e, relative_count: int = 250, extend: Q_ = np.nan * ureg.au,
-                 parent: StellarBody = None, semi_major_axis: Q_ = np.nan * ureg.au, orbital_eccentricity: float = 0,
+                 parent = None, semi_major_axis: Q_ = np.nan * ureg.au, orbital_eccentricity: float = 0,
                  orbit_type='prograde', composition='', inclination: float = 0, longitude_of_ascending_node: float = 0,
                  argument_of_periapsis: float = np.nan, axial_tilt: float = 0, albedo: float = 0,
                  age: Q_ = np.nan * ureg.T_s, image_filename=None) -> None:
@@ -756,7 +861,7 @@ class AsteroidBelt(Planet):
         if np.isnan(self.extend.m):
             self.extend = self.semi_major_axis / 8
         if self.composition == '':
-            if self.semi_major_axis < self.parent.frost_line or np.isnan(self.semi_major_axis.m):
+            if self.semi_major_axis < self.parent.water_frost_line or np.isnan(self.semi_major_axis.m):
                 self.composition = 'Rockworld70'
             else:
                 self.composition = 'Waterworld100'
@@ -811,7 +916,7 @@ class Trojans(Planet):
         if np.isnan(self.extend):
             self.extend = self.parent.semi_major_axis / 8
         if self.composition == '':
-            if self.semi_major_axis < self.parent.parent.frost_line or np.isnan(self.semi_major_axis.m):
+            if self.semi_major_axis < self.parent.parent.water_frost_line or np.isnan(self.semi_major_axis.m):
                 self.composition = 'Rockworld70'
             else:
                 self.composition = 'Waterworld100'
@@ -883,7 +988,8 @@ class Satellite(Planet):
 
     def __post_init__(self):
         if self.composition == '':
-            if self.parent.semi_major_axis < self.parent.parent.frost_line or np.isnan(self.parent.semi_major_axis.m):
+            if self.parent.semi_major_axis < self.parent.parent.water_frost_line \
+                    or np.isnan(self.parent.semi_major_axis.m):
                 self.composition = 'Rockworld70'
             else:
                 self.composition = 'Waterworld100'

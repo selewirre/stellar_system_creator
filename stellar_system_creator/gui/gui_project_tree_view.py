@@ -122,11 +122,11 @@ def set_system_parent_tree_model_from_dict(parent_dict, tree_model):
         # set parent's children branches if parent is binary
         if 'BinaryChildren' in parent_dict.keys():
             primary_child_tree_item: TreeViewItemFromSolarSystemElement = \
-                parent_dict['BinaryChildren'][0]['TreeViewItem']
+                parent_dict['BinaryChildren']['TreeViewItem'][0]
             parent_tree_item.appendRow(primary_child_tree_item)
 
             secondary_child_tree_item: TreeViewItemFromSolarSystemElement = \
-                parent_dict['BinaryChildren'][1]['TreeViewItem']
+                parent_dict['BinaryChildren']['TreeViewItem'][1]
             parent_tree_item.appendRow(secondary_child_tree_item)
 
 

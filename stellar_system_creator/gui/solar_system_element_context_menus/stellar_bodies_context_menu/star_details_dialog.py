@@ -77,6 +77,14 @@ class StarDetailsDialog(BasicDetailsDialog):
         super()._set_unit_labels()
 
         self.ulabels['Peak Wavelength'] = UnitLabel(sse, 'peak_wavelength')
+        self.ulabels['Rough Inner Orbit Limit'] = UnitLabel(sse, 'rough_inner_orbit_limit')
+        self.ulabels['Rough Outer Orbit Limit'] = UnitLabel(sse, 'rough_outer_orbit_limit')
+        self.ulabels['Inner Water Frost Limit'] = UnitLabel(sse, 'prevailing_water_frost_lines', 'Inner Limit')
+        self.ulabels['Sol Equivalent Water Frost Limit'] = UnitLabel(sse, 'prevailing_water_frost_lines',
+                                                                     'Sol Equivalent')
+        self.ulabels['Outer Water Frost Limit'] = UnitLabel(sse, 'prevailing_water_frost_lines', 'Outer Limit')
+        self.ulabels['Inner Rock Formation Limit'] = UnitLabel(sse, 'prevailing_rock_lines', 'Inner Limit')
+        self.ulabels['Outer Rock Formation Limit'] = UnitLabel(sse, 'prevailing_rock_lines', 'Outer Limit')
 
     def _set_general_tab(self):
         sse: Star = self.parent_item.solar_system_element
@@ -177,13 +185,23 @@ class StarDetailsDialog(BasicDetailsDialog):
                 'Inner Orbit Limit', 'Outer Orbit Limit']
         self.add_keys_to_layout(basic_limits_box_layout, self.ulabels, keys)
 
-        # setting Frost Line group box
-        self.frost_line_group_box = GroupBox('Frost Line')
-        frost_line_box_layout = QFormLayout()
-        self.frost_line_group_box.setLayout(frost_line_box_layout)
+        # setting Rock Line group box
+        self.rock_line_group_box = GroupBox('Rock Formation Limits')
+        rock_line_box_layout = QFormLayout()
+        self.rock_line_group_box.setLayout(rock_line_box_layout)
+        keys = ['Inner Rock Formation Limit', 'Outer Rock Formation Limit']
+        self.add_keys_to_layout(rock_line_box_layout, self.ulabels, keys)
+
+        # setting Water Frost Line group box
+        self.water_frost_line_group_box = GroupBox('Water Frost Limits')
+        water_frost_line_box_layout = QFormLayout()
+        self.water_frost_line_group_box.setLayout(water_frost_line_box_layout)
+        keys = ['Inner Water Frost Limit', 'Sol Equivalent Water Frost Limit', 'Outer Water Frost Limit']
+        self.add_keys_to_layout(water_frost_line_box_layout, self.ulabels, keys)
 
         tab_layout.addWidget(self.basic_limits_group_box)
-        tab_layout.addWidget(self.frost_line_group_box)
+        tab_layout.addWidget(self.rock_line_group_box)
+        tab_layout.addWidget(self.water_frost_line_group_box)
         tab_layout.addStretch()
 
     def _initialize_insolation_tab(self):
