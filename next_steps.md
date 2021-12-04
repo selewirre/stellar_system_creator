@@ -1,10 +1,12 @@
 
 # Main code:
 1. Ring, resonances from moons etc. To find ring minima, use atmospheric extend. Ring maxima is the roche limit.
-2. Check lagrange L4, L5 point m3 limit. Gascheau's limit?
-3. Add saddle orbits?
-4. add oblateness option?
-5. Add stellar initial rotation period/speed from
+2. Add saddle/horseshoe orbits? 
+    - https://www.sciencedirect.com/science/article/abs/pii/0019103581901470
+    - https://pdfs.semanticscholar.org/0821/7be72965593b0db36dbba501ed12e842b852.pdf
+    - https://academic.oup.com/mnras/article-pdf/426/4/3051/3315870/426-4-3051.pdf
+3. add oblateness option?
+4. Add stellar initial rotation period/speed from
     - https://arxiv.org/pdf/1307.2891.pdf, 
     - http://assets.cambridge.org/97805217/72181/sample/9780521772181ws.pdf
     - https://www.aanda.org/articles/aa/abs/2012/01/aa17691-11/aa17691-11.html
@@ -12,17 +14,17 @@
     - I can also determine the minimum corotation radius by using the minimum starting period at 10-100 Myr or so,
     and hence, define another rough limit for the inner orbit radius!
     - From corotation and rockline, we get what is the suggested inner limit.
-6. Make an atmospheric model class with:
+5. Make an atmospheric model class with:
      1. Many potential chemicals, their mass, their absorption and reflection spectra.
      2. Make subclasses of specific atmospheres, calculate if the compounds can actually stay in the atmosphere
      3. allow for creation of user based subclasses
      4. estimate greenhouse effect, albedo(?), color of sky, color of vegetation.
      5. Give description of atmosphere for users.
      6. Start with terran atmosphere. add terran atm mods, carry on with mars atmosphere etc.
-7. Modify HZ for A-type stars: https://iopscience.iop.org/article/10.3847/1538-4357/aab8fa/pdf pg. 6, table 2
-8. Add other types of stars -> probably not, because they are not long-lasting.
-9. Add black holes https://arxiv.org/pdf/1909.06748.pdf (it would only be around AGNs and it is tricky)
-10. add dwarfs?
+6. Modify HZ for A-type stars: https://iopscience.iop.org/article/10.3847/1538-4357/aab8fa/pdf pg. 6, table 2
+7. Add other types of stars -> probably not, because they are not long-lasting.
+8. Add black holes https://arxiv.org/pdf/1909.06748.pdf (it would only be around AGNs and it is tricky)
+9. add dwarfs?
 
 # Plotting:
 0. plotting of binaries/trinaries/quaternaries

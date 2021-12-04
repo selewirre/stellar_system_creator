@@ -684,12 +684,12 @@ class Planet(StellarBody):
         if self.composition != 'Icegiant' and self.composition != 'Gasgiant' \
                 and not self.composition.startswith('Ironworld'):
             primordial_heating_flux = calculate_primordial_heating_rocky_planets(
-                self.lifetime / 2, self.mass, self.surface_area)
+                self.age, self.mass, self.surface_area)
         else:
             primordial_heating_flux = 0 * ureg.watt / ureg.m ** 2
 
         radiogenic_heating_flux = calculate_radiogenic_heating(
-            self.lifetime / 2, self.mass, self.surface_area, self.chemical_composition)
+            self.age, self.mass, self.surface_area, self.chemical_composition)
         if self.parent is not None:
             tidal_heating_flux = calculate_tidal_heating(
                 self.parent.mass, self.semi_major_axis, self.orbital_eccentricity, self.radius)
@@ -957,9 +957,9 @@ class Trojans(Planet):
             flux_on_parent = np.nan * ureg.S_s
         return flux_on_parent
 
-    def _set_orbital_characteristics(self):
-        self.orbital_period = self.calculate_orbital_period()
-        self.orbital_velocity = self.calculate_orbital_velocity()
+    # def _set_orbital_characteristics(self):
+    #     self.orbital_period = self.calculate_orbital_period()
+    #     self.orbital_velocity = self.calculate_orbital_velocity()
 
     def get_orbital_stability(self) -> Tuple[bool, str]:
         return self.parent.orbital_stability, self.parent.stability_violations
@@ -981,10 +981,10 @@ class Satellite(Planet):
 
         if not isinstance(parent, Planet):
             raise TypeError(f'Parent of {self.name} must be a planetary class object')
-        super().__init__(name, mass, radius, parent, semi_major_axis, orbital_eccentricity, orbit_type,
-                         composition, spin_period, inclination, longitude_of_ascending_node, argument_of_periapsis,
-                         axial_tilt, albedo, normalized_greenhouse, heat_distribution, emissivity, luminosity, age,
-                         image_filename)
+        Planet.__init__(self, name, mass, radius, parent, semi_major_axis, orbital_eccentricity, orbit_type,
+                        composition, spin_period, inclination, longitude_of_ascending_node, argument_of_periapsis,
+                        axial_tilt, albedo, normalized_greenhouse, heat_distribution, emissivity, luminosity, age,
+                        image_filename)
 
     def __post_init__(self):
         if self.composition == '':
@@ -994,11 +994,11 @@ class Satellite(Planet):
             else:
                 self.composition = 'Waterworld100'
 
-        super().__post_init__()
+        Planet.__post_init__(self)
 
     def get_image_array(self) -> np.ndarray:
         if self.mass > 0.03 * ureg.M_e:
-            image = super().get_image_array()
+            image = Planet.get_image_array(self)
         elif self.mass > 0.0003 * ureg.M_e:
             image = stellar_body_marker_dict['big_moon'].copy()
         elif self.mass > 0.000003 * ureg.M_e:
@@ -1034,14 +1034,14 @@ class Satellite(Planet):
         return calculate_synodic_period(self.spin_period, self.parent.orbital_period)
 
     def _set_orbit_values(self) -> None:
-        super()._set_orbit_values()
+        Planet._set_orbit_values(self)
         if self.orbit_type == 'prograde':
             self.orbit_type_factor = self.calculate_prograde_orbit_limit_factor()
         elif self.orbit_type == 'retrograde':
             self.orbit_type_factor = self.calculate_retrograde_orbit_limit_factor()
 
     def _set_other_characteristics(self):
-        super()._set_other_characteristics()
+        Planet._set_other_characteristics(self)
         self.maximum_mass_limit = self.calculate_max_satellite_mass()
 
     def check_habitability(self: Union["Satellite", Trojans]) -> Tuple[bool, str]:
@@ -1106,3 +1106,43 @@ class Satellite(Planet):
         if not len(habitability_violation):
             habitability_violation.append('None')
         return habitability, ' '.join(habitability_violation)
+
+
+class TrojanSatellite(Satellite, Trojans):
+
+    def __init__(self, name, parent: Planet, lagrange_position: int, mass: Q_, radius: Q_ = np.nan * ureg.R_e,
+                 composition='', spin_period: Q_ = np.nan * ureg.days, axial_tilt: float = 0,
+                 albedo: float = 0, normalized_greenhouse: float = 0, heat_distribution: float = 1,
+                 emissivity: float = 1, luminosity=np.nan * ureg.L_s,
+                 age: Q_ = np.nan * ureg.T_s, image_filename=None) -> None:
+
+        self.lagrange_position = lagrange_position
+
+        Satellite.__init__(self, name, mass, parent, radius,
+                           parent.semi_major_axis, parent.orbital_eccentricity, parent.orbit_type,
+                           composition, spin_period, parent.inclination,
+                           parent.longitude_of_ascending_node, parent.argument_of_periapsis,
+                           axial_tilt, albedo, normalized_greenhouse, heat_distribution, emissivity,
+                           luminosity, age=age, image_filename=image_filename)
+
+    def calculate_orbital_period(self):
+        return self.parent.orbital_period
+
+    def calculate_orbital_velocity(self):
+        return self.parent.orbital_velocity
+
+    def calculate_incident_flux(self, ecc_correction='flux') -> Q_:
+        if self.parent is not None:
+            flux_on_parent = self.parent.incident_flux
+        else:
+            flux_on_parent = np.nan * ureg.S_s
+        return flux_on_parent
+
+    def get_orbital_stability(self) -> Tuple[bool, str]:
+        return self.parent.orbital_stability, self.parent.stability_violations
+
+    def _set_orbit_values(self) -> None:
+        Planet._set_orbit_values(self)
+
+    def calculate_max_satellite_mass(self):
+        return calculate_three_body_lagrange_point_smallest_body_mass_limit(self.parent.parent.mass, self.parent.mass)

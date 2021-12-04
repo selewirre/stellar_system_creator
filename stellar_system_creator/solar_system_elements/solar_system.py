@@ -4,9 +4,10 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from stellar_system_creator.solar_system_elements.binary_system import BinarySystem
-from stellar_system_creator.visualization.drawing_systems import draw_orbit, draw_filled_orbit, draw_planet, draw_asteroids, draw_satellite
+from stellar_system_creator.visualization.drawing_systems import draw_orbit, draw_filled_orbit, draw_planet, \
+    draw_asteroids, draw_satellite, draw_trojan_satellite
 from stellar_system_creator.solar_system_elements.planetary_system import PlanetarySystem
-from stellar_system_creator.solar_system_elements.stellar_body import Star, AsteroidBelt
+from stellar_system_creator.solar_system_elements.stellar_body import Star, AsteroidBelt, TrojanSatellite
 
 
 class SolarSystem:
@@ -205,16 +206,21 @@ class SolarSystem:
         for planetary_system in self.planetary_systems:
             if planetary_system.trojans_list is not None:
                 for trojan in planetary_system.trojans_list:
-                    if draw_detailed_trojans:
-                        draw_asteroids(trojan.relative_count, trojan.semi_major_axis.to('au').m, self.ax,
-                                       self.min_drawing_orbit.to('au').m, trojan.extend.to('au').m,
-                                       trojan.radius_distribution.to('R_e').m, trojan.image_array,
-                                       lagrange_position=trojan.lagrange_position)
+                    if isinstance(trojan, TrojanSatellite):
+                        draw_trojan_satellite(trojan.radius.to('R_e').m, trojan.semi_major_axis.to('au').m,
+                                              trojan.image_array, self.ax,
+                                              self.min_drawing_orbit.to('au').m, trojan.lagrange_position)
                     else:
-                        draw_filled_orbit(trojan.semi_major_axis.to('au').m - trojan.extend.to('au').m,
-                                          trojan.semi_major_axis.to('au').m + trojan.extend.to('au').m,
-                                          self.ax, self.min_drawing_orbit.to('au').m, color='gold', alpha=1,
-                                          height_min=0.2, height_max=0.4)
+                        if draw_detailed_trojans:
+                            draw_asteroids(trojan.relative_count, trojan.semi_major_axis.to('au').m, self.ax,
+                                           self.min_drawing_orbit.to('au').m, trojan.extend.to('au').m,
+                                           trojan.radius_distribution.to('R_e').m, trojan.image_array,
+                                           lagrange_position=trojan.lagrange_position)
+                        else:
+                            draw_filled_orbit(trojan.semi_major_axis.to('au').m - trojan.extend.to('au').m,
+                                              trojan.semi_major_axis.to('au').m + trojan.extend.to('au').m,
+                                              self.ax, self.min_drawing_orbit.to('au').m, color='gold', alpha=1,
+                                              height_min=0.2, height_max=0.4)
 
     def draw_satellites(self):
         for planetary_system in self.planetary_systems:

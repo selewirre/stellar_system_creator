@@ -87,14 +87,30 @@ def draw_asteroids(relative_count, orbit_radius, main_axis, min_drawing_orbit, b
     if not lagrange_position:
         y = np.random.uniform(-y_orbit.max(), y_orbit.max(), size=asteroid_relative_count)
     else:
-        y = np.random.uniform(3*lagrange_position*y_orbit.max()/5, 5*lagrange_position*y_orbit.max()/5,
-                              size=asteroid_relative_count)
+        if asteroid_relative_count > 1:
+            y = np.random.uniform(3*lagrange_position*y_orbit.max()/5, 5*lagrange_position*y_orbit.max()/5,
+                                  size=asteroid_relative_count)
+        else:
+            y = 4*lagrange_position*y_orbit.max()/5
+            r = orbit_radius
+            x = np.sqrt(1 - y ** 2) * r
+            draw_planet(radius_distribution, x, image_arrays, main_axis, normalization_factor=10, y0=y)
+            return
 
     r = np.random.normal(loc=orbit_radius, scale=belt_extend / 2, size=asteroid_relative_count)
     x = np.sqrt(1 - y ** 2) * r
 
     for j, radius in enumerate(radius_distribution):
         draw_planet(radius, x[j], image_arrays[j % 3], main_axis, normalization_factor=10, y0=y[j])
+
+
+def draw_trojan_satellite(radius, orbit_radius, image_array, main_axis, min_drawing_orbit, lagrange_position=0):
+    x_orbit, y_orbit = draw_orbit(orbit_radius, main_axis, min_drawing_orbit, 'grey', ploting=False)
+    y = 4*lagrange_position*y_orbit.max()/5
+    r = orbit_radius
+    x = np.sqrt(1 - y ** 2) * r
+    draw_planet(radius, x, image_array, main_axis, normalization_factor=10, y0=y)
+    return
 
 
 def add_fill_gradient_patch(x, y, axis):
