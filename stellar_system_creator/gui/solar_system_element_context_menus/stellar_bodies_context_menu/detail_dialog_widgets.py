@@ -171,7 +171,7 @@ class Label(QLabel):
         elif isinstance(self.sse.__dict__[self.value_name], dict) and self.sub_value_name is not None:
             text = str(self.sse.__dict__[self.value_name][self.sub_value_name])
         elif self.sub_value_name is not None and self.sse.__dict__[self.value_name] is not None:
-            text = str(self.sse.__dict__[self.value_name].__dict__(self.sub_value_name))
+            text = str(self.sse.__dict__[self.value_name].__dict__[self.sub_value_name])
         else:
             text = str(self.sse.__dict__[self.value_name])
         if text is None:

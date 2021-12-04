@@ -218,3 +218,89 @@ class BinaryInsolationModel:
             self.spectrally_weighted_luminosities_on_thresholds[zone_type] = {name: habitable_zones[zone_type][name]
                                                                               ** 2 for name in self.names}
         self.swl = self.spectrally_weighted_luminosities_on_thresholds
+
+
+class InsolationForWaterFrostline(InsolationBySelsis):
+    """
+     We use Selsis model since it allows for easy, Solar system comparisons.
+    As shown on the wikipedia page https://en.wikipedia.org/wiki/Frost_line_(astrophysics), there are different
+    frost lines for different compounds. Water is important and seems to determine the line between gas planets and
+    rocky planets.
+    The inner limit is taken from wiki's suggestion for big sized bodies at 200 K (~1.94 AU),
+    the outer limit is taken from wiki's mention on the early-days frost line at 5 AU (~124.5 K),
+    and the Sol equivalent limit is from the average of the newest finds ~3.1 AU (~ 158.2 K)
+    """
+
+    def _set_parameters(self):
+        self.parameters = {
+            'Inner Limit': {'sl': 1.94, 'a': 2.7619E-5, 'b': 3.8095E-9},
+            'Sol Equivalent': {'sl': 3.1, 'a': 2.7619E-5, 'b': 3.8095E-9},
+            'Outer Limit': {'sl': 5, 'a': 1.3786E-4, 'b': 1.4286E-9},
+        }
+
+    def _set_popular_limit_names(self):
+        self.min_name = 'Inner Limit'
+        self.max_name = 'Outer Limit'
+        self.sol_equivalent = 'Sol Equivalent'
+
+    def _set_threshold_types(self):
+        self.threshold_types = {
+            'Inner Limit': 'Inner',
+            'Sol Equivalent': 'Inner',
+            'Outer Limit': 'Outer',
+        }
+
+
+class InsolationForRockLine(InsolationBySelsis):
+    """
+     We use Selsis model since it allows for easy, Solar system comparisons.
+    Rockline is the distance at which iron and rock can form clusters, planetesimals and eventually planets.
+    Since the rockline is determined by when rock and iron are more or less solid, I decided to use:
+    For the inner limit, the boiling point of a fast rotating iron ball (heating distribution 1, albedo 0.15) @ 2870 K.
+    For the outer limit, the melting point of a slow rotating (tidally locked) (heating distribution 0.5, albedo 0.85)
+     rock ball and multiply by 5/3.1 (similar to the early solar system frostline) @ 600 K (lowest from
+     http://hyperphysics.phy-astr.gsu.edu/hbase/Geophys/meltrock.html)
+    Formula used: (To/Teff) ** 2 * sqrt((1-albedo)/heatdist)
+    """
+
+    def _set_parameters(self):
+        self.parameters = {
+            'Inner Limit': {'sl': 0.087, 'a': 2.7619E-5, 'b': 3.8095E-9},
+            'Outer Limit': {'sl': 0.281, 'a': 1.3786E-4, 'b': 1.4286E-9},
+        }
+
+    def _set_popular_limit_names(self):
+        self.min_name = 'Inner Limit'
+        self.max_name = 'Outer Limit'
+
+    def _set_threshold_types(self):
+        self.threshold_types = {
+            'Inner Limit': 'Inner',
+            'Outer Limit': 'Outer',
+        }
+
+
+class BinaryInsolationForWaterFrostLine(BinaryInsolationModel):
+
+    def __init__(self, frost_lines: Dict, child_insolation_model: InsolationForWaterFrostline):
+        super().__init__(frost_lines, child_insolation_model)
+
+    def _set_popular_limit_names(self, child_insolation_model: InsolationForWaterFrostline):
+        self.min_name = child_insolation_model.min_name
+        self.max_name = child_insolation_model.max_name
+        self.sol_equivalent = child_insolation_model.sol_equivalent
+
+    def _set_spectrally_weighted_luminosities_on_thresholds(self, frost_lines: Dict):
+        self.spectrally_weighted_luminosities_on_thresholds = {}
+        self.spectrally_weighted_luminosities_on_thresholds = {name: frost_lines[name] ** 2 for name in self.names}
+        self.swl = self.spectrally_weighted_luminosities_on_thresholds
+
+
+class BinaryInsolationForRockLine(BinaryInsolationModel):
+
+    def __init__(self, frost_lines: Dict, child_insolation_model: InsolationForRockLine):
+        super().__init__(frost_lines, child_insolation_model)
+
+    def _set_popular_limit_names(self, child_insolation_model: InsolationForRockLine):
+        self.min_name = child_insolation_model.min_name
+        self.max_name = child_insolation_model.max_name
