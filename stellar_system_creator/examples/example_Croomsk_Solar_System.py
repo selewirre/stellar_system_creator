@@ -87,11 +87,11 @@ ss = SolarSystem('ss1', croomsk_star, [ps1, ps2, ps3, ps4, ps5, ps6, ps7, ps8], 
 # ss.draw_solar_system(save_fig=False)
 # for sat in ps1.satellite_list:
 #     print(sat.orbital_stability)
-planet3.save_as_csv('output_files/planet1.csv')
-croomsk_star.save_as_csv('output_files/CroomskStar.csv')
-num = 2
-a = timeit.timeit(lambda: save(ss, 'output_files/CroomskSystem.ssc'), number=num)
-print(a/num)
+# planet3.save_as_csv('output_files/planet1.csv')
+# croomsk_star.save_as_csv('output_files/CroomskStar.csv')
+# num = 2
+# a = timeit.timeit(lambda: save(ss, 'output_files/CroomskSystem.ssc'), number=num)
+# print(a/num)
 save(ss, 'output_files/CroomskSystem.ssc')
 save(ps1, 'output_files/Planet1System.ssc')
 # plt.show()

@@ -158,8 +158,8 @@ class SolarSystem:
                                  self.ax, self.min_drawing_orbit.to('au').m, color='forestgreen', alpha=alpha)
 
     def draw_frost_line(self):
-        if 'frost_line' in self.parent.__dict__.keys():
-            return draw_orbit(self.parent.frost_line.to('au').m, self.ax,
+        if 'water_frost_line' in self.parent.__dict__.keys():
+            return draw_orbit(self.parent.water_frost_line.to('au').m, self.ax,
                               self.min_drawing_orbit.to('au').m, color='dodgerblue', text_top=False)
         else:
             return None

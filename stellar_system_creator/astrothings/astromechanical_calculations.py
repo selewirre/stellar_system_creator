@@ -1,4 +1,5 @@
 import numpy as np
+
 from stellar_system_creator.astrothings.units import ureg, Q_, gravitational_constant
 
 
@@ -76,8 +77,12 @@ def calculate_hill_sphere(child_stellar_body, parent_stellar_body) -> Q_:
     More info on: https://en.wikipedia.org/wiki/Hill_sphere
     """
     child_parent_mass_ratio = (child_stellar_body.mass / parent_stellar_body.mass).to_reduced_units().m
-    return child_stellar_body.semi_major_axis * (1 - child_stellar_body.orbital_eccentricity) \
-                                              * (child_parent_mass_ratio / 3) ** (1 / 3)
+    if 'semi_major_axis' in child_stellar_body.__dict__:
+        return child_stellar_body.semi_major_axis * (1 - child_stellar_body.orbital_eccentricity) \
+                                                  * (child_parent_mass_ratio / 3) ** (1 / 3)
+    else:
+        return child_stellar_body.parent.mean_distance * (1 - child_stellar_body.parent.eccentricity) \
+               * (child_parent_mass_ratio / 3) ** (1 / 3)
 
 
 def calculate_roche_lobe(stellar_mass, companion_mass, mean_distance: Q_) -> Q_:

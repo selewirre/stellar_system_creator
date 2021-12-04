@@ -33,16 +33,13 @@ class BinarySystemTreeViewItemContextMenu(SystemTreeViewItemContextMenu):
         super().__init__(parent_item)
 
     def _create_menu(self):
-        pass
-        # super()._create_menu()
+        super()._create_menu()
 
     def _connect_actions(self):
-        pass
-        # super()._connect_actions()
+        super()._connect_actions()
 
     def _create_menu_actions(self):
-        pass
-        # super()._create_menu_actions()
+        super()._create_menu_actions()
 
 
 class SolarSystemTreeViewItemContextMenu(SystemTreeViewItemContextMenu):
