@@ -8,12 +8,13 @@ from PyQt5.Qt import QStandardItem
 from .misc import CategoryBasedTreeViewItemContextMenu
 from .stellar_bodies_context_menu.planet_context_menu import \
     PlanetTreeViewItemContextMenu, SatelliteTreeViewItemContextMenu, AsteroidBeltTreeViewItemContextMenu, \
-    TrojanTreeViewItemContextMenu
+    TrojanTreeViewItemContextMenu, TrojanSatelliteTreeViewItemContextMenu
 from .stellar_bodies_context_menu.star_context_menu import \
     StarTreeViewItemContextMenu
 from .system_context_menu import BinarySystemTreeViewItemContextMenu, \
     PlanetarySystemTreeViewItemContextMenu, SolarSystemTreeViewItemContextMenu
-from stellar_system_creator.solar_system_elements.stellar_body import StellarBody, Star, Planet, Satellite, AsteroidBelt, Trojans
+from stellar_system_creator.solar_system_elements.stellar_body import StellarBody, Star, Planet, Satellite, \
+    AsteroidBelt, Trojans, TrojanSatellite
 from stellar_system_creator.solar_system_elements.solar_system import SolarSystem
 from stellar_system_creator.solar_system_elements.planetary_system import PlanetarySystem
 from stellar_system_creator.solar_system_elements.binary_system import BinarySystem
@@ -59,14 +60,16 @@ class TreeViewItemFromSolarSystemElement(QStandardItem):
             self.context_menu_class = PlanetarySystemTreeViewItemContextMenu
         elif isinstance(self.solar_system_element, Star):
             self.context_menu_class = StarTreeViewItemContextMenu
-        elif isinstance(self.solar_system_element, Planet):
-            self.context_menu_class = PlanetTreeViewItemContextMenu
+        elif isinstance(self.solar_system_element, TrojanSatellite):
+            self.context_menu_class = TrojanSatelliteTreeViewItemContextMenu
         elif isinstance(self.solar_system_element, Satellite):
             self.context_menu_class = SatelliteTreeViewItemContextMenu
-        elif isinstance(self.solar_system_element, AsteroidBelt):
-            self.context_menu_class = AsteroidBeltTreeViewItemContextMenu
         elif isinstance(self.solar_system_element, Trojans):
             self.context_menu_class = TrojanTreeViewItemContextMenu
+        elif isinstance(self.solar_system_element, AsteroidBelt):
+            self.context_menu_class = AsteroidBeltTreeViewItemContextMenu
+        elif isinstance(self.solar_system_element, Planet):
+            self.context_menu_class = PlanetTreeViewItemContextMenu
 
     def _set_context_menu(self):
         self.context_menu = self.context_menu_class(self)

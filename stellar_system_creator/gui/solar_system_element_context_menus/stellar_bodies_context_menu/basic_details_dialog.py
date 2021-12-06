@@ -5,8 +5,10 @@ from PyQt5.QtCore import Qt
 
 from PyQt5.QtWidgets import QDialog, QDialogButtonBox
 
-from stellar_system_creator.gui.solar_system_element_context_menus.stellar_bodies_context_menu.detail_dialog_widgets import LineEdit, \
-    UnitLineEdit, UnitLabel, Label, TextBrowser, CheckBox, InsolationModelRadioButtons, ImageLabel, ImageLineEdit
+from stellar_system_creator.gui.solar_system_element_context_menus.stellar_bodies_context_menu.detail_dialog_widgets import \
+    LineEdit, \
+    UnitLineEdit, UnitLabel, Label, TextBrowser, CheckBox, InsolationModelRadioButtons, ImageLabel, ImageLineEdit, \
+    ComboBox
 from stellar_system_creator.solar_system_elements.stellar_body import AsteroidBelt, Planet, Star, StellarBody, Satellite, Trojans
 
 
@@ -110,6 +112,7 @@ class BasicDetailsDialog(QDialog):
                                                 'Lifetime': UnitLabel(sse, 'lifetime'),
                                                 'Tidal Locking Radius': UnitLabel(sse, 'tidal_locking_radius'),
                                                 'Hill Sphere': UnitLabel(sse, 'hill_sphere'),
+                                                'Dense Roche Limit': UnitLabel(sse, 'dense_roche_limit'),
                                                 'Inner Orbit Limit': UnitLabel(sse, 'inner_orbit_limit'),
                                                 'Outer Orbit Limit': UnitLabel(sse, 'outer_orbit_limit'),
                                                 }
@@ -143,12 +146,14 @@ class BasicDetailsDialog(QDialog):
         super().reject()
 
     @staticmethod
-    def change_text(qobj: Union[LineEdit, UnitLineEdit, UnitLabel, InsolationModelRadioButtons],
+    def change_text(qobj: Union[LineEdit, UnitLineEdit, UnitLabel, ComboBox, InsolationModelRadioButtons],
                     text: str, process_change=True) -> None:
         if isinstance(qobj, (UnitLabel, LineEdit)):
             qobj.setText(text)
         elif isinstance(qobj, InsolationModelRadioButtons):
             qobj.radio_buttons[text].toggle()
+        elif isinstance(qobj, ComboBox):
+            qobj.setCurrentText(text)
         else:
             qobj.line_edit.setText(text)
         qobj.setFocus()

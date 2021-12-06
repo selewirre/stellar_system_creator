@@ -187,6 +187,85 @@ class ParentHabitabilityTab(Tab):
         #     self.habitability_labels[key].update_text()
 
 
+class ChildHabitabilityTab(Tab):
+    def __init__(self, sse: Planet, parent=None):
+        super().__init__()
+
+        self.sse = sse
+        self.influenced_labels: Dict[(str, Union[UnitLabel, Label])] = None
+
+        widget = QWidget(parent)
+        self.setWidget(widget)
+        self.tab_layout = QVBoxLayout()
+        widget.setLayout(self.tab_layout)
+
+    def set_boxes(self):
+        # self.habitability_labels = self.get_habitability_labels()
+        self._set_boxes()
+
+    def _set_boxes(self):
+        # setting outlook group box
+        self.outlook_group_box = GroupBox('Outlook')
+        outlook_box_layout = QFormLayout()
+        self.outlook_group_box.setLayout(outlook_box_layout)
+
+        # # setting zones group box
+        # self.zones_group_box = GroupBox('Zones')
+        # zones_box_layout = QVBoxLayout()
+        # self.zones_group_box.setLayout(zones_box_layout)
+
+        self._set_outlook_box_cells()
+        # self._set_zones_box_cells()
+        self.tab_layout.addWidget(self.outlook_group_box)
+        # self.tab_layout.addWidget(self.zones_group_box)
+        self.tab_layout.addStretch()
+
+    def _set_outlook_box_cells(self):
+        self.outlook_group_box.layout().addRow("Habitability:", self.influenced_labels['Habitability'])
+        self.outlook_group_box.layout().addRow("Violations:", self.influenced_labels['Habitability Violations'])
+
+    # def _set_zones_box_cells(self):
+    #     self.zones_tab_widget = QTabWidget(self.widget().parent())
+    #     self.zones_group_box.layout().addWidget(self.zones_tab_widget)
+    #
+    #     hzlimits = self.sse.habitable_zone_limits
+    #     self.habitability_subtabs = {}
+    #     for hzltype in hzlimits:
+    #         self.habitability_subtabs[hzltype] = QWidget(self.zones_tab_widget)
+    #         subtab_layout = QFormLayout()
+    #         for limit_name in hzlimits[hzltype]:
+    #             subtab_layout.addRow(f'{limit_name}:', self.habitability_labels[f'{hzltype}/{limit_name}'])
+    #
+    #         self.habitability_subtabs[hzltype].setLayout(subtab_layout)
+    #         self.zones_tab_widget.addTab(self.habitability_subtabs[hzltype], hzltype)
+    #
+    # def changes_due_to_isolation_model_change(self):
+    #     clearLayout(self.zones_group_box.layout())
+    #     self.habitability_labels = self.get_habitability_labels()
+    #     for key in self.influenced_labels:
+    #         self.influenced_labels[key].update_text()
+    #     # self._set_outlook_box_cells()
+    #     self._set_zones_box_cells()
+    #
+    # def get_habitability_labels(self) -> Dict:
+    #     labels: Dict[(str, UnitLabel)] = {}
+    #
+    #     hzlimits = self.sse.habitable_zone_limits
+    #     for hzltype in hzlimits:
+    #         for limit_name in hzlimits[hzltype]:
+    #             labels[f'{hzltype}/{limit_name}'] = UnitLabel(hzlimits, hzltype, limit_name)
+    #     return labels
+
+    def update_text(self):
+        pass
+    #     clearLayout(self.zones_group_box.layout())
+    #     self.habitability_labels = self.get_habitability_labels()
+    #     self._set_zones_box_cells()
+    #     # for key in self.habitability_labels:
+    #     #     self.habitability_labels[key].update_text()
+
+
+
 class ImageTab(Tab):
 
     def __init__(self, sse: Union[Star, Planet, Satellite], influenced_image_label: ImageLabel,
