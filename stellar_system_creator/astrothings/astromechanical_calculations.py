@@ -51,7 +51,7 @@ def calculate_approximate_inner_orbit_limit(parent_radius: Q_) -> Q_:
     More info on: https://en.wikipedia.org/wiki/Roche_limit
     """
     parent_child_density_ratio = 10
-    return (2.44 * parent_radius * parent_child_density_ratio ** (1 / 3)).to_reduced_units().m
+    return (2.44 * parent_radius * parent_child_density_ratio ** (1 / 3)).to_reduced_units()
 
 
 def calculate_roche_limit(child_stellar_body, parent_stellar_body) -> Q_:
@@ -530,15 +530,14 @@ def calculate_spectrum_peak_wavelength(temperature: Q_) -> Q_:
 
 
 def calculate_planetary_effective_surface_temperature(temp_avg_incident_flux: Q_, bond_albedo, normalized_greenhouse,
-                                                      heat_distribution) -> Q_:
+                                                      heat_distribution, emissivity) -> Q_:
     """
     source: https://arxiv.org/pdf/1702.07314.pdf, equation (6)
-    We assume that emissivity is included in the parent_luminosity.
     Instead of using the incident luminosity from a single source, I added the fluxes as an average from all sources.
     """
     To = 278.5 * ureg.K  # Kelvin (earth's effective temperature with A=0)
     return To * (((1 - bond_albedo) * temp_avg_incident_flux.to('solar_flux').magnitude) / (
-            heat_distribution * (1 - normalized_greenhouse) * 0.9)) ** (1 / 4)
+            heat_distribution * emissivity * (1 - normalized_greenhouse))) ** (1 / 4)
 
 
 def calculate_tidal_locking_radius(parent_mass: Q_, age: Q_) -> Q_:

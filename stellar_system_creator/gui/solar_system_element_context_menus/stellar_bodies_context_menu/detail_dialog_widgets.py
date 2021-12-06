@@ -1,4 +1,4 @@
-from typing import Union, Dict
+from typing import Union, Dict, List
 
 import numpy as np
 from PyQt5 import QtGui, QtCore
@@ -6,6 +6,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QHBoxLayout, QGroupBox, QWidget, QComboBox, QLineEdit, QLabel, QTextBrowser, QSizePolicy, \
     QCheckBox, QTabBar, QStylePainter, QStyleOptionTab, QStyle, QTabWidget, QScrollArea, \
     QRadioButton, QPushButton, QFileDialog
+
+from stellar_system_creator.astrothings.radius_models.planetary_radius_model import planet_compositions
 from stellar_system_creator.astrothings.units import Q_
 from bidict import bidict
 
@@ -84,6 +86,7 @@ class UnitLabel(QWidget):
         self.sse = sse
         self.value_name = value_name
         self.sub_value_name = sub_value_name
+        self.sizeflag = 0
         self.value: Q_ = self.get_value()
 
         self._set_unit_drop_menu()
@@ -96,7 +99,11 @@ class UnitLabel(QWidget):
         self.setLayout(layout)
         self.label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
         self.unit_drop_menu.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.setFixedSize(300, self.sizeHint().height())
+        if not self.sizeflag:
+            self.setFixedSize(300, self.sizeHint().height())
+        else:
+            layout.addStretch()
+            # self.setFixedSize(600, self.sizeHint().height())
         self.unit_drop_menu.setFixedWidth(150)
 
     def get_value(self) -> Q_:
@@ -108,6 +115,8 @@ class UnitLabel(QWidget):
         elif self.sub_value_name is not None:
             return self.sse.__dict__[self.value_name].__dict__(self.sub_value_name)
         else:
+            if isinstance(self.sse.__dict__[self.value_name], dict):
+                self.sizeflag = 1
             return self.sse.__dict__[self.value_name]
 
     def _set_unit_drop_menu(self):
@@ -123,7 +132,11 @@ class UnitLabel(QWidget):
 
     def update_text(self):
         units = self.dict_pretty.inverse[self.unit_drop_menu.currentText()]
-        self.value = self.get_value().to(units)
+        self.value = self.get_value()
+        if self.sizeflag:
+            self.value = {key: self.value[key].to(units) for key in self.value}
+        else:
+            self.value = self.value.to(units)
         self.label.setText(get_value_string(self.value))
 
 
@@ -142,7 +155,12 @@ class LineEdit(QLineEdit):
 
     def change_text_action(self, process_change=True) -> None:
         if self.hasFocus():
-            self.sse.__dict__[self.value_name] = self.text()
+            text = self.text()
+            try:
+                value = float(text)
+            except ValueError:
+                value = text
+            self.sse.__dict__[self.value_name] = value
             if process_change:
                 self.sse.__post_init__()
                 for key in self.influenced_labels:
@@ -165,17 +183,21 @@ class Label(QLabel):
 
     def update_text(self) -> None:
         if self.sse is None:
-            text = 'None'
+            text_value = None
         elif self.value_name not in self.sse.__dict__:
-            text = 'None'
+            text_value = None
         elif isinstance(self.sse.__dict__[self.value_name], dict) and self.sub_value_name is not None:
-            text = str(self.sse.__dict__[self.value_name][self.sub_value_name])
+            text_value = self.sse.__dict__[self.value_name][self.sub_value_name]
         elif self.sub_value_name is not None and self.sse.__dict__[self.value_name] is not None:
-            text = str(self.sse.__dict__[self.value_name].__dict__[self.sub_value_name])
+            text_value = self.sse.__dict__[self.value_name].__dict__[self.sub_value_name]
         else:
-            text = str(self.sse.__dict__[self.value_name])
-        if text is None:
-            text = 'None'
+            text_value = self.sse.__dict__[self.value_name]
+
+        if isinstance(text_value, dict):
+            text = '\n'.join([f'{key}:\t{text_value[key]}' for key in text_value])
+        else:
+            text = str(text_value)
+
         self.setText(text)
 
 
@@ -306,6 +328,33 @@ class InsolationModelRadioButtons(QWidget):
             selsis_button.setChecked(True)
 
 
+class ComboBox(QComboBox):
+    def __init__(self, sse: Planet, value_name: str, value_list: List, influenced_labels: Dict, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.sse = sse
+        self.value_name = value_name
+        self.value_list = value_list
+        self.influenced_labels = influenced_labels
+
+        self.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
+        self.setFixedWidth(300)
+
+        self.addItems(self.value_list)
+        self.setCurrentText(self._get_value())
+        self.currentTextChanged.connect(self.change_text_action)
+
+    def _get_value(self):
+        return self.sse.__dict__[self.value_name]
+
+    def change_text_action(self, process_change=True) -> None:
+        self.sse.__dict__[self.value_name] = self.currentText()
+        if process_change:
+            self.sse.__post_init__()
+            for key in self.influenced_labels:
+                self.influenced_labels[key].update_text()
+
+
 class ImageLabel(QLabel):
 
     def __init__(self, sse: Union[Star, Planet, Satellite], *args, **kwargs):
@@ -409,12 +458,19 @@ def clearLayout(layout):
 
 
 def get_value_string(value: Q_):
-    return f'{value.m:.3g}'
+    if isinstance(value, dict):
+        return '\n'.join([f'{key}:\t{value[key].m:.3g}' for key in value])
+    else:
+        return f'{value.m:.3g}'
 
 
 def get_unit_bidict(value: Q_):
-    unit_str = str(f'{value.units:~P}')
-    unit_dimensions = value.dimensionality
+    if isinstance(value, dict):
+        unit_str = str(f'{value[list(value.keys())[0]].units:~P}')
+        unit_dimensions = value[list(value.keys())[0]].dimensionality
+    else:
+        unit_str = str(f'{value.units:~P}')
+        unit_dimensions = value.dimensionality
     dict_pretty = bidict({})
     if len(unit_dimensions) == 1:
         if unit_dimensions['[length]'] == 1:
@@ -464,7 +520,7 @@ def get_unit_bidict(value: Q_):
                                   'min': 'minute',
                                   'hr': 'hour',
                                   'd': 'day',
-                                  'yr': 'year',
+                                  'a': 'year',
                                   'Gyr': 'gigayear',
                                   'T_s': 'Ts'})
         elif unit_dimensions['[temperature]'] == 1:
@@ -494,7 +550,7 @@ def get_unit_bidict(value: Q_):
                                   'rho_j': 'ρj',
                                   'rho_s': 'ρs'})
         elif unit_dimensions['[mass]'] == 1 and unit_dimensions['[time]'] == -3:
-            dict_pretty = bidict({'W/m²': 'W/m²', 'S_s': 'Ss'})
+            dict_pretty = bidict({'W/m²': 'W/m²', 'S_s': 'Ss', 'L_s/au²': 'Ls/au²'})
     elif len(unit_dimensions) == 3:
         if unit_dimensions['[length]'] == 2 and unit_dimensions['[mass]'] == 1 and unit_dimensions['[time]'] == -3:
             dict_pretty = bidict({'W': 'W', 'L_s': 'Ls'})

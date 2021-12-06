@@ -280,6 +280,7 @@ class Star(StellarBody):
 
     def set_habitable_zone(self, zone_type: str, binary_companion=None):
         model = self.insolation_model
+        comp_model_swl = None
         if binary_companion is not None:
             comp_model = binary_companion.insolation_model
             comp_model_swl = comp_model.swl
@@ -430,6 +431,7 @@ class Star(StellarBody):
         self.rough_inner_orbit_limit = calculate_rough_inner_orbit_limit(self.mass)
         self.rough_outer_orbit_limit = calculate_rough_outer_orbit_limit(self.mass)
         self.hill_sphere = self.calculate_hill_sphere()
+        self.dense_roche_limit = calculate_approximate_inner_orbit_limit(self.radius)
         self.tidal_locking_radius = self.calculate_tidal_locking_radius()
 
         self.water_frost_lines, self.water_frost_lines_in_binary = self.calculate_water_frost_lines()
@@ -446,10 +448,10 @@ class Star(StellarBody):
             self.prevailing_rock_lines = self.rock_lines
 
         warnings.filterwarnings("ignore", category=UnitStrippedWarning)
-        self_inner_limits = np.array([self.rough_inner_orbit_limit, self.rock_line], dtype=Q_)
-        self_maximum_inner_limit_index = np.nanargmax(self_inner_limits)
-        self.inner_orbit_limit = self_inner_limits[self_maximum_inner_limit_index]
-
+        # self_inner_limits = np.array([self.rough_inner_orbit_limit, self.rock_line], dtype=Q_)
+        # self_maximum_inner_limit_index = np.nanargmax(self_inner_limits)
+        # self.inner_orbit_limit = self_inner_limits[self_maximum_inner_limit_index]
+        self.inner_orbit_limit = self.rough_inner_orbit_limit
         self.outer_orbit_limit = self.rough_outer_orbit_limit
 
     def _set_other_characteristics(self):
@@ -502,9 +504,9 @@ class Planet(StellarBody):
 
     def __init__(self, name, mass: Q_, radius: Q_ = np.nan * ureg.R_e, parent=None,
                  semi_major_axis: Q_ = np.nan * ureg.au, orbital_eccentricity: float = 0, orbit_type='prograde',
-                 composition='Rockworld70', spin_period: Q_ = np.nan * ureg.days, inclination: float = 0,
-                 longitude_of_ascending_node: float = 0, argument_of_periapsis: float = np.nan,
-                 axial_tilt: float = 0, albedo: float = 0, normalized_greenhouse: float = 0,
+                 composition='Rockworld70', spin_period: Q_ = np.nan * ureg.days, inclination: Q_ = 0 * ureg.deg,
+                 longitude_of_ascending_node: Q_ = 0 * ureg.deg, argument_of_periapsis: Q_ = np.nan * ureg.deg,
+                 axial_tilt: Q_ = 0 * ureg.deg, albedo: float = 0, normalized_greenhouse: float = 0,
                  heat_distribution: float = 1, emissivity: float = 1,
                  luminosity: Q_ = np.nan * ureg.L_s, age: Q_ = np.nan * ureg.T_s, image_filename=None) -> None:
 
@@ -531,8 +533,16 @@ class Planet(StellarBody):
         super().__post_init__()
 
     def _get_age(self) -> None:
-        if np.isnan(self.age.m) and self.parent is not None:
-            self.age = self.parent.age - 0.1 * ureg.Gyr
+        if 'suggested_age' in self.__dict__:
+            previous_suggested_age = self.suggested_age
+        else:
+            previous_suggested_age = -999 * ureg.T_s
+        if self.parent is not None:
+            self.suggested_age = self.parent.age - 0.1 * ureg.Gyr
+        else:
+            self.suggested_age = np.nan * ureg.T_s
+        if np.isnan(self.age.m) or previous_suggested_age == self.age:
+            self.age = self.suggested_age
 
     def calculate_suggested_radius(self) -> Q_:
         return calculate_planet_radius(self.mass, self.composition, self.incident_flux)
@@ -602,7 +612,8 @@ class Planet(StellarBody):
     def calculate_temperature(self) -> Q_:
         temperature_average_incident_flux = self.calculate_incident_flux(ecc_correction='temp')
         return calculate_planetary_effective_surface_temperature(
-            temperature_average_incident_flux, self.albedo, self.normalized_greenhouse, self.heat_distribution)
+            temperature_average_incident_flux, self.albedo, self.normalized_greenhouse, self.heat_distribution,
+            self.emissivity)
 
         # return calculate_planetary_effective_surface_temperature(self.albedo, self.normalized_greenhouse,
         #                                                          self.parent.luminosity, self.semi_major_axis,
@@ -658,7 +669,7 @@ class Planet(StellarBody):
                 to_parent = calculate_tide_height(self.mass, self.parent.mass, self.parent.radius, self.semi_major_axis)
             else:
                 to_self = calculate_tide_height(self.parent.mass, self.mass, self.radius, self.semi_major_axis)
-                to_parent = {calculate_tide_height(
+                to_parent = {parent_body.name: calculate_tide_height(
                     self.mass, parent_body.mass, parent_body.radius, self.semi_major_axis)
                              for parent_body in [self.parent.primary_body, self.parent.secondary_body]}
         else:
@@ -672,7 +683,7 @@ class Planet(StellarBody):
                 of_parent = calculate_angular_diameter(self.parent.radius, self.semi_major_axis)
                 from_parent = calculate_angular_diameter(self.radius, self.semi_major_axis)
             else:
-                of_parent = {calculate_angular_diameter(parent_body.radius, self.semi_major_axis)
+                of_parent = {parent_body.name: calculate_angular_diameter(parent_body.radius, self.semi_major_axis)
                              for parent_body in [self.parent.primary_body, self.parent.secondary_body]}
                 from_parent = calculate_angular_diameter(self.radius, self.semi_major_axis)
         else:
@@ -706,9 +717,13 @@ class Planet(StellarBody):
 
     def _set_orbit_values(self) -> None:
         self.orbit_type_factor = 1
-        self.outer_orbit_limit = self.calculate_hill_sphere()
-        self.inner_orbit_limit = self.radius * 1.1
+        self.outer_orbit_limit = self.hill_sphere = self.calculate_hill_sphere()
+        self.inner_orbit_limit = self.dense_roche_limit = calculate_approximate_inner_orbit_limit(self.radius)
         self.semi_major_axis_minimum_limit = self.calculate_roche_limit()
+        if self.parent is not None:
+            self.semi_major_axis_maximum_limit = self.parent.outer_orbit_limit
+        else:
+            self.semi_major_axis_maximum_limit = np.nan * self.semi_major_axis_minimum_limit.units()
         self.tidal_locking_radius = self.calculate_tidal_locking_radius()
 
         self.semi_minor_axis = self.calculate_semi_minor_axis()
@@ -804,16 +819,26 @@ class Planet(StellarBody):
         stability = True
         stability_violation = []
 
-        if self.semi_major_axis_minimum_limit > self.semi_major_axis:
+        if self.semi_major_axis_minimum_limit > self.periapsis:
             stability = False
-            stability_violation.append('Semi-major axis is closer to the parent than the Roche limit.')
+            stability_violation.append('Periapsis is closer to the parent than the Roche limit.')
         if self.parent is not None:
             if self.parent.inner_orbit_limit > self.semi_major_axis:
                 stability = False
-                stability_violation.append('Semi-major axis is closer to the parent than the inner orbit limit.')
-            if self.semi_major_axis > self.parent.outer_orbit_limit * self.orbit_type_factor:
+                stability_violation.append('Semi-major axis is closer to the parent than the rough inner orbit limit.')
+            if (self.composition.startswith('Rockworld') or self.composition.startswith('Ironworld')) \
+                    and 'rock_line' in self.parent.__dict__:
+                if self.parent.rock_line > self.semi_major_axis:
+                    stability = False
+                    stability_violation.append('Semi-major axis is closer to the parent than the Rocky/Iron-planet '
+                                               'formation line.')
+
+            if self.apoapsis > self.semi_major_axis_maximum_limit:
                 stability = False
-                stability_violation.append('Semi-major axis is farther from the parent than the outer orbit limit.')
+                stability_violation.append('Apoapsis is farther from the parent than the outer orbit limit.')
+
+        if not len(stability_violation):
+            stability_violation.append('None')
 
         return stability, ' '.join(stability_violation)
 
@@ -845,9 +870,10 @@ class Planet(StellarBody):
 class AsteroidBelt(Planet):
 
     def __init__(self, name, mass: Q_ = 0.0004 * ureg.M_e, relative_count: int = 250, extend: Q_ = np.nan * ureg.au,
-                 parent = None, semi_major_axis: Q_ = np.nan * ureg.au, orbital_eccentricity: float = 0,
-                 orbit_type='prograde', composition='', inclination: float = 0, longitude_of_ascending_node: float = 0,
-                 argument_of_periapsis: float = np.nan, axial_tilt: float = 0, albedo: float = 0,
+                 parent=None, semi_major_axis: Q_ = np.nan * ureg.au, orbital_eccentricity: float = 0,
+                 orbit_type='prograde', composition='', inclination: Q_ = 0 * ureg.deg,
+                 longitude_of_ascending_node: Q_ = 0 * ureg.deg, argument_of_periapsis: Q_ = np.nan * ureg.deg,
+                 axial_tilt: Q_ = 0 * ureg.deg, albedo: float = 0,
                  age: Q_ = np.nan * ureg.T_s, image_filename=None) -> None:
 
         self.extend = extend
@@ -973,9 +999,9 @@ class Satellite(Planet):
 
     def __init__(self, name, mass: Q_, parent: Planet, radius: Q_ = np.nan * ureg.R_e,
                  semi_major_axis: Q_ = np.nan * ureg.R_e, orbital_eccentricity: float = 0, orbit_type='prograde',
-                 composition='', spin_period: Q_ = np.nan * ureg.days, inclination: float = 0,
-                 longitude_of_ascending_node: float = 0, argument_of_periapsis: float = np.nan,
-                 axial_tilt: float = 0, albedo: float = 0, normalized_greenhouse: float = 0,
+                 composition='', spin_period: Q_ = np.nan * ureg.days, inclination: Q_ = 0 * ureg.deg,
+                 longitude_of_ascending_node: Q_ = 0 * ureg.deg, argument_of_periapsis: Q_ = np.nan * ureg.deg,
+                 axial_tilt: Q_ = 0 * ureg.deg, albedo: float = 0, normalized_greenhouse: float = 0,
                  heat_distribution: float = 1, emissivity: float = 1,
                  luminosity=np.nan * ureg.L_s, age: Q_ = np.nan * ureg.T_s, image_filename=None) -> None:
 
@@ -1039,6 +1065,7 @@ class Satellite(Planet):
             self.orbit_type_factor = self.calculate_prograde_orbit_limit_factor()
         elif self.orbit_type == 'retrograde':
             self.orbit_type_factor = self.calculate_retrograde_orbit_limit_factor()
+        self.semi_major_axis_maximum_limit = self.parent.outer_orbit_limit * self.orbit_type_factor
 
     def _set_other_characteristics(self):
         Planet._set_other_characteristics(self)
@@ -1111,7 +1138,7 @@ class Satellite(Planet):
 class TrojanSatellite(Satellite, Trojans):
 
     def __init__(self, name, parent: Planet, lagrange_position: int, mass: Q_, radius: Q_ = np.nan * ureg.R_e,
-                 composition='', spin_period: Q_ = np.nan * ureg.days, axial_tilt: float = 0,
+                 composition='', spin_period: Q_ = np.nan * ureg.days, axial_tilt: Q_ = 0 * ureg.deg,
                  albedo: float = 0, normalized_greenhouse: float = 0, heat_distribution: float = 1,
                  emissivity: float = 1, luminosity=np.nan * ureg.L_s,
                  age: Q_ = np.nan * ureg.T_s, image_filename=None) -> None:
