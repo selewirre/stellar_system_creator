@@ -181,8 +181,8 @@ class StarDetailsDialog(BasicDetailsDialog):
         self.basic_limits_group_box = GroupBox('Basic Limits')
         basic_limits_box_layout = QFormLayout()
         self.basic_limits_group_box.setLayout(basic_limits_box_layout)
-        keys = ['Rough Inner Orbit Limit', 'Rough Outer Orbit Limit', 'Tidal Locking Radius', 'Hill Sphere',
-                'Inner Orbit Limit', 'Outer Orbit Limit']
+        keys = ['Rough Inner Orbit Limit', 'Rough Outer Orbit Limit', 'Tidal Locking Radius', 'Dense Roche Limit',
+                'Hill Sphere', 'Inner Orbit Limit', 'Outer Orbit Limit']
         self.add_keys_to_layout(basic_limits_box_layout, self.ulabels, keys)
 
         # setting Rock Line group box

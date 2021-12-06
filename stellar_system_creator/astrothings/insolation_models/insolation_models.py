@@ -1,3 +1,4 @@
+import copy
 from typing import Dict
 
 import numpy as np
@@ -67,6 +68,9 @@ class InsolationThresholdModel:
             self.star_luminosity, self.insolation_thresholds[name], self.potential_orbit_eccentricity)
             for name in self.names}
         self.swl = self.spectrally_weighted_luminosities_on_thresholds
+
+    def copy(self):
+        return copy.deepcopy(self)
 
 
 class InsolationByKopparapu(InsolationThresholdModel):

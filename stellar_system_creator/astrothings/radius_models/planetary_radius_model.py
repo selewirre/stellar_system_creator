@@ -68,8 +68,11 @@ def calculate_planet_radius(planet_mass: Q_, planet_composition,
     radius = 10 ** log10_radius * r1
 
     if planet_composition == 'Gasgiant' and solar_radiation_incident_flux is not None:
-        from stellar_system_creator.astrothings.radius_models.hot_gasgiant_radius_model import get_hot_gas_giant_mass_class
+        from .hot_gasgiant_radius_model import get_hot_gas_giant_mass_class
         radius = radius * gasgiant_radius_modification(np.log10(solar_radiation_incident_flux.to('watt/m^2').magnitude),
                                                        get_hot_gas_giant_mass_class(planet_mass))
 
-    return radius * ureg.R_e
+    radius = radius * ureg.R_e
+    if radius >= 0.7 * ureg.R_j:
+        radius.to('R_j')
+    return radius

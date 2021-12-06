@@ -1,10 +1,15 @@
 
 # Main code:
 1. Ring, resonances from moons etc. To find ring minima, use atmospheric extend. Ring maxima is the roche limit.
-2. Check lagrange L4, L5 point m3 limit. Gascheau's limit?
-3. Add saddle orbits?
-4. add oblateness option?
-5. Add stellar initial rotation period/speed from
+2. Add planetary binaries.
+3. Check semi-major axis minimum limit on planets/satellites.
+4. Make the habitable zone calculation of planets include the eccentricity by copying the parent insolation model.
+5. Add saddle/horseshoe orbits as planetary binaries? 
+    - https://www.sciencedirect.com/science/article/abs/pii/0019103581901470
+    - https://pdfs.semanticscholar.org/0821/7be72965593b0db36dbba501ed12e842b852.pdf
+    - https://academic.oup.com/mnras/article-pdf/426/4/3051/3315870/426-4-3051.pdf
+6. add oblateness option?
+7. Add stellar initial rotation period/speed from
     - https://arxiv.org/pdf/1307.2891.pdf, 
     - http://assets.cambridge.org/97805217/72181/sample/9780521772181ws.pdf
     - https://www.aanda.org/articles/aa/abs/2012/01/aa17691-11/aa17691-11.html
@@ -12,17 +17,17 @@
     - I can also determine the minimum corotation radius by using the minimum starting period at 10-100 Myr or so,
     and hence, define another rough limit for the inner orbit radius!
     - From corotation and rockline, we get what is the suggested inner limit.
-6. Make an atmospheric model class with:
+8. Make an atmospheric model class with:
      1. Many potential chemicals, their mass, their absorption and reflection spectra.
      2. Make subclasses of specific atmospheres, calculate if the compounds can actually stay in the atmosphere
      3. allow for creation of user based subclasses
      4. estimate greenhouse effect, albedo(?), color of sky, color of vegetation.
      5. Give description of atmosphere for users.
      6. Start with terran atmosphere. add terran atm mods, carry on with mars atmosphere etc.
-7. Modify HZ for A-type stars: https://iopscience.iop.org/article/10.3847/1538-4357/aab8fa/pdf pg. 6, table 2
-8. Add other types of stars -> probably not, because they are not long-lasting.
-9. Add black holes https://arxiv.org/pdf/1909.06748.pdf (it would only be around AGNs and it is tricky)
-10. add dwarfs?
+9. Modify HZ for A-type stars: https://iopscience.iop.org/article/10.3847/1538-4357/aab8fa/pdf pg. 6, table 2
+10. Add other types of stars -> probably not, because they are not long-lasting.
+11. Add black holes https://arxiv.org/pdf/1909.06748.pdf (it would only be around AGNs and it is tricky)
+12. add dwarfs?
 
 # Plotting:
 0. plotting of binaries/trinaries/quaternaries
@@ -42,14 +47,11 @@
 4. Add trigger functions to Edit menu
 5. Add trigger functions to insert menu
 6. Add right-click functionalities for tree view.
-    - add details on planet
-    - add details on asteroid belt
-    - add details on Satellite
-    - add details on Trojan
+    - Make lagrange position a comboBox.
     - add details on binary system
     - add details on solar system
     - add details on planetary system
-7. Add tree view header right-click functionalities (and allow name change like rest "system" types)
+8. Add tree view header right-click functionalities (and allow name change like rest "system" types)
 
 
 
@@ -66,6 +68,6 @@
 
 
 [comment]: <publishing options>
-[comment]: <flask and html through google sites>
+[comment]: <flask and html through google sites https://realpython.com/python-web-applications/>
 [comment]: <html and github>
 

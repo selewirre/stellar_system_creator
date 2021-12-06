@@ -4,12 +4,13 @@ albedo,0
 angular_diameter_from_parent,0.007448 deg
 angular_diameter_of_parent,0.5709 deg
 apoapsis,0.69 au
-argument_of_periapsis,nan
-axial_tilt,0
+argument_of_periapsis,nan deg
+axial_tilt,0 deg
 chemical_composition,"{'Fe': 0.3, 'MgSiO3': 0.7, 'H2O': 0.0, 'H2': 0.0, 'He': 0.0, 'CH4': 0.0}"
 circumference,6.616 R_e
 composition,Rockworld70
 day_period,0.5953 d
+dense_roche_limit,5.536 R_e
 density,6.233 g/cm³
 emissivity,1
 escape_velocity,1.12 vesc_e
@@ -17,16 +18,17 @@ farthest_parent,CroomskStar
 habitability,True
 habitability_violations,None
 heat_distribution,1
+hill_sphere,0.008157 au
 image_filename,None
 incident_flux,0.06846 L_s/au²
-inclination,0
+inclination,0 deg
 induced_tide_height_to_parent,0.0009455 m
 induced_tide_height_to_self,1.115 m
-inner_orbit_limit,1.158 R_e
-internal_heating_fluxes,"{'Primordial': 0.006098 W/m², 'Radiogenic': 0.03788 W/m², 'Tidal': 0 W/m², 'Total': 0.04398 W/m²}"
+inner_orbit_limit,5.536 R_e
+internal_heating_fluxes,"{'Primordial': 0.006309 W/m², 'Radiogenic': 0.03823 W/m², 'Tidal': 0 W/m², 'Total': 0.04454 W/m²}"
 lifetime,1.953 T_s
-longitude_of_ascending_node,0
-luminosity,1.845×10¹⁷ W
+longitude_of_ascending_node,0 deg
+luminosity,1.66×10¹⁷ W
 mass,1.32 M_e
 mass_class,Terran
 name,planet3
@@ -43,17 +45,19 @@ part_of_binary,False
 periapsis,0.69 au
 radius,1.053 R_e
 semi_major_axis,0.69 au
+semi_major_axis_maximum_limit,32 au
 semi_major_axis_minimum_limit,1.38 R_s
 semi_minor_axis,0.69 au
 spin_period,0.5938 d
-stability_violations,
-suggested_luminosity,1.845×10¹⁷ W
+stability_violations,None
+suggested_age,0.9666 T_s
+suggested_luminosity,1.66×10¹⁷ W
 suggested_radius,1.053 R_e
 suggested_spin_period,0.5938 d
 surface_area,13.93 R_e²
 surface_gravity,1.19 g_e
 surface_pressure,1.417 atm
 tectonic_activity,Medium Low
-temperature,275.4 K
-tidal_locking_radius,0.008278 au
+temperature,268.2 K
+tidal_locking_radius,0.008264 au
 volume,4.891 R_e³
