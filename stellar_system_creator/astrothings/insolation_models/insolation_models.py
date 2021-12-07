@@ -302,9 +302,14 @@ class BinaryInsolationForWaterFrostLine(BinaryInsolationModel):
 
 class BinaryInsolationForRockLine(BinaryInsolationModel):
 
-    def __init__(self, frost_lines: Dict, child_insolation_model: InsolationForRockLine):
-        super().__init__(frost_lines, child_insolation_model)
+    def __init__(self, rock_lines: Dict, child_insolation_model: InsolationForRockLine):
+        super().__init__(rock_lines, child_insolation_model)
 
     def _set_popular_limit_names(self, child_insolation_model: InsolationForRockLine):
         self.min_name = child_insolation_model.min_name
         self.max_name = child_insolation_model.max_name
+
+    def _set_spectrally_weighted_luminosities_on_thresholds(self, rock_lines: Dict):
+        self.spectrally_weighted_luminosities_on_thresholds = {}
+        self.spectrally_weighted_luminosities_on_thresholds = {name: rock_lines[name] ** 2 for name in self.names}
+        self.swl = self.spectrally_weighted_luminosities_on_thresholds

@@ -18,6 +18,7 @@ class BasicDetailsDialog(QDialog):
         from ..standard_items import TreeViewItemFromStellarSystemElement
         self.parent_item: TreeViewItemFromStellarSystemElement = parent_item
         super().__init__(self.parent_item.model().parent().parent())
+        self.parent_item.stellar_system_element.__post_init__()
         self.__post_init__()
 
     def __post_init__(self):
@@ -46,7 +47,6 @@ class BasicDetailsDialog(QDialog):
             'Use Suggested Age': CheckBox(self.ule['Age']),
             'Use Suggested Image': CheckBox(self.ule['Image Filename'])
                 }
-        self.random = [self.check_boxes[key].isChecked() for key in self.check_boxes]
 
     def _set_line_edits(self):
         sse: Union[StellarBody, Star, Planet, AsteroidBelt,

@@ -18,7 +18,7 @@ from stellar_system_creator.stellar_system_elements.stellar_body import StellarB
 
 class UnitLineEdit(QWidget):
 
-    def __init__(self, sse: Union[StellarBody], value_name: str, influenced_labels: Dict, *args, **kwargs):
+    def __init__(self, sse: Union[StellarBody, StellarBinary], value_name: str, influenced_labels: Dict, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.sse = sse
@@ -79,7 +79,7 @@ class UnitLineEdit(QWidget):
 
 class UnitLabel(QWidget):
 
-    def __init__(self, sse: Union[StellarBody, InsolationThresholdModel],
+    def __init__(self, sse: Union[StellarBody, StellarBinary, InsolationThresholdModel],
                  value_name: str, sub_value_name: str = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -142,7 +142,7 @@ class UnitLabel(QWidget):
 
 class LineEdit(QLineEdit):
 
-    def __init__(self, sse: Union[StellarBody], value_name: str, influenced_labels: Dict, *args, **kwargs):
+    def __init__(self, sse: Union[StellarBody, StellarBinary], value_name: str, influenced_labels: Dict, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.sse = sse
         self.value_name = value_name
@@ -173,7 +173,7 @@ class LineEdit(QLineEdit):
 
 class Label(QLabel):
 
-    def __init__(self, sse: Union[StellarBody, InsolationThresholdModel],
+    def __init__(self, sse: Union[StellarBody, StellarBinary, InsolationThresholdModel],
                  value_name: str, sub_value_name: str = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.sse = sse
@@ -203,7 +203,7 @@ class Label(QLabel):
 
 class TextBrowser(QTextBrowser):
 
-    def __init__(self, sse: Union[StellarBody], value_name: str, *args, **kwargs):
+    def __init__(self, sse: Union[StellarBody, StellarBinary], value_name: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.sse = sse
         self.value_name = value_name
@@ -391,7 +391,7 @@ class ImageLabel(QLabel):
 
 class ImageLineEdit(QWidget):
 
-    def __init__(self, sse: Union[StellarBody], influenced_labels: Dict, *args, **kwargs):
+    def __init__(self, sse: Union[StellarBody, StellarBinary], influenced_labels: Dict, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.sse = sse
         self.value_name = ''

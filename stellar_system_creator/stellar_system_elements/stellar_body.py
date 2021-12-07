@@ -148,6 +148,9 @@ class StellarBody:
         elif 'parent' not in self.__dict__:
             self.parent = parent
             self.parent.add_child(self)
+        elif self.parent is None:
+            self.parent = parent
+            self.parent.add_child(self)
         elif self.parent != parent:
             self.parent.remove_child(self)
             self.parent = parent
@@ -361,6 +364,10 @@ class Star(StellarBody):
             self.set_habitable_zone('RHZ', companion_body)
             self.set_habitable_zone('PHZ', companion_body)
             self.set_habitable_zone('AHZ', companion_body)
+            model = self.insolation_model
+            if np.isnan(self.habitable_zone_limits['RHZ'][model.earth_equivalent].m):
+                self.habitable_zone_limits['PHZ'] = {name: np.nan * ureg.au for name in model.names}
+                self.habitable_zone_limits['AHZ'] = {name: np.nan * ureg.au for name in model.names}
 
     def check_habitability(self) -> Tuple[bool, str]:
         habitability = True
@@ -503,12 +510,18 @@ class Star(StellarBody):
         self.habitable_zone_limits = {}
         self.set_habitable_zones()
 
-    def reset_insolation_model_and_habitability(self, model_name='Kopparapu'):
+    def reset_insolation_model(self, model_name='Kopparapu'):
         self._set_insolation_model(model_name)
         self._set_orbit_values()  # here for cause the frost lines also depend on the binary
+
+    def reset_habitability(self):
         self.habitable_zone_limits = {}
         self.set_habitable_zones()
         self.habitability, self.habitability_violations = self.check_habitability()
+
+    def reset_insolation_model_and_habitability(self, model_name='Kopparapu'):
+        self.reset_insolation_model(model_name)
+        self.reset_habitability()
 
 
 class MainSequenceStar(Star):

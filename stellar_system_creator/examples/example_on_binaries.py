@@ -17,8 +17,8 @@ duheb_star = MainSequenceStar('DuhebStar', 0.6 * ureg.M_s)
 shugravu_binary = StellarBinary('ShugravuBinary', andra_star, croomsk_star,
                                 mean_distance=0.5 * ureg.au, eccentricity=0.5)
 # print(shugravu_binary)
-# for key in shugravu_binary.habitable_zone_limits:
-#     print(key, shugravu_binary.habitable_zone_limits[key])
+for key in shugravu_binary.habitable_zone_limits:
+    print(key, shugravu_binary.habitable_zone_limits[key])
 # shugravu_binary.primary_body.save_as_csv('output_files/AndraStar_in_ShugravuBinary.csv')
 # shugravu_binary.save_as_csv('output_files/ShugravuBinary.csv')
 
@@ -33,8 +33,8 @@ shugravu_binary = StellarBinary('ShugravuBinary', andra_star, croomsk_star,
 # trakruna_binaryS.primary_body.save_as_csv('output_files/BhasdhaStar_in_TrakrunaBinaryS.csv')
 # trakruna_binaryS.save_as_csv('output_files/TrakrunaBinaryS.csv')
 
-# trakruna_binaryP = StellarBinary('TrakrunaBinaryP', bhasdha_star, duheb_star,
-#                                  mean_distance=1.1 * ureg.au, eccentricity=0.44)
+trakruna_binaryP = StellarBinary('TrakrunaBinaryP', bhasdha_star, duheb_star,
+                                 mean_distance=0.1 * ureg.au, eccentricity=0.2)
 
 # print(trakruna_binaryP)
 # for key in trakruna_binaryP.habitable_zone_limits:
@@ -43,15 +43,15 @@ shugravu_binary = StellarBinary('ShugravuBinary', andra_star, croomsk_star,
 # trakruna_binaryP.primary_body.save_as_csv('output_files/BhasdhaStar_in_TrakrunaBinaryP.csv')
 # trakruna_binaryP.save_as_csv('output_files/TrakrunaBinaryP.csv')
 
-# quezuliferh_quaternary = StellarBinary('QuezuliferhQuaternary', shugravu_binary, trakruna_binaryP,
-#                                        mean_distance=100 * ureg.au, eccentricity=0.7)
+quezuliferh_quaternary = StellarBinary('QuezuliferhQuaternary', shugravu_binary, trakruna_binaryP,
+                                       mean_distance=100 * ureg.au, eccentricity=0.7)
 # print(quezuliferh_quaternary)
 # for key in quezuliferh_quaternary.habitable_zone_limits:
 #     print(key, quezuliferh_quaternary.habitable_zone_limits[key])
 # for key in trakruna_binaryP.habitable_zone_limits:
 #     print(key, trakruna_binaryP.habitable_zone_limits[key])
-# for key in shugravu_binary.habitable_zone_limits:
-#     print(key, shugravu_binary.habitable_zone_limits[key])
+for key in shugravu_binary.habitable_zone_limits:
+    print(key, shugravu_binary.habitable_zone_limits[key])
 
 # quezuliferh_quaternary.primary_body.save_as_csv('output_files/ShugravuBinary_in_QuezuliferhQuaternary.csv')
 # quezuliferh_quaternary.save_as_csv('output_files/QuezuliferhQuaternary.csv')
