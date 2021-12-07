@@ -410,8 +410,6 @@ class TrojanSatelliteDetailsDialog(SatelliteDetailsDialog):
         sse: TrojanSatellite = self.parent_item.stellar_system_element
         super()._set_line_edits()
 
-        self.le['Lagrange Position'] = LineEdit(sse, 'lagrange_position', self.all_labels)
-
     def _set_tabs(self):
         super()._set_tabs()
         self.tab_widget.removeTab(4)
@@ -425,7 +423,7 @@ class TrojanSatelliteDetailsDialog(SatelliteDetailsDialog):
         super()._set_orbital_characteristics_tab()
         basic_orbital_characteristics_box_layout = self.basic_orbital_characteristics_group_box.layout()
         key = 'Lagrange Position'
-        basic_orbital_characteristics_box_layout.insertRow(1, f"{key}:", self.le[key])
+        basic_orbital_characteristics_box_layout.insertRow(1, f"{key}:", self.other_edits[key])
 
         self.other_edits['Orbit Type'].setEnabled(False)
         self.le['Eccentricity'].setEnabled(False)
@@ -434,6 +432,23 @@ class TrojanSatelliteDetailsDialog(SatelliteDetailsDialog):
         self.ule['Argument of Periapsis'].setEnabled(False)
         self.ule['Longitude of the Ascending Node'].setEnabled(False)
 
+    def _set_other_edits(self):
+        super()._set_other_edits()
+        sse: Planet = self.parent_item.stellar_system_element
+        self.other_edits['Lagrange Position'] = ComboBox(sse, 'orbit_type', ['1', '-1'], self.all_labels)
+
+    def _set_other_edit_init_values(self):
+        super()._set_other_edit_init_values()
+        self.other_edit_init_values['Lagrange Position'] = self.other_edits['Lagrange Position'].currentText()
+
+    def return_other_edits_to_initial_values(self):
+        super().return_other_edits_to_initial_values()
+        self.other_edits['Lagrange Position'].setCurrentText(self.other_edit_init_values['Lagrange Position'])
+
+    def confirm_other_edit_changes(self):
+        super().confirm_other_edit_changes()
+        self.other_edit_init_values['Lagrange Position'] = self.parent_item.stellar_system_element.lagrange_position
+
 
 class TrojanDetailsDialog(PlanetDetailsDialog):
 
@@ -441,7 +456,6 @@ class TrojanDetailsDialog(PlanetDetailsDialog):
         sse: Trojan = self.parent_item.stellar_system_element
         super()._set_line_edits()
 
-        self.le['Lagrange Position'] = LineEdit(sse, 'lagrange_position', self.all_labels)
         self.le['Relative Count'] = LineEdit(sse, 'relative_count', self.all_labels)
 
     def _set_unit_line_edits(self):
@@ -500,7 +514,7 @@ class TrojanDetailsDialog(PlanetDetailsDialog):
         super()._set_orbital_characteristics_tab()
         basic_orbital_characteristics_box_layout = self.basic_orbital_characteristics_group_box.layout()
         key = 'Lagrange Position'
-        basic_orbital_characteristics_box_layout.insertRow(1, f"{key}:", self.le[key])
+        basic_orbital_characteristics_box_layout.insertRow(1, f"{key}:", self.other_edits[key])
         orbital_distance_characteristics_box_layout = self.orbital_distance_characteristics_group_box.layout()
         key = 'Extent'
         orbital_distance_characteristics_box_layout.insertRow(0, f"{key}:", self.ule[key])
@@ -511,6 +525,23 @@ class TrojanDetailsDialog(PlanetDetailsDialog):
         self.ule['Inclination'].setEnabled(False)
         self.ule['Argument of Periapsis'].setEnabled(False)
         self.ule['Longitude of the Ascending Node'].setEnabled(False)
+
+    def _set_other_edits(self):
+        super()._set_other_edits()
+        sse: Planet = self.parent_item.stellar_system_element
+        self.other_edits['Lagrange Position'] = ComboBox(sse, 'orbit_type', ['1', '-1'], self.all_labels)
+
+    def _set_other_edit_init_values(self):
+        super()._set_other_edit_init_values()
+        self.other_edit_init_values['Lagrange Position'] = self.other_edits['Lagrange Position'].currentText()
+
+    def return_other_edits_to_initial_values(self):
+        super().return_other_edits_to_initial_values()
+        self.other_edits['Lagrange Position'].setCurrentText(self.other_edit_init_values['Lagrange Position'])
+
+    def confirm_other_edit_changes(self):
+        super().confirm_other_edit_changes()
+        self.other_edit_init_values['Lagrange Position'] = self.parent_item.stellar_system_element.lagrange_position
 
 
 class AsteroidBeltDetailsDialog(PlanetDetailsDialog):

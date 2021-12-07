@@ -335,6 +335,7 @@ class ComboBox(QComboBox):
         self.sse = sse
         self.value_name = value_name
         self.value_list = value_list
+        self.value_type = type(self.sse.__dict__[self.value_name])
         self.influenced_labels = influenced_labels
 
         self.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
@@ -345,10 +346,10 @@ class ComboBox(QComboBox):
         self.currentTextChanged.connect(self.change_text_action)
 
     def _get_value(self):
-        return self.sse.__dict__[self.value_name]
+        return str(self.sse.__dict__[self.value_name])
 
     def change_text_action(self, process_change=True) -> None:
-        self.sse.__dict__[self.value_name] = self.currentText()
+        self.sse.__dict__[self.value_name] = self.value_type(self.currentText())
         if process_change:
             self.sse.__post_init__()
             for key in self.influenced_labels:
