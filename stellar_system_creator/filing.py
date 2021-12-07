@@ -4,10 +4,10 @@ import blosc
 import _pickle as cPickle
 # https://stackoverflow.com/questions/57983431/whats-the-most-space-efficient-way-to-compress-serialized-python-data
 
-from stellar_system_creator.solar_system_elements.binary_system import BinarySystem
-from stellar_system_creator.solar_system_elements.planetary_system import PlanetarySystem
-from stellar_system_creator.solar_system_elements.solar_system import SolarSystem
-from stellar_system_creator.solar_system_elements.stellar_body import StellarBody
+from stellar_system_creator.stellar_system_elements.binary_system import BinarySystem
+from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
+from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem
+from stellar_system_creator.stellar_system_elements.stellar_body import StellarBody
 
 
 def add_extension_if_necessary(filename, extension):
@@ -21,9 +21,9 @@ def add_extension_if_necessary(filename, extension):
     return filename
 
 
-def save(obj: Union[StellarBody, BinarySystem, PlanetarySystem, SolarSystem], filename: str) -> bool:
+def save(obj: Union[StellarBody, BinarySystem, PlanetarySystem, StellarSystem], filename: str) -> bool:
     """Saving object (can be any class) via pickling under filename with extension .scc"""
-    supported_classes = [StellarBody, BinarySystem, PlanetarySystem, SolarSystem]
+    supported_classes = [StellarBody, BinarySystem, PlanetarySystem, StellarSystem]
 
     if any([isinstance(obj, cl) for cl in supported_classes]):
         filename = add_extension_if_necessary(filename, 'ssc')
@@ -39,7 +39,7 @@ def save(obj: Union[StellarBody, BinarySystem, PlanetarySystem, SolarSystem], fi
         return False
 
 
-def load(filename: str) -> Union[StellarBody, BinarySystem, PlanetarySystem, SolarSystem]:
+def load(filename: str) -> Union[StellarBody, BinarySystem, PlanetarySystem, StellarSystem]:
     """Loading scc pickled files"""
     # filename = add_extension_if_necessary(filename, 'ssc')
 

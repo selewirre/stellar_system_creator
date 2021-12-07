@@ -2,12 +2,12 @@
 from matplotlib import pyplot as plt
 
 from stellar_system_creator.filing import save
-from stellar_system_creator.solar_system_elements.planetary_system import PlanetarySystem
-from stellar_system_creator.solar_system_elements.stellar_body import MainSequenceStar, Planet, AsteroidBelt, Trojans, \
-    Satellite
-from stellar_system_creator.solar_system_elements.binary_system import StellarBinary
+from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
+from stellar_system_creator.stellar_system_elements.stellar_body import MainSequenceStar, Planet, AsteroidBelt, Trojan, \
+    Satellite, TrojanSatellite
+from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
 from stellar_system_creator.astrothings.units import ureg
-from stellar_system_creator.solar_system_elements.solar_system import SolarSystem, MultiSolarSystemSType
+from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem, MultiStellarSystemSType
 
 bhasdha_star = MainSequenceStar('BhasdhaStar', 1.0 * ureg.M_s, radius=1 * ureg.R_s)
 duheb_star = MainSequenceStar('DuhebStar', 0.6 * ureg.M_s)
@@ -36,8 +36,9 @@ planet8 = Planet('planet8', 0.0086 * ureg.M_e, semi_major_axis=22.7 * 2 * ureg.a
 asteroid_belt = AsteroidBelt('asteroids1', semi_major_axis=2.15 * 2 * ureg.au, parent=trakruna_binaryP, extend=2/3 * ureg.au)
 
 # creating trojans around planet1
-trojans1 = Trojans('trojans1', planet1, 1, relative_count=30, composition='Rockworld70')
-trojans2 = Trojans('trojans2', planet1, -1, relative_count=30, composition='Rockworld70')
+# trojans1 = Trojans('trojans1', planet1, 1, relative_count=1, composition='Rockworld70', mass=1*ureg.M_e)
+trojans1 = TrojanSatellite('trojanMoon', planet1, 1, 0.4 * ureg.M_e, composition='Rockworld70')
+trojans2 = Trojan('trojans2', planet1, -1, relative_count=30, composition='Rockworld70')
 
 # creating three satelites for planet3
 satellite1 = Satellite('moon1', 0.032 * ureg.M_e, parent=planet3, semi_major_axis=210E3 * ureg.km)
@@ -70,9 +71,9 @@ ps6 = PlanetarySystem('ps6', planet6)
 ps7 = PlanetarySystem('ps7', planet7)
 ps8 = PlanetarySystem('ps8', planet8)
 
-# creating solar system for visualization
-ss = SolarSystem('Trakuna Stellar System', trakruna_binaryP, [ps1, ps2, ps3, ps4, ps5, ps6, ps7, ps8], [asteroid_belt])
+# creating stellar system for visualization
+ss = StellarSystem('Trakuna Stellar System', trakruna_binaryP, [ps1, ps2, ps3, ps4, ps5, ps6, ps7, ps8], [asteroid_belt])
 
-save(ss, 'output_files/TrakunaStellarSystem.ssc')
-# ss.draw_solar_system()
-# plt.show()
+# save(ss, 'output_files/TrakunaStellarSystem.ssc')
+ss.draw_stellar_system()
+plt.show()

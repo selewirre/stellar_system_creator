@@ -1,5 +1,1 @@
-from .stellar_body import StellarBody, Star, MainSequenceStar, BlackHole, Planet, AsteroidBelt, Satellite, Trojan, \
-    TrojanSatellite
-from .binary_system import BinarySystem, StellarBinary
-from .planetary_system import PlanetarySystem
-from .stellar_system import StellarSystem, MultiStellarSystemSType
+from . import stellar_body, binary_system, planetary_system, stellar_system

@@ -55,25 +55,25 @@ class StarDetailsDialog(BasicDetailsDialog):
 
     def _set_other_edit_init_values(self):
         self.other_edit_init_values = {'Insolation Model Radio Button':
-                                       self.parent_item.ssc_object.insolation_model.name}
+                                       self.parent_item.stellar_system_element.insolation_model.name}
 
     def _set_line_edits(self):
-        sse: Star = self.parent_item.ssc_object
+        sse: Star = self.parent_item.stellar_system_element
         super()._set_line_edits()
 
     def _set_labels(self):
-        sse: Star = self.parent_item.ssc_object
+        sse: Star = self.parent_item.stellar_system_element
         super()._set_labels()
 
         self.labels['Luminosity Class'] = Label(sse, 'luminosity_class')
         self.labels['Appearance Frequency'] = Label(sse, 'appearance_frequency')
 
     def _set_unit_line_edits(self):
-        sse: Star = self.parent_item.ssc_object
+        sse: Star = self.parent_item.stellar_system_element
         super()._set_unit_line_edits()
 
     def _set_unit_labels(self):
-        sse: Star = self.parent_item.ssc_object
+        sse: Star = self.parent_item.stellar_system_element
         super()._set_unit_labels()
 
         self.ulabels['Peak Wavelength'] = UnitLabel(sse, 'peak_wavelength')
@@ -87,7 +87,7 @@ class StarDetailsDialog(BasicDetailsDialog):
         self.ulabels['Outer Rock Formation Limit'] = UnitLabel(sse, 'prevailing_rock_lines', 'Outer Limit')
 
     def _set_general_tab(self):
-        sse: Star = self.parent_item.ssc_object
+        sse: Star = self.parent_item.stellar_system_element
         self.general_tab = Tab()
         widget = QWidget(self.tab_widget)
         self.general_tab.setWidget(widget)
@@ -106,14 +106,14 @@ class StarDetailsDialog(BasicDetailsDialog):
         classifications_box_layout = QFormLayout()
         self.classifications_group_box.setLayout(classifications_box_layout)
         self.add_keys_to_layout(classifications_box_layout, self.labels,
-                                ['Mass Class', 'Luminosity Class'])  # , 'Appearance Frequency'])
+                                ['Mass Class', 'Luminosity Class', 'Appearance Frequency'])
 
         tab_layout.addWidget(self.designations_group_box)
         tab_layout.addWidget(self.classifications_group_box)
         tab_layout.addStretch()
 
     def _set_physical_characteristics_tab(self):
-        sse: Star = self.parent_item.ssc_object
+        sse: Star = self.parent_item.stellar_system_element
         self.physical_characteristics_tab = Tab()
         widget = QWidget(self.tab_widget)
         self.physical_characteristics_tab.setWidget(widget)
@@ -124,53 +124,43 @@ class StarDetailsDialog(BasicDetailsDialog):
         self.material_characteristics_group_box = GroupBox('Material Characteristics')
         material_characteristics_box_layout = QFormLayout()
         self.material_characteristics_group_box.setLayout(material_characteristics_box_layout)
-        self.add_key_to_layout(material_characteristics_box_layout, self.ule, 'Mass', 'quantities/material/mass.html')
-        self.add_key_to_layout(material_characteristics_box_layout, self.ulabels, 'Density',
-                               'quantities/material/density.html')
+        self.add_key_to_layout(material_characteristics_box_layout, self.ule, 'Mass')
+        self.add_key_to_layout(material_characteristics_box_layout, self.ulabels, 'Density')
 
         # setting Geometric characteristics group box
         self.geometric_characteristics_group_box = GroupBox('Geometric Characteristics')
         geometric_characteristics_box_layout = QFormLayout()
         self.geometric_characteristics_group_box.setLayout(geometric_characteristics_box_layout)
         self.add_key_to_layout(geometric_characteristics_box_layout, self.check_boxes, 'Use Suggested Radius')
-        self.add_key_to_layout(geometric_characteristics_box_layout, self.ule, 'Radius',
-                               'quantities/geometric/radius.html')
+        self.add_key_to_layout(geometric_characteristics_box_layout, self.ule, 'Radius')
         keys = ['Suggested Radius', 'Circumference', 'Surface Area', 'Volume']
-        tooltip_dirs = [f'quantities/geometric/{s}.html' for s in ['radius', 'circumference', 'surface_area', 'volume']]
-        self.add_keys_to_layout(geometric_characteristics_box_layout, self.ulabels, keys, tooltip_dirs)
+        self.add_keys_to_layout(geometric_characteristics_box_layout, self.ulabels, keys)
 
         # setting Spectral characteristics group box
         self.spectral_characteristics_group_box = GroupBox('Spectral Characteristics')
         spectral_characteristics_box_layout = QFormLayout()
         self.spectral_characteristics_group_box.setLayout(spectral_characteristics_box_layout)
         self.add_key_to_layout(spectral_characteristics_box_layout, self.check_boxes, 'Use Suggested Luminosity')
-        self.add_key_to_layout(spectral_characteristics_box_layout, self.ule, 'Luminosity',
-                               'quantities/surface/emission/luminosity.html')
+        self.add_key_to_layout(spectral_characteristics_box_layout, self.ule, 'Luminosity')
         keys = ['Suggested Luminosity', 'Temperature', 'Peak Wavelength']
-        tooltip_dirs = [f'quantities/surface/emission/{s}.html'
-                        for s in ['luminosity', 'temperature', 'peak_wavelength']]
-        self.add_keys_to_layout(spectral_characteristics_box_layout, self.ulabels, keys, tooltip_dirs)
+        self.add_keys_to_layout(spectral_characteristics_box_layout, self.ulabels, keys)
 
         # setting Rotational characteristics group box
         self.rotational_characteristics_group_box = GroupBox('Rotational Characteristics')
         rotational_characteristics_box_layout = QFormLayout()
         self.rotational_characteristics_group_box.setLayout(rotational_characteristics_box_layout)
         self.add_key_to_layout(rotational_characteristics_box_layout, self.check_boxes, 'Use Suggested Spin Period')
-        self.add_key_to_layout(rotational_characteristics_box_layout, self.ule, 'Spin Period',
-                               'quantities/rotational/spin_period.html')
-        self.add_key_to_layout(rotational_characteristics_box_layout, self.ulabels, 'Suggested Spin Period',
-                               'quantities/rotational/spin_period.html')
+        self.add_key_to_layout(rotational_characteristics_box_layout, self.ule, 'Spin Period')
+        self.add_key_to_layout(rotational_characteristics_box_layout, self.ulabels, 'Suggested Spin Period')
 
         # setting age characteristics group box
         self.age_characteristics_group_box = GroupBox('Age Characteristics')
         age_characteristics_box_layout = QFormLayout()
         self.age_characteristics_group_box.setLayout(age_characteristics_box_layout)
         self.add_key_to_layout(age_characteristics_box_layout, self.check_boxes, 'Use Suggested Age')
-        self.add_key_to_layout(age_characteristics_box_layout, self.ule, 'Age', 'quantities/life/age.html')
-        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Suggested Age',
-                               'quantities/life/age.html')
-        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Lifetime',
-                               'quantities/life/lifetime.html')
+        self.add_key_to_layout(age_characteristics_box_layout, self.ule, 'Age')
+        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Suggested Age')
+        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Lifetime')
 
         tab_layout.addWidget(self.material_characteristics_group_box)
         tab_layout.addWidget(self.geometric_characteristics_group_box)
@@ -180,7 +170,7 @@ class StarDetailsDialog(BasicDetailsDialog):
         tab_layout.addStretch()
 
     def _set_children_orbit_limits_tab(self):
-        sse: Star = self.parent_item.ssc_object
+        sse: Star = self.parent_item.stellar_system_element
         self.children_orbit_limits_tab = Tab()
         widget = QWidget(self.tab_widget)
         self.children_orbit_limits_tab.setWidget(widget)
@@ -191,32 +181,23 @@ class StarDetailsDialog(BasicDetailsDialog):
         self.basic_limits_group_box = GroupBox('Basic Limits')
         basic_limits_box_layout = QFormLayout()
         self.basic_limits_group_box.setLayout(basic_limits_box_layout)
-        keys = ['Tidal Locking Radius', 'Rough Inner Orbit Limit', 'Dense Roche Limit', 'Inner Orbit Limit',
-                'Rough Outer Orbit Limit', 'Hill Sphere', 'S-Type Critical Orbit', 'Outer Orbit Limit']
-        tooltip_dirs = [f'quantities/children_orbit_limits/{s}.html'
-                        for s in ['tidal_locking_radius', 'rough_inner_orbit_limit', 'dense_roche_limit',
-                                  'inner_orbit_limit', 'rough_outer_orbit_limit', 'hill_sphere',
-                                  's_type_critical_orbit', 'outer_orbit_limit']]
-        self.add_keys_to_layout(basic_limits_box_layout, self.ulabels, keys, tooltip_dirs)
+        keys = ['Rough Inner Orbit Limit', 'Rough Outer Orbit Limit', 'Tidal Locking Radius', 'Dense Roche Limit',
+                'Hill Sphere', 'Inner Orbit Limit', 'Outer Orbit Limit']
+        self.add_keys_to_layout(basic_limits_box_layout, self.ulabels, keys)
 
         # setting Rock Line group box
         self.rock_line_group_box = GroupBox('Rock Formation Limits')
         rock_line_box_layout = QFormLayout()
         self.rock_line_group_box.setLayout(rock_line_box_layout)
         keys = ['Inner Rock Formation Limit', 'Outer Rock Formation Limit']
-        tooltip_dirs = [f'quantities/children_orbit_limits/{s}.html'
-                        for s in ['inner_rock_formation_limit', 'outer_rock_formation_limit']]
-        self.add_keys_to_layout(rock_line_box_layout, self.ulabels, keys, tooltip_dirs)
+        self.add_keys_to_layout(rock_line_box_layout, self.ulabels, keys)
 
         # setting Water Frost Line group box
         self.water_frost_line_group_box = GroupBox('Water Frost Limits')
         water_frost_line_box_layout = QFormLayout()
         self.water_frost_line_group_box.setLayout(water_frost_line_box_layout)
         keys = ['Inner Water Frost Limit', 'Sol Equivalent Water Frost Limit', 'Outer Water Frost Limit']
-        tooltip_dirs = [f'quantities/children_orbit_limits/{s}.html'
-                        for s in ['inner_water_frost_limit', 'sol_equivalent_water_frost_limit',
-                                  'outer_water_frost_limit']]
-        self.add_keys_to_layout(water_frost_line_box_layout, self.ulabels, keys, tooltip_dirs)
+        self.add_keys_to_layout(water_frost_line_box_layout, self.ulabels, keys)
 
         tab_layout.addWidget(self.basic_limits_group_box)
         tab_layout.addWidget(self.rock_line_group_box)
@@ -224,25 +205,25 @@ class StarDetailsDialog(BasicDetailsDialog):
         tab_layout.addStretch()
 
     def _initialize_insolation_tab(self):
-        sse: Star = self.parent_item.ssc_object
+        sse: Star = self.parent_item.stellar_system_element
         self.insolation_tab = InsolationTab(sse, self.tab_widget, self.habitability_tab)
 
     def _set_insolation_tab(self):
-        sse: Star = self.parent_item.ssc_object
+        sse: Star = self.parent_item.stellar_system_element
         self.insolation_tab.set_influenced_labels(self.all_labels)
 
     def _initialize_habitability_tab(self):
-        sse: Star = self.parent_item.ssc_object
+        sse: Star = self.parent_item.stellar_system_element
         self.habitability_tab = ParentHabitabilityTab(sse, self.tab_widget)
 
     def _set_habitability_tab(self):
-        sse: Star = self.parent_item.ssc_object
+        sse: Star = self.parent_item.stellar_system_element
         label_keys = ['Habitability', 'Habitability Violations']
         self.habitability_tab.influenced_labels = {key: self.all_labels[key] for key in label_keys}
         self.habitability_tab.set_boxes()
 
     def _set_image_tab(self):
-        sse: Star = self.parent_item.ssc_object
+        sse: Star = self.parent_item.stellar_system_element
         image_label = self.all_labels['Image Array']
         image_line_edit = self.ule['Image Filename']
         image_check_box = self.check_boxes['Use Suggested Image']
@@ -255,10 +236,5 @@ class StarDetailsDialog(BasicDetailsDialog):
 
     def confirm_other_edit_changes(self):
         self.other_edit_init_values['Insolation Model Radio Button'] = \
-            self.parent_item.ssc_object.insolation_model.name
+            self.parent_item.stellar_system_element.insolation_model.name
 
-    def return_texts_to_initial_values(self, update_parent=True):
-        super().return_texts_to_initial_values(update_parent)
-
-    def confirm_text_changes(self, update_parent=True):
-        super().confirm_text_changes(update_parent)
