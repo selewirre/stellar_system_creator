@@ -6,6 +6,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.Qt import QStandardItem
 
 from .misc import CategoryBasedTreeViewItemContextMenu
+from .stellar_bodies_context_menu.binary_system_context_menu import StellarBinaryTreeViewItemContextMenu
 from .stellar_bodies_context_menu.planet_context_menu import \
     PlanetTreeViewItemContextMenu, SatelliteTreeViewItemContextMenu, AsteroidBeltTreeViewItemContextMenu, \
     TrojanTreeViewItemContextMenu, TrojanSatelliteTreeViewItemContextMenu
@@ -17,7 +18,7 @@ from stellar_system_creator.stellar_system_elements.stellar_body import StellarB
     AsteroidBelt, Trojan, TrojanSatellite
 from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
-from stellar_system_creator.stellar_system_elements.binary_system import BinarySystem
+from stellar_system_creator.stellar_system_elements.binary_system import BinarySystem, StellarBinary
 
 
 class TreeViewItemFromString(QStandardItem):
@@ -39,8 +40,8 @@ class TreeViewItemFromString(QStandardItem):
 
 
 class TreeViewItemFromStellarSystemElement(QStandardItem):
-    def __init__(self, stellar_system_element: Union[StellarBody, Star, Planet,
-                                                   BinarySystem, PlanetarySystem, StellarSystem]):
+    def __init__(self, stellar_system_element: Union[StellarBody, Star, Planet, StellarBinary,
+                                                     BinarySystem, PlanetarySystem, StellarSystem]):
         super().__init__()
         self.setEditable(False)
         self.stellar_system_element = stellar_system_element
@@ -52,8 +53,8 @@ class TreeViewItemFromStellarSystemElement(QStandardItem):
         self.set_stellar_system_element_icon()
 
     def _get_context_menu_class(self):
-        if isinstance(self.stellar_system_element, BinarySystem):
-            self.context_menu_class = BinarySystemTreeViewItemContextMenu
+        if isinstance(self.stellar_system_element, StellarBinary):
+            self.context_menu_class = StellarBinaryTreeViewItemContextMenu
         elif isinstance(self.stellar_system_element, StellarSystem):
             self.context_menu_class = StellarSystemTreeViewItemContextMenu
         elif isinstance(self.stellar_system_element, PlanetarySystem):
