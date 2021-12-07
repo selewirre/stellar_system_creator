@@ -25,6 +25,5 @@ class StellarBodyTreeViewItemContextMenu(QMenu):
         self.details_action = QAction("&Details...", self)
 
     def details_action_process(self):
-        details_dialog = StellarBodyDetailsDialog(self.parent_item)
-        details_dialog.exec()
+        pass
 
