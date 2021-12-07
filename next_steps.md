@@ -30,7 +30,7 @@
 12. add dwarfs?
 
 # Plotting:
-0. plotting of binaries/trinaries/quaternaries
+0. plotting of trinaries/quaternaries
 1. try to plot in processing instead of matplotlib? (supposed to be faster)
     - https://github.com/jdf/processing-py-site
     - https://py.processing.org/
