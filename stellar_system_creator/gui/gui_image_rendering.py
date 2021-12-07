@@ -6,23 +6,23 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QVBoxLayout
 
-from stellar_system_creator.solar_system_elements.planetary_system import PlanetarySystem
-from stellar_system_creator.solar_system_elements.solar_system import SolarSystem
+from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
+from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem
 
 
 class SystemRenderingWidget(QSvgWidget):
 
-    def __init__(self, ssc_object: Union[SolarSystem, PlanetarySystem, None] = None):
+    def __init__(self, ssc_object: Union[StellarSystem, PlanetarySystem, None] = None):
         super().__init__()
         self.render_image(ssc_object)
 
-    def render_image(self, ssc_object: Union[SolarSystem, PlanetarySystem, None]):
+    def render_image(self, ssc_object: Union[StellarSystem, PlanetarySystem, None]):
 
         if ssc_object is not None:
             save_format = 'svg'
             with tempfile.NamedTemporaryFile("r+b", delete=True) as fd:
-                if isinstance(ssc_object, SolarSystem):
-                    ssc_object.draw_solar_system(save_fig=True, save_temp_file=fd, save_format=save_format)
+                if isinstance(ssc_object, StellarSystem):
+                    ssc_object.draw_stellar_system(save_fig=True, save_temp_file=fd, save_format=save_format)
                 elif isinstance(ssc_object, PlanetarySystem):
                     ssc_object.draw_planetary_system(save_fig=True, save_temp_file=fd, save_format=save_format)
                 fd.seek(0)
@@ -36,7 +36,7 @@ class SystemRenderingWidget(QSvgWidget):
 
 class SystemImageWidget(QWidget):
 
-    def __init__(self, ssc_object: Union[SolarSystem, PlanetarySystem, None] = None):
+    def __init__(self, ssc_object: Union[StellarSystem, PlanetarySystem, None] = None):
         super().__init__()
         self.ssc_object = ssc_object
 

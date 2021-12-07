@@ -1,7 +1,7 @@
 from stellar_system_creator.astrothings.units import ureg
-from stellar_system_creator.solar_system_elements.stellar_body import MainSequenceStar, Planet, Satellite, Trojans, AsteroidBelt
-from stellar_system_creator.solar_system_elements.planetary_system import PlanetarySystem
-from stellar_system_creator.solar_system_elements.solar_system import SolarSystem
+from stellar_system_creator.stellar_system_elements.stellar_body import MainSequenceStar, Planet, Satellite, Trojan, AsteroidBelt
+from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
+from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem
 from stellar_system_creator.filing import save
 import timeit
 
@@ -30,8 +30,8 @@ planet8 = Planet('planet8', 0.0086 * ureg.M_e, semi_major_axis=22.7 * ureg.au, p
 asteroid_belt = AsteroidBelt('asteroids1', semi_major_axis=2.15 * ureg.au, parent=croomsk_star, extend=1/3 * ureg.au)
 
 # creating trojans around planet1
-trojans1 = Trojans('trojans1', planet1, 1, relative_count=30, composition='Rockworld70')
-trojans2 = Trojans('trojans2', planet1, -1, relative_count=30, composition='Rockworld70')
+trojans1 = Trojan('trojans1', planet1, 1, relative_count=30, composition='Rockworld70')
+trojans2 = Trojan('trojans2', planet1, -1, relative_count=30, composition='Rockworld70')
 
 # creating three satelites for planet3
 satellite1 = Satellite('moon1', 0.032 * ureg.M_e, parent=planet3, semi_major_axis=210E3 * ureg.km)
@@ -64,8 +64,8 @@ ps6 = PlanetarySystem('ps6', planet6)
 ps7 = PlanetarySystem('ps7', planet7)
 ps8 = PlanetarySystem('ps8', planet8)
 
-# creating solar system for visualization
-ss = SolarSystem('ss1', croomsk_star, [ps1, ps2, ps3, ps4, ps5, ps6, ps7, ps8], [asteroid_belt])
+# creating stellar system for visualization
+ss = StellarSystem('ss1', croomsk_star, [ps1, ps2, ps3, ps4, ps5, ps6, ps7, ps8], [asteroid_belt])
 
 # visualizing planetary systems with satellites
 # ps1.want_orbit_label = False
@@ -75,16 +75,16 @@ ss = SolarSystem('ss1', croomsk_star, [ps1, ps2, ps3, ps4, ps5, ps6, ps7, ps8], 
 
 # ps3.draw_planetary_system(save_fig=False)
 #
-# # visualizing Croomsk solar system
+# # visualizing Croomsk stellar system
 # ss.want_draw_orbit_lines = False
 # ss.want_draw_frost_line = False
 # ss.draw_detailed_asteroid_belt = False
 # ss.draw_detailed_trojans = False
-# ss.want_draw_solar_system_limits = False
+# ss.want_draw_stellar_system_limits = False
 # ss.want_draw_extended_habitable_zone = False
 # ss.want_draw_conservative_habitable_zone = False
 
-# ss.draw_solar_system(save_fig=False)
+# ss.draw_stellar_system(save_fig=False)
 # for sat in ps1.satellite_list:
 #     print(sat.orbital_stability)
 # planet3.save_as_csv('output_files/planet1.csv')

@@ -2,7 +2,7 @@
 # Main code:
 1. Ring, resonances from moons etc. To find ring minima, use atmospheric extend. Ring maxima is the roche limit.
 2. Add planetary binaries.
-3. Check semi-major axis minimum limit on planets/satellites.
+3. Semi-major axis minimum limit should take into account the gas giant radius expansion with the roche limit.
 4. Make the habitable zone calculation of planets include the eccentricity by copying the parent insolation model.
 5. Add saddle/horseshoe orbits as planetary binaries? 
     - https://www.sciencedirect.com/science/article/abs/pii/0019103581901470
@@ -43,13 +43,13 @@
 0. updatable treeview
 1. Add to qthread: rendering, opening, saving
 2. Add zoom function for svgwidget
-3. Add S-type Binaries (multisolar systems) in treeview
+3. Add S-type Binaries (multistellar systems) in treeview
 4. Add trigger functions to Edit menu
 5. Add trigger functions to insert menu
 6. Add right-click functionalities for tree view.
     - Make lagrange position a comboBox.
     - add details on binary system
-    - add details on solar system
+    - add details on stellar system
     - add details on planetary system
 8. Add tree view header right-click functionalities (and allow name change like rest "system" types)
 

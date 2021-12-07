@@ -7,8 +7,8 @@ from PyQt5.QtWidgets import QMenu, QAction, QFileDialog, QMenuBar, QMessageBox
 
 from stellar_system_creator.filing import save as save_ssc_object, add_extension_if_necessary
 from stellar_system_creator.gui.gui_central_widget import CentralWidget
-from stellar_system_creator.solar_system_elements.planetary_system import PlanetarySystem
-from stellar_system_creator.solar_system_elements.solar_system import SolarSystem
+from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
+from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem
 
 
 class MenuBar(QMenuBar):
@@ -37,7 +37,7 @@ class FileMenu(QMenu):
     def _create_menu(self):
 
         self.addMenu(self.new_project_submenu)
-        self.new_project_submenu.addAction(self.new_project_solar_system_action)
+        self.new_project_submenu.addAction(self.new_project_stellar_system_action)
         self.new_project_submenu.addAction(self.new_project_planetary_system_action)
 
         self.addAction(self.open_project_action)
@@ -48,7 +48,7 @@ class FileMenu(QMenu):
         self.addAction(self.exit_action)
 
     def _connect_actions(self):
-        self.new_project_solar_system_action.triggered.connect(partial(new_project, self, 'Solar System'))
+        self.new_project_stellar_system_action.triggered.connect(partial(new_project, self, 'Solar System'))
         self.new_project_planetary_system_action.triggered.connect(partial(new_project, self, 'Planetary System'))
         self.open_project_action.triggered.connect(partial(open_project, self))
         self.save_project_action.triggered.connect(partial(save_project, self))
@@ -56,7 +56,7 @@ class FileMenu(QMenu):
 
     def _create_menu_actions(self, menubar):
         self.new_project_submenu = QMenu("&New Project", menubar)
-        self.new_project_solar_system_action = QAction("&Solar System...", menubar)
+        self.new_project_stellar_system_action = QAction("&Solar System...", menubar)
         self.new_project_planetary_system_action = QAction("&Planetary System...", menubar)
 
         self.open_project_action = QAction(QIcon.fromTheme("document-open"), "&Open Project...", menubar)
@@ -188,7 +188,7 @@ def new_project(parent, system_type):
     if filename != '':
         filename = add_extension_if_necessary(filename, 'ssc')
         if system_type == 'Solar System':
-            ssc_object = SolarSystem(system_name)
+            ssc_object = StellarSystem(system_name)
         elif system_type == 'Planetary System':
             ssc_object = PlanetarySystem(system_name)
 

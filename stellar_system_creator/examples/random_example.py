@@ -1,4 +1,4 @@
-from stellar_system_creator.solar_system_elements.stellar_body import StellarBody
+from stellar_system_creator.stellar_system_elements.stellar_body import StellarBody
 from stellar_system_creator.astrothings.units import ureg
 
 # titan = Planet('Titan', 0.055*ureg.M_e, composition='Rockworld70')

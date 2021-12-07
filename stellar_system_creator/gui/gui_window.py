@@ -29,7 +29,7 @@ class Window(QMainWindow):
     def __init__(self, parent=None):
         """Initializer."""
         super().__init__(parent)
-        self.setWindowTitle("Solar System Creator")
+        self.setWindowTitle("Stellar System Creator")
         self.resize(1000, 1000)
         self.setWindowIcon(QtGui.QIcon('logo.ico'))
 

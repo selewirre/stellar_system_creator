@@ -1,9 +1,9 @@
 from matplotlib import pyplot as plt
 
-from stellar_system_creator.solar_system_elements.stellar_body import MainSequenceStar
-from stellar_system_creator.solar_system_elements.binary_system import StellarBinary
+from stellar_system_creator.stellar_system_elements.stellar_body import MainSequenceStar
+from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
 from stellar_system_creator.astrothings.units import ureg
-from stellar_system_creator.solar_system_elements.solar_system import SolarSystem, MultiSolarSystemSType
+from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem, MultiStellarSystemSType
 
 # creating 4 different stars that will be parts of binary systems
 andra_star = MainSequenceStar('AndraStar', 1.4 * ureg.M_s, luminosity=4 * ureg.L_s)
@@ -56,14 +56,14 @@ shugravu_binary = StellarBinary('ShugravuBinary', andra_star, croomsk_star,
 # quezuliferh_quaternary.primary_body.save_as_csv('output_files/ShugravuBinary_in_QuezuliferhQuaternary.csv')
 # quezuliferh_quaternary.save_as_csv('output_files/QuezuliferhQuaternary.csv')
 
-# shugravu_system = SolarSystem('Shugravu System', shugravu_binary)
-# trakrunaP_system = SolarSystem('TrakrunaP System', trakruna_binaryP)
-# quezuliferh_system = MultiSolarSystemSType('TrakrunaP System', quezuliferh_quaternary,
+# shugravu_system = StellarSystem('Shugravu System', shugravu_binary)
+# trakrunaP_system = StellarSystem('TrakrunaP System', trakruna_binaryP)
+# quezuliferh_system = MultiStellarSystemSType('TrakrunaP System', quezuliferh_quaternary,
 #                                            [shugravu_system, trakrunaP_system])
 
-# shugravu_system.draw_solar_system()
-# trakrunaP_system.draw_solar_system()
-# quezuliferh_system.draw_multi_solar_system()
+# shugravu_system.draw_stellar_system()
+# trakrunaP_system.draw_stellar_system()
+# quezuliferh_system.draw_multi_stellar_system()
 
 # plt.show()
 
