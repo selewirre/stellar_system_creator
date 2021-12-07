@@ -74,6 +74,6 @@ ps8 = PlanetarySystem('ps8', planet8)
 # creating stellar system for visualization
 ss = StellarSystem('Trakuna Stellar System', trakruna_binaryP, [ps1, ps2, ps3, ps4, ps5, ps6, ps7, ps8], [asteroid_belt])
 
-# save(ss, 'output_files/TrakunaStellarSystem.ssc')
-ss.draw_stellar_system()
-plt.show()
+save(ss, 'output_files/TrakunaStellarSystem.ssc')
+# ss.draw_stellar_system()
+# plt.show()

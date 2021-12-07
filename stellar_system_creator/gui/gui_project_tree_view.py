@@ -108,8 +108,8 @@ def get_stellar_system_dict(stellar_system: StellarSystem) -> Dict:
     from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items import TreeViewItemFromStellarSystemElement
     stellar_system_item = TreeViewItemFromStellarSystemElement(stellar_system)
     stellar_system_dict = {'Name': stellar_system.name, 'Object': stellar_system,
-                         'TreeViewItem': stellar_system_item, 'Parent': parent_dict,
-                         'Planets': planetary_dicts, 'Asteroid Belts': asteroid_belt_dicts}
+                           'TreeViewItem': stellar_system_item, 'Parent': parent_dict,
+                           'Planets': planetary_dicts, 'Asteroid Belts': asteroid_belt_dicts}
 
     return stellar_system_dict
 

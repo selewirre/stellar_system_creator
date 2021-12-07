@@ -752,15 +752,32 @@ class Planet(StellarBody):
     def calculate_distance_to_horizon(self, height: Q_) -> Q_:
         return calculate_distance_to_horizon(self.radius, height)
 
+    def get_semi_major_axis_minimum_limit(self):
+        minimum_limit = self.calculate_roche_limit()
+        from stellar_system_creator.stellar_system_elements.binary_system import BinarySystem
+        if self.parent is not None:
+            if isinstance(self.parent, BinarySystem):
+                if minimum_limit < self.parent.binary_ptype_critical_orbit:
+                    minimum_limit = self.parent.binary_ptype_critical_orbit
+
+        return minimum_limit
+
+    def get_semi_major_axis_maximum_limit(self):
+        if self.parent is not None:
+            return self.parent.outer_orbit_limit * self.orbit_type_factor
+        else:
+            return np.nan * self.semi_major_axis_minimum_limit.units()
+
+    def get_orbit_type_factor(self):
+        return 1
+
     def _set_orbit_values(self) -> None:
-        self.orbit_type_factor = 1
+        self.orbit_type_factor = self.get_orbit_type_factor()
         self.outer_orbit_limit = self.hill_sphere = self.calculate_hill_sphere()
         self.inner_orbit_limit = self.dense_roche_limit = calculate_approximate_inner_orbit_limit(self.radius)
-        self.semi_major_axis_minimum_limit = self.calculate_roche_limit()
-        if self.parent is not None:
-            self.semi_major_axis_maximum_limit = self.parent.outer_orbit_limit
-        else:
-            self.semi_major_axis_maximum_limit = np.nan * self.semi_major_axis_minimum_limit.units()
+        self.semi_major_axis_minimum_limit = self.get_semi_major_axis_minimum_limit()
+        self.semi_major_axis_maximum_limit = self.get_semi_major_axis_maximum_limit()
+
         self.tidal_locking_radius = self.calculate_tidal_locking_radius()
 
         self.semi_minor_axis = self.calculate_semi_minor_axis()
@@ -856,9 +873,17 @@ class Planet(StellarBody):
         stability = True
         stability_violation = []
 
-        if self.semi_major_axis_minimum_limit > self.periapsis:
+        if self.calculate_roche_limit() > self.periapsis:
             stability = False
             stability_violation.append('Periapsis is closer to the parent than the Roche limit.')
+        if self.parent is not None:
+            from stellar_system_creator.stellar_system_elements.binary_system import BinarySystem
+            if isinstance(self.parent, BinarySystem):
+                if self.parent.binary_ptype_critical_orbit > self.semi_major_axis:
+                    stability = False
+                    stability_violation.append('Semi-major axis is closer to the binary parent than the P-type'
+                                               ' stability limit.')
+
         if self.parent is not None:
             if self.parent.inner_orbit_limit > self.semi_major_axis:
                 stability = False
@@ -1033,14 +1058,24 @@ class Trojan(Planet):
             if self.parent.parent is not None:
                 return calculate_roche_limit(self, self.parent.parent)
             else:
-                return np.nan * ureg.au
+                return np.nan * self.semi_major_axis.units()
         else:
-            return np.nan * ureg.au
+            return np.nan * self.semi_major_axis.units()
+
+    def get_semi_major_axis_minimum_limit(self):
+        return self.calculate_roche_limit()
+
+    def get_semi_major_axis_maximum_limit(self):
+        if self.parent is not None:
+            if self.parent.parent is not None:
+                return self.parent.parent.outer_orbit_limit
+            else:
+                return np.nan * self.semi_major_axis_minimum_limit.units()
+        else:
+            return np.nan * self.semi_major_axis_minimum_limit.units()
 
     def _set_orbit_values(self) -> None:
         Planet._set_orbit_values(self)
-        self.semi_major_axis_maximum_limit = self.parent.parent.outer_orbit_limit * self.orbit_type_factor
-        self.semi_major_axis_minimum_limit = self.calculate_roche_limit()
 
     # def _set_orbital_characteristics(self):
     #     self.orbital_period = self.calculate_orbital_period()
@@ -1118,13 +1153,15 @@ class Satellite(Planet):
     def calculate_day_period(self):
         return calculate_synodic_period(self.spin_period, self.parent.orbital_period)
 
+    def get_orbit_type_factor(self):
+        if self.orbit_type.lower() == 'prograde':
+            return self.calculate_prograde_orbit_limit_factor()
+        elif self.orbit_type.lower() == 'retrograde':
+            return self.calculate_retrograde_orbit_limit_factor()
+
     def _set_orbit_values(self) -> None:
         Planet._set_orbit_values(self)
-        if self.orbit_type == 'prograde':
-            self.orbit_type_factor = self.calculate_prograde_orbit_limit_factor()
-        elif self.orbit_type == 'retrograde':
-            self.orbit_type_factor = self.calculate_retrograde_orbit_limit_factor()
-        self.semi_major_axis_maximum_limit = self.parent.outer_orbit_limit * self.orbit_type_factor
+    #     self.semi_major_axis_maximum_limit = self.parent.outer_orbit_limit * self.orbit_type_factor
 
     def _set_other_characteristics(self):
         Planet._set_other_characteristics(self)
@@ -1238,17 +1275,27 @@ class TrojanSatellite(Satellite, Trojan):
             if self.parent.parent is not None:
                 return calculate_roche_limit(self, self.parent.parent)
             else:
-                return np.nan * ureg.au
+                return np.nan * self.semi_major_axis.units()
         else:
-            return np.nan * ureg.au
+            return np.nan * self.semi_major_axis.units()
 
     def get_orbital_stability(self) -> Tuple[bool, str]:
         return self.parent.orbital_stability, self.parent.stability_violations
 
+    def get_orbit_type_factor(self):
+        Planet.get_orbit_type_factor(self)
+
+    def get_semi_major_axis_maximum_limit(self):
+        if self.parent is not None:
+            if self.parent.parent is not None:
+                return self.parent.parent.outer_orbit_limit
+            else:
+                return np.nan * self.semi_major_axis_minimum_limit.units()
+        else:
+            return np.nan * self.semi_major_axis_minimum_limit.units()
+
     def _set_orbit_values(self) -> None:
         Planet._set_orbit_values(self)
-        self.semi_major_axis_maximum_limit = self.parent.parent.outer_orbit_limit * self.orbit_type_factor
-        self.semi_major_axis_minimum_limit = self.calculate_roche_limit()
 
     def calculate_max_satellite_mass(self):
         return calculate_three_body_lagrange_point_smallest_body_mass_limit(self.parent.parent.mass, self.parent.mass)
