@@ -33,7 +33,7 @@ def calculate_frost_line(luminosity: Q_) -> Q_:
     """
     The frost line is the distance at which volatile compounds (water, carbon oxide, ammonia, etc) condense enough to
      become solid ice. This distance depends on the luminosity these compounds receive, and on the type of compound.
-     Here, we have an estimate of the water frost line for well developed solar systems (not during their birth).
+     Here, we have an estimate of the water frost line for well developed stellar systems (not during their birth).
 
     More information can be found on here: https://en.wikipedia.org/wiki/Frost_line_(astrophysics)
 
@@ -60,12 +60,16 @@ def calculate_roche_limit(child_stellar_body, parent_stellar_body) -> Q_:
 
     More info on: https://en.wikipedia.org/wiki/Roche_limit
     """
-    if "radius" in parent_stellar_body.__dict__.keys():
-        parent_child_density_ratio = (parent_stellar_body.density / child_stellar_body.density).to_reduced_units().m
-        return 2.44 * parent_stellar_body.radius * parent_child_density_ratio ** (1 / 3)
-    else:
-        parent_child_mass_ratio = (parent_stellar_body.mass / child_stellar_body.mass).to_reduced_units().m
-        return 2.44 * child_stellar_body.radius * parent_child_mass_ratio ** (1 / 3)
+    # if "radius" in parent_stellar_body.__dict__.keys():
+    #     parent_child_density_ratio = (parent_stellar_body.density / child_stellar_body.density).to_reduced_units().m
+    #     return 2.44 * parent_stellar_body.radius * parent_child_density_ratio ** (1 / 3)
+    # else:
+    radius = child_stellar_body.radius
+    # if 'composition' in child_stellar_body.__dict__:
+    #     if child_stellar_body.composition == 'Gasgiant':
+    #         pass
+    parent_child_mass_ratio = (parent_stellar_body.mass / child_stellar_body.mass).to_reduced_units().m
+    return 2.44 * radius * parent_child_mass_ratio ** (1 / 3)
 
 
 def calculate_hill_sphere(child_stellar_body, parent_stellar_body) -> Q_:

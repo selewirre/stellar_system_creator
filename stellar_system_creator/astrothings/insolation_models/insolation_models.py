@@ -262,7 +262,7 @@ class InsolationForRockLine(InsolationBySelsis):
     Since the rockline is determined by when rock and iron are more or less solid, I decided to use:
     For the inner limit, the boiling point of a fast rotating iron ball (heating distribution 1, albedo 0.15) @ 2870 K.
     For the outer limit, the melting point of a slow rotating (tidally locked) (heating distribution 0.5, albedo 0.85)
-     rock ball and multiply by 5/3.1 (similar to the early solar system frostline) @ 600 K (lowest from
+     rock ball and multiply by 5/3.1 (similar to the early stellar system frostline) @ 600 K (lowest from
      http://hyperphysics.phy-astr.gsu.edu/hbase/Geophys/meltrock.html)
     Formula used: (To/Teff) ** 2 * sqrt((1-albedo)/heatdist)
     """

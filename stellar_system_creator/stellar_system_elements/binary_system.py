@@ -1,7 +1,3 @@
-import copy
-import inspect
-import uuid
-
 import numpy as np
 from typing import Union, Tuple
 import warnings
@@ -31,43 +27,32 @@ class BinarySystem:
                  mean_distance: Q_ = np.nan * ureg.au, eccentricity: float = np.nan,
                  parent: Union["BinarySystem", StellarBody, Star, Planet] = None) -> None:
 
-        self._uuid = str(uuid.uuid4())
         self.name = name
         self._set_children_list()
-        self.primary_body = primary_body
-        self.secondary_body = secondary_body
-        self.mean_distance = mean_distance
-        self.eccentricity = eccentricity
+        if primary_body is not None and secondary_body is not None \
+                and not np.isnan(mean_distance.m) and not np.isnan(eccentricity):
+            self.__post_init__(primary_body, secondary_body, mean_distance, eccentricity, parent)
+
+    def __post_init__(self, primary_body: Union["BinarySystem", StellarBody, Star, Planet],
+                      secondary_body: Union["BinarySystem", StellarBody, Star, Planet], mean_distance: Q_,
+                      eccentricity: float, parent: Union["BinarySystem", StellarBody, Star, Planet] = None):
+        if primary_body.mass > secondary_body.mass:
+            self.primary_body = primary_body
+            self.secondary_body = secondary_body
+        else:
+            self.primary_body = secondary_body
+            self.secondary_body = primary_body
+
+        # self.unit_family = self.primary_body.unit_family
         self._set_parent(parent)
-
-        self.__post_init__()
-
-    def __post_init__(self, want_to_update_parent=False):
-        if self.primary_body is None or self.secondary_body is None \
-                or np.isnan(self.mean_distance.m) or np.isnan(self.eccentricity):
-            return
-
-        self.primary_body._set_parent(self)
-        self.secondary_body._set_parent(self)
-
-        if self.primary_body.mass < self.secondary_body.mass:
-            temporary_body = self.primary_body
-            self.primary_body = self.secondary_body
-            self.secondary_body = temporary_body
-
-        self._set_parent(self.parent)
         self.farthest_parent = self.get_farthest_parent()
 
-        self.mean_distance = self.mean_distance
-        self.eccentricity = self.eccentricity
+        self.mean_distance = mean_distance
+        self.eccentricity = eccentricity
 
         self.mass = self.calculate_total_mass()
-        if self.primary_body.lifetime < self.secondary_body.lifetime:
-            self.lifetime = self.primary_body.lifetime
-            self.age = self.primary_body.age
-        else:
-            self.lifetime = self.secondary_body.lifetime
-            self.age = self.secondary_body.age
+        self.lifetime = self.primary_body.lifetime
+        self.age = self.primary_body.age
 
         self.maximum_distance = self.calculate_maximum_distance()
         self.minimum_distance = self.calculate_minimum_distance()
@@ -77,9 +62,6 @@ class BinarySystem:
         self._set_orbit_values()
 
         self.contact = self.check_binary_contact()
-
-        if want_to_update_parent:
-            self.update_parent()
 
     def __repr__(self, precision=4) -> str:
         string = ''
@@ -120,21 +102,17 @@ class BinarySystem:
 
     def update_children(self):
         for child in self._children:
-            child.__post_init__()
-
-    def update_parent(self):
-        if isinstance(self.parent, BinarySystem):
-            if self.parent.primary_body == self or self.parent.secondary_body == self:
-                self.parent.__post_init__()
+            if isinstance(child, StellarBody):
+                child.__post_init__()
+            elif isinstance(child, BinarySystem):
+                child.__post_init__(child.primary_body, child.secondary_body, child.mean_distance, child.eccentricity,
+                                    child.parent)
 
     def _set_parent(self, parent):
         self.parent: Union[Star, Planet, StellarBinary]
         if parent is None:
             self.parent = parent
         elif 'parent' not in self.__dict__:
-            self.parent = parent
-            self.parent.add_child(self)
-        elif self.parent is None:
             self.parent = parent
             self.parent.add_child(self)
         elif self.parent != parent:
@@ -156,19 +134,13 @@ class BinarySystem:
 
     def calculate_hill_sphere(self) -> Q_:
         if self.parent is not None:
-            if isinstance(self.parent, BinarySystem):
-                if self.parent.primary_body == self:
-                    return calculate_roche_lobe(self.parent.primary_body.mass, self.parent.secondary_body.mass,
-                                                self.parent.mean_distance, self.parent.eccentricity)
-                    # return calculate_hill_sphere(self, self.parent.secondary_body)
-                elif self.parent.secondary_body == self:
-                    return calculate_roche_lobe(self.parent.secondary_body.mass, self.parent.primary_body.mass,
-                                                self.parent.mean_distance, self.parent.eccentricity)
-                    # return calculate_hill_sphere(self, self.parent.primary_body)
-                else:
-                    return calculate_hill_sphere(self, self.parent)
-            else:
+            if not isinstance(self.parent, StellarBinary):
                 return calculate_hill_sphere(self, self.parent)
+            else:
+                if self.parent.primary_body == self:
+                    return calculate_hill_sphere(self, self.parent.secondary_body)
+                else:
+                    return calculate_hill_sphere(self, self.parent.primary_body)
         else:
             return 2 * ureg.lightyears
 
@@ -178,10 +150,9 @@ class BinarySystem:
         return calculate_tidal_locking_radius(self.mass, self.age)
 
     def check_binary_contact(self):
-        primary_roche_lobe = calculate_roche_lobe(self.primary_body.mass, self.secondary_body.mass,
-                                                  self.mean_distance, self.eccentricity)
+        primary_roche_lobe = calculate_roche_lobe(self.primary_body.mass, self.secondary_body.mass, self.mean_distance)
         secondary_roche_lobe = calculate_roche_lobe(self.secondary_body.mass, self.primary_body.mass,
-                                                    self.mean_distance, self.eccentricity)
+                                                    self.mean_distance)
 
         primary_distance_check = self.primary_body.radius if isinstance(self.primary_body, StellarBody) \
             else self.primary_body.maximum_distance + self.primary_body.primary_body.radius
@@ -195,17 +166,16 @@ class BinarySystem:
         return contact
 
     def _set_child_orbital_limits(self) -> None:
-        pass
         # get S-type circumstellar orbit maximum limit around each individual star
-        # self.primary_stype_critical_orbit = calculate_wide_binary_critical_orbit(
-        #     (self.primary_body.mass / self.mass).to_reduced_units().m, self.mean_distance, self.eccentricity)
-        #
-        # self.secondary_stype_critical_orbit = calculate_wide_binary_critical_orbit(
-        #     (self.secondary_body.mass / self.mass).to_reduced_units().m, self.mean_distance, self.eccentricity)
+        self.primary_stype_critical_orbit = calculate_wide_binary_critical_orbit(
+            (self.primary_body.mass / self.mass).to_reduced_units().m, self.mean_distance, self.eccentricity)
+
+        self.secondary_stype_critical_orbit = calculate_wide_binary_critical_orbit(
+            (self.secondary_body.mass / self.mass).to_reduced_units().m, self.mean_distance, self.eccentricity)
 
         # get P-type circumbinary orbit minimum limit for both stars
-        # self.binary_ptype_critical_orbit = calculate_close_binary_critical_orbit(
-        #     (self.secondary_body.mass / self.mass).to_reduced_units().m, self.mean_distance, self.eccentricity)
+        self.binary_ptype_critical_orbit = calculate_close_binary_critical_orbit(
+            (self.secondary_body.mass / self.mass).to_reduced_units().m, self.mean_distance, self.eccentricity)
 
     def _set_orbit_values(self):
         warnings.filterwarnings("ignore", category=UnitStrippedWarning)
@@ -213,32 +183,24 @@ class BinarySystem:
         self.rough_outer_orbit_limit = calculate_rough_outer_orbit_limit(self.mass)
         self.hill_sphere = self.calculate_hill_sphere()
         self.tidal_locking_radius = self.calculate_tidal_locking_radius()
-        self.binary_ptype_critical_orbit = calculate_close_binary_critical_orbit(
-            (self.secondary_body.mass / self.mass).to_reduced_units().m, self.mean_distance, self.eccentricity)
-        if isinstance(self.parent, StellarBinary):
-            self.stype_critical_orbit = calculate_wide_binary_critical_orbit(
-                (self.mass / self.parent.mass).to_reduced_units().m, self.parent.mean_distance, self.parent.eccentricity)
-        else:
-            self.stype_critical_orbit = np.nan * self.hill_sphere.units
 
-        binary_inner_limits = np.array([self.rough_inner_orbit_limit,
-                                        self.binary_ptype_critical_orbit], dtype=Q_)
-        binary_inner_limits = np.array([bil for bil in binary_inner_limits if not np.isnan(bil.m)], dtype=Q_)
-        if len(binary_inner_limits):
-            binary_maximum_inner_limit_index = np.nanargmax(binary_inner_limits)
-            self.inner_orbit_limit = binary_inner_limits[binary_maximum_inner_limit_index]
-        else:
-            self.inner_orbit_limit = np.nan * self.binary_ptype_critical_orbit.units
+        binary_inner_limits = np.array([self.rough_inner_orbit_limit, self.binary_ptype_critical_orbit], dtype=Q_)
+        binary_maximum_inner_limit_index = np.nanargmax(binary_inner_limits)
+        self.inner_orbit_limit = binary_inner_limits[binary_maximum_inner_limit_index]
 
-        outer_limits = np.array([self.stype_critical_orbit,
-                                 self.rough_outer_orbit_limit,
-                                 self.hill_sphere], dtype=Q_)
-        outer_limits = np.array([ol for ol in outer_limits if not np.isnan(ol.m)], dtype=Q_)
-        if len(outer_limits):
-            minimum_outer_limit_index = np.nanargmin(outer_limits)
-            self.outer_orbit_limit = outer_limits[minimum_outer_limit_index]
-        else:
-            self.outer_orbit_limit = np.nan * self.stype_critical_orbit.units
+        self.outer_orbit_limit = self.rough_outer_orbit_limit
+
+        primary_outer_limits = np.array([self.primary_stype_critical_orbit,
+                                         self.primary_body.rough_outer_orbit_limit,
+                                         self.primary_body.hill_sphere], dtype=Q_)
+        primary_minimum_outer_limit_index = np.nanargmin(primary_outer_limits)
+        self.primary_body.outer_orbit_limit = primary_outer_limits[primary_minimum_outer_limit_index]
+
+        secondary_outer_limits = np.array([self.secondary_stype_critical_orbit,
+                                           self.secondary_body.rough_outer_orbit_limit,
+                                           self.secondary_body.hill_sphere], dtype=Q_)
+        secondary_minimum_outer_limit_index = np.nanargmin(secondary_outer_limits)
+        self.secondary_body.outer_orbit_limit = secondary_outer_limits[secondary_minimum_outer_limit_index]
 
     def get_farthest_parent(self):
         parent = self.parent
@@ -251,27 +213,6 @@ class BinarySystem:
                     keep_going_farther = False
         return parent
 
-    def copy(self):
-        return copy.deepcopy(self)
-
-    def __hash__(self):
-        return super().__hash__()
-
-    @property
-    def children(self):
-        return self._children
-
-    @property
-    def uuid(self):
-        return self._uuid
-
-    @classmethod
-    def load_with_args(cls, binary_system: "BinarySystem"):
-        arg_keys = inspect.getfullargspec(cls)
-        kwargs = {key: binary_system.__dict__[key] for key in arg_keys}
-        cls_obj = cls(**kwargs)
-        return cls_obj
-
 
 class StellarBinary(BinarySystem):
     # TODO: Redo habitability and insolation model assignments to make it look nice. At least it works now
@@ -281,14 +222,14 @@ class StellarBinary(BinarySystem):
                  eccentricity: float = np.nan, parent: Union["StellarBinary", Star] = None) -> None:
         super().__init__(name, primary_body, secondary_body, mean_distance, eccentricity, parent)
 
-    def __post_init__(self, want_to_update_parent=False):
-        super().__post_init__()
-        # self.reset_insolation_model_and_habitability_for_children()
-        # self.reset_solo_habitability()
-        self.reset_insolation_model_and_habitability()
-
-        if want_to_update_parent:
-            self.update_parent()
+    def __post_init__(self, primary_body: Union["StellarBinary", Star],
+                      secondary_body: Union["StellarBinary", Star], mean_distance: Q_, eccentricity: float,
+                      parent: Union["StellarBinary", Star] = None):
+        primary_body.parent = self
+        secondary_body.parent = self
+        super().__post_init__(primary_body, secondary_body, mean_distance, eccentricity, parent)
+        self.reset_insolation_model_and_habitability_for_children()
+        self._set_insolation_model_and_habitability()
 
     def calculate_water_frost_lines(self):
         # setting ptype frost zone (not part of trinary/quaternary)
@@ -311,9 +252,8 @@ class StellarBinary(BinarySystem):
         ss_water_frost_lines = {name: calculate_ptype_average_habitable_limit(
             prime_swl[name], sec_swl[name], self.mean_distance, self.eccentricity, sec_mass_ratio)
             for name in prime_swl}
-        ss_water_frost_lines = {name: line if line > self.maximum_distance else np.nan * line.u
-                                for (name, line) in ss_water_frost_lines.items()}
 
+        # TODO: the following is definitely not complete!
         # setting average frost zone if self is part of bigger binary as S-type
         if isinstance(self.parent, StellarBinary):
             if self.parent.primary_body == self:
@@ -333,8 +273,6 @@ class StellarBinary(BinarySystem):
             model = BinaryInsolationForWaterFrostLine(ss_water_frost_lines, comp_model)
             water_frost_lines_in_binary = {name: calculate_stype_average_habitable_limit(
                 model.swl[name], comp_model.swl[name], mean_distance, eccentricity) for name in model.names}
-            water_frost_lines_in_binary = {name: line if self.parent.minimum_distance > line > 0 else np.nan * line.u
-                                           for (name, line) in water_frost_lines_in_binary.items()}
         else:
             water_frost_lines_in_binary = None
 
@@ -345,13 +283,15 @@ class StellarBinary(BinarySystem):
         if isinstance(self.primary_body, StellarBinary):
             prim_prim_insolation_model = InsolationForRockLine(self.primary_body.primary_body.temperature,
                                                                self.primary_body.primary_body.luminosity)
-            prime_swl = BinaryInsolationForRockLine(self.primary_body.rock_lines, prim_prim_insolation_model).swl
+            prime_swl = BinaryInsolationForRockLine(self.primary_body.water_frost_lines,
+                                                    prim_prim_insolation_model).swl
         else:
             prime_swl = InsolationForRockLine(self.primary_body.temperature, self.primary_body.luminosity).swl
         if isinstance(self.secondary_body, StellarBinary):
             sec_prim_insolation_model = InsolationForRockLine(self.secondary_body.primary_body.temperature,
                                                               self.secondary_body.primary_body.luminosity)
-            sec_swl = BinaryInsolationForRockLine(self.secondary_body.rock_lines, sec_prim_insolation_model).swl
+            sec_swl = BinaryInsolationForRockLine(self.secondary_body.water_frost_lines,
+                                                  sec_prim_insolation_model).swl
         else:
             sec_swl = InsolationForRockLine(self.secondary_body.temperature, self.secondary_body.luminosity).swl
 
@@ -359,8 +299,6 @@ class StellarBinary(BinarySystem):
         ss_rock_lines = {name: calculate_ptype_average_habitable_limit(
             prime_swl[name], sec_swl[name], self.mean_distance, self.eccentricity, sec_mass_ratio)
             for name in prime_swl}
-        ss_rock_lines = {name: line if line > self.maximum_distance else np.nan * line.u
-                         for (name, line) in ss_rock_lines.items()}
 
         # setting average rock zone if self is part of bigger binary as S-type
         if isinstance(self.parent, StellarBinary):
@@ -381,8 +319,6 @@ class StellarBinary(BinarySystem):
             model = BinaryInsolationForRockLine(ss_rock_lines, comp_model)
             rock_lines_in_binary = {name: calculate_stype_average_habitable_limit(
                 model.swl[name], comp_model.swl[name], mean_distance, eccentricity) for name in model.names}
-            rock_lines_in_binary = {name: line if self.parent.minimum_distance > line > 0 else np.nan * line.u
-                                    for (name, line) in rock_lines_in_binary.items()}
         else:
             rock_lines_in_binary = None
 
@@ -403,57 +339,29 @@ class StellarBinary(BinarySystem):
             self.prevailing_water_frost_lines = self.water_frost_lines
             self.prevailing_rock_lines = self.rock_lines
 
+        warnings.filterwarnings("ignore", category=UnitStrippedWarning)
+        self_inner_limits = np.array([self.inner_orbit_limit, self.rock_line], dtype=Q_)
+        self_maximum_inner_limit_index = np.nanargmax(self_inner_limits)
+        self.inner_orbit_limit = self_inner_limits[self_maximum_inner_limit_index]
+
     def reset_insolation_model_and_habitability_for_children(self, model_name=''):
         if model_name == '':
             model_name = self.primary_body.insolation_model.name
-
-        changed = False
         if model_name != self.primary_body.insolation_model.name:
-            self.primary_body.reset_insolation_model(model_name)
-            self.primary_body.set_solo_habitable_zones()
-            changed = True
+            self.primary_body.reset_insolation_model_and_habitability(model_name)
         if model_name != self.secondary_body.insolation_model.name:
-            self.secondary_body.reset_insolation_model(model_name)
-            self.secondary_body.set_solo_habitable_zones()
-            changed = True
+            self.secondary_body.reset_insolation_model_and_habitability(model_name)
 
-        # if changed:
-        self.primary_body.set_dual_habitable_zones()
-        self.primary_body.do_habitability_check()
-        self.secondary_body.set_dual_habitable_zones()
-        self.secondary_body.do_habitability_check()
+    def _set_insolation_model_and_habitability(self):
+        self.habitable_zone_limits = {}
+        self.primary_body.reset_insolation_model_and_habitability()
+        self.secondary_body.reset_insolation_model_and_habitability()
+        self.set_habitable_zones()
+        self.insolation_model = BinaryInsolationModel(self.habitable_zone_limits, self.primary_body.insolation_model)
 
     def reset_insolation_model_and_habitability(self, model_name=''):
-        self.reset_insolation_model(model_name)
-        self.reset_solo_habitability()
-        try:
-            self.set_dual_habitable_zones()
-            self.do_habitability_check()
-        except Exception:
-            pass
-
-    def reset_insolation_model(self, model_name=''):
         self.reset_insolation_model_and_habitability_for_children(model_name)
-        self.reset_solo_habitability()
-        primary_im_swl = self.primary_body.insolation_model.swl
-        secondary_im_swl = self.secondary_body.insolation_model.swl
-        combinded_swl = {name: primary_im_swl[name] + secondary_im_swl[name]
-                         for name in self.primary_body.insolation_model.names}
-        self.insolation_model = BinaryInsolationModel(combinded_swl, self.primary_body.insolation_model)
-        try:
-            self.set_dual_habitable_zones()
-            self.do_habitability_check()
-        except Exception:
-            pass
-        self._set_orbit_values()  # here for cause the frost lines also depend on the binary
-
-    def do_habitability_check(self):
-        self.habitability, self.habitability_violations = self.check_habitability()
-
-    def reset_solo_habitability(self):
-        self.habitable_zone_limits = {}
-        self.set_solo_habitable_zones()
-        self.do_habitability_check()
+        self._set_insolation_model_and_habitability()
 
     def set_habitable_zone(self, zone_type: str, binary_companion=None):
         prime_model: InsolationThresholdModel = self.primary_body.insolation_model
@@ -461,14 +369,21 @@ class StellarBinary(BinarySystem):
         prime_swl = prime_model.swl
         sec_swl = sec_model.swl
 
+        if isinstance(self.primary_body, StellarBinary):
+            prime_swl = prime_swl[f'{zone_type}']
+        if isinstance(self.secondary_body, StellarBinary):
+            sec_swl = sec_swl[f'{zone_type}']
+
         model = None
         model_swl = None
         comp_model_swl = None
         if binary_companion is not None:
             model = self.insolation_model
-            model_swl = {name: self.habitable_zone_limits[f'ptype{zone_type}'][name] ** 2 for name in model.names}
+            model_swl = model.swl[f'ptype{zone_type}']
             comp_model = binary_companion.insolation_model
             comp_model_swl = comp_model.swl
+            if isinstance(binary_companion, StellarBinary):
+                comp_model_swl = comp_model_swl[f'ptype{zone_type}']
 
         if zone_type == 'ptypeRHZ':
             self.habitable_zone_limits['ptypeRHZ'] = {name: calculate_ptype_radiative_habitable_limit(
@@ -503,25 +418,18 @@ class StellarBinary(BinarySystem):
 
         if zone_type in self.habitable_zone_limits:
             if binary_companion is not None:
-                if abs(self.habitable_zone_limits[zone_type][model.earth_equivalent]) > \
-                        abs(self.habitable_zone_limits[zone_type][model.conservative_max_name]):
+                if self.habitable_zone_limits[zone_type][model.earth_equivalent] > \
+                        self.habitable_zone_limits[zone_type][model.conservative_max_name]:
                     self.habitable_zone_limits[zone_type] = {name: np.nan * ureg.au for name in model.names}
             else:
-                if abs(self.habitable_zone_limits[zone_type][prime_model.earth_equivalent]) > \
-                        abs(self.habitable_zone_limits[zone_type][prime_model.conservative_max_name]):
+                if self.habitable_zone_limits[zone_type][prime_model.earth_equivalent] > \
+                        self.habitable_zone_limits[zone_type][prime_model.conservative_max_name]:
                     self.habitable_zone_limits[zone_type] = {name: np.nan * ureg.au for name in prime_model.names}
 
-    def set_solo_habitable_zones(self):
+    def set_habitable_zones(self) -> None:
         self.set_habitable_zone('ptypeRHZ')
         self.set_habitable_zone('ptypePHZ')
         self.set_habitable_zone('ptypeAHZ')
-        model = self.primary_body.insolation_model
-        if np.isnan(self.habitable_zone_limits['ptypeRHZ'][model.earth_equivalent].m):
-            self.habitable_zone_limits['ptypePHZ'] = {name: np.nan * ureg.au for name in model.names}
-            self.habitable_zone_limits['ptypeAHZ'] = {name: np.nan * ureg.au for name in model.names}
-
-    def set_dual_habitable_zones(self):
-        model = self.primary_body.insolation_model
         if isinstance(self.parent, StellarBinary):
             if self.parent.primary_body == self:
                 companion_body = self.parent.secondary_body
@@ -530,13 +438,6 @@ class StellarBinary(BinarySystem):
             self.set_habitable_zone('RHZ', companion_body)
             self.set_habitable_zone('PHZ', companion_body)
             self.set_habitable_zone('AHZ', companion_body)
-            if np.isnan(self.habitable_zone_limits['RHZ'][model.relaxed_max_name].m):
-                self.habitable_zone_limits['PHZ'] = {name: np.nan * ureg.au for name in model.names}
-                self.habitable_zone_limits['AHZ'] = {name: np.nan * ureg.au for name in model.names}
-
-    def set_habitable_zones(self) -> None:
-        self.set_solo_habitable_zones()
-        self.set_dual_habitable_zones()
 
     def check_habitability(self) -> Tuple[bool, str]:
         habitability = True
@@ -555,10 +456,9 @@ class StellarBinary(BinarySystem):
         else:
             relevant_zone_type = 'ptypeRHZ'
 
-        model = self.primary_body.insolation_model
+        model = self.insolation_model
         if self.habitable_zone_limits[relevant_zone_type][model.relaxed_max_name] \
-                < self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name] or \
-                np.isnan(self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name]):
+                < self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name]:
             habitability = False
             habitability_violations.append('There are no habitable zones in this system.')
         elif self.inner_orbit_limit > self.habitable_zone_limits[relevant_zone_type][model.relaxed_max_name] \

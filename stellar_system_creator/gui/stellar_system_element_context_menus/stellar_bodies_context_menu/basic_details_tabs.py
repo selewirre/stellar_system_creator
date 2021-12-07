@@ -1,13 +1,11 @@
 from typing import Union, Dict
 
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGroupBox, QFormLayout, QRadioButton, QTabWidget, QSizePolicy, QLabel
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGroupBox, QFormLayout, QRadioButton, QTabWidget, QSizePolicy
 
-from stellar_system_creator.gui.stellar_system_element_context_menus.stellar_bodies_context_menu.detail_dialog_widgets import \
-    Tab, \
-    InsolationModelRadioButtons, clearLayout, Label, UnitLabel, GroupBox, ImageLabel, LineEdit, DetailsLabel, \
-    DetailsGroupBox, RingRadioButtons, RingColorsWidget, RingImage
+from stellar_system_creator.gui.stellar_system_element_context_menus.stellar_bodies_context_menu.detail_dialog_widgets import Tab, \
+    InsolationModelRadioButtons, clearLayout, Label, UnitLabel, GroupBox, ImageLabel, LineEdit
 from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
-from stellar_system_creator.stellar_system_elements.stellar_body import Star, Planet, Satellite, TrojanSatellite
+from stellar_system_creator.stellar_system_elements.stellar_body import Star, Planet, Satellite
 
 
 class InsolationTab(Tab):
@@ -41,7 +39,7 @@ class InsolationTab(Tab):
 
     def _set_boxes(self):
         # setting model box
-        self.model_group_box = DetailsGroupBox('Model', 'quantities/insolation_models/insolation_models.html')
+        self.model_group_box = QGroupBox('Model')
         model_box_layout = QFormLayout()
         self.model_group_box.setLayout(model_box_layout)
 
@@ -77,11 +75,8 @@ class InsolationTab(Tab):
         # setting common habitability limits group box
         keys = ['Conservative Minimum Limit Name', 'Conservative Maximum Limit Name',
                 'Relaxed Minimum Limit Name', 'Relaxed Maximum Limit Name', 'Earth Equivalent']
-        tooltip_dirs = ['conservative_minimum_limit', 'conservative_maximum_limit', 'relaxed_minimum_limit',
-                        'relaxed_maximum_limit', 'earth_equivalent_limit']
-        for i, key in enumerate(keys):
-            label = DetailsLabel(f"{key}:", f'quantities/insolation_models/{tooltip_dirs[i]}.html')
-            self.common_habitability_limits_group_box.layout().addRow(label, self.insolation_labels[key])
+        for key in keys:
+            self.common_habitability_limits_group_box.layout().addRow(f"{key}:", self.insolation_labels[key])
 
     def update_text(self):
         for key in self.insolation_labels:
@@ -89,10 +84,7 @@ class InsolationTab(Tab):
 
     def change_insolation_model(self, button: QRadioButton):
         if button.isChecked():
-            if self.sse.parent is not None:
-                self.sse.farthest_parent.reset_insolation_model_and_habitability(button.text())
-            else:
-                self.sse.reset_insolation_model_and_habitability(button.text())
+            self.sse.reset_insolation_model_and_habitability(button.text())
             layouts = [self.common_habitability_limits_group_box.layout(), self.threshold_equivalent_group_box.layout()]
             for layout in layouts:
                 clearLayout(layout)
@@ -123,11 +115,10 @@ class ParentHabitabilityTab(Tab):
         super().__init__()
 
         self.sse = sse
-        self.influenced_labels: Union[Dict[(str, Union[UnitLabel, Label])], None] = None
+        self.influenced_labels: Dict[(str, Union[UnitLabel, Label])] = None
 
         widget = QWidget(parent)
         self.setWidget(widget)
-        self.zones_tab_widget_index = None
         self.tab_layout = QVBoxLayout()
         widget.setLayout(self.tab_layout)
 
@@ -142,7 +133,7 @@ class ParentHabitabilityTab(Tab):
         self.outlook_group_box.setLayout(outlook_box_layout)
 
         # setting zones group box
-        self.zones_group_box = DetailsGroupBox('Zones', 'quantities/habitability/habitable_zones/habitable_zones.html')
+        self.zones_group_box = GroupBox('Zones')
         zones_box_layout = QVBoxLayout()
         self.zones_group_box.setLayout(zones_box_layout)
 
@@ -153,8 +144,7 @@ class ParentHabitabilityTab(Tab):
         self.tab_layout.addStretch()
 
     def _set_outlook_box_cells(self):
-        label = DetailsLabel("Habitability:", 'quantities/habitability/habitability.html')
-        self.outlook_group_box.layout().addRow(label, self.influenced_labels['Habitability'])
+        self.outlook_group_box.layout().addRow("Habitability:", self.influenced_labels['Habitability'])
         self.outlook_group_box.layout().addRow("Violations:", self.influenced_labels['Habitability Violations'])
 
     def _set_zones_box_cells(self):
@@ -171,10 +161,6 @@ class ParentHabitabilityTab(Tab):
 
             self.habitability_subtabs[hzltype].setLayout(subtab_layout)
             self.zones_tab_widget.addTab(self.habitability_subtabs[hzltype], hzltype)
-
-        if self.zones_tab_widget_index is None:
-            self.zones_tab_widget_index = self.zones_tab_widget.count() - 1
-        self.zones_tab_widget.setCurrentIndex(self.zones_tab_widget_index)
 
     def changes_due_to_isolation_model_change(self):
         clearLayout(self.zones_group_box.layout())
@@ -194,12 +180,9 @@ class ParentHabitabilityTab(Tab):
         return labels
 
     def update_text(self):
-        try:
-            clearLayout(self.zones_group_box.layout())
-            self.habitability_labels = self.get_habitability_labels()
-            self._set_zones_box_cells()
-        except AttributeError:
-            pass
+        clearLayout(self.zones_group_box.layout())
+        self.habitability_labels = self.get_habitability_labels()
+        self._set_zones_box_cells()
         # for key in self.habitability_labels:
         #     self.habitability_labels[key].update_text()
 
@@ -209,7 +192,7 @@ class ChildHabitabilityTab(Tab):
         super().__init__()
 
         self.sse = sse
-        self.influenced_labels: Union[Dict[(str, Union[UnitLabel, Label])], None] = None
+        self.influenced_labels: Dict[(str, Union[UnitLabel, Label])] = None
 
         widget = QWidget(parent)
         self.setWidget(widget)
@@ -238,15 +221,7 @@ class ChildHabitabilityTab(Tab):
         self.tab_layout.addStretch()
 
     def _set_outlook_box_cells(self):
-        if isinstance(self.sse, Satellite):
-            label = DetailsLabel("Habitability:", 'quantities/habitability/satellite_habitability.html')
-        elif isinstance(self.sse, TrojanSatellite):
-            label = DetailsLabel("Habitability:", 'quantities/habitability/trojan_satellite_habitability.html')
-        elif isinstance(self.sse, Planet):
-            label = DetailsLabel("Habitability:", 'quantities/habitability/planet_habitability.html')
-        else:
-            label = QLabel('Habitability:')
-        self.outlook_group_box.layout().addRow(label, self.influenced_labels['Habitability'])
+        self.outlook_group_box.layout().addRow("Habitability:", self.influenced_labels['Habitability'])
         self.outlook_group_box.layout().addRow("Violations:", self.influenced_labels['Habitability Violations'])
 
     # def _set_zones_box_cells(self):
@@ -289,114 +264,6 @@ class ChildHabitabilityTab(Tab):
     #     # for key in self.habitability_labels:
     #     #     self.habitability_labels[key].update_text()
 
-
-class RingTab(Tab):
-    def __init__(self, sse: Planet, parent=None):
-        super().__init__()
-
-        self.sse = sse
-        self.ring_copy = self.sse.ring.copy()
-        self.init_has_ring = self.sse.has_ring
-        self.influenced_labels: Union[Dict[(str, Union[UnitLabel, Label])], None] = {}
-
-        widget = QWidget(parent)
-        self.setWidget(widget)
-        self.tab_layout = QVBoxLayout()
-        widget.setLayout(self.tab_layout)
-
-        self.parameter_box = None
-        self._set_ring_radio_button()
-        self._set_influenced_labels()
-
-    def set_boxes(self):
-        self._set_boxes()
-
-    def _set_boxes(self):
-        # setting outlook group box
-        self.parameter_box = GroupBox('Parameters')
-        parameter_box_layout = QFormLayout()
-        self.parameter_box.setLayout(parameter_box_layout)
-
-        self.color_box = GroupBox('Colors')
-        color_box_layout = QVBoxLayout()
-        self.color_box.setLayout(color_box_layout)
-
-        self.ring_image_box = GroupBox('Ring Image')
-        ring_image_box_layout = QVBoxLayout()
-        self.ring_image_box.setLayout(ring_image_box_layout)
-
-        self._set_parameters_box_cells()
-        self._set_color_box_cells()
-        self._set_ring_image_box_cells()
-        self.tab_layout.addWidget(self.parameter_box)
-        self.tab_layout.addWidget(self.color_box)
-        self.tab_layout.addWidget(self.ring_image_box)
-        self.tab_layout.addStretch()
-
-    def _set_influenced_labels(self):
-        if self.sse.has_ring:
-            self.influenced_labels = {'Inner Radius': UnitLabel(self.sse.ring, 'inner_radius'),
-                                      'Outer Radius': UnitLabel(self.sse.ring, 'outer_radius')}
-            self.ring_image = RingImage(self.sse)
-
-    def reset_influenced_labels(self):
-        self._set_influenced_labels()
-
-    def _set_ring_radio_button(self):
-        self.ring_radio_button = RingRadioButtons(self.sse, self.influenced_labels)
-        self.ring_radio_button.radio_buttons['Yes'].toggled.connect(
-            lambda: self.change_radio_button(self.ring_radio_button.radio_buttons['Yes']))
-        self.ring_radio_button.radio_buttons['No'].toggled.connect(
-            lambda: self.change_radio_button(self.ring_radio_button.radio_buttons['No']))
-
-    def change_radio_button(self, button: QRadioButton):
-        new_value = button.isChecked()
-        if button.text() == 'No':
-            new_value = not new_value
-
-        if self.sse.has_ring != new_value:
-            clearLayout(self.parameter_box.layout())
-            clearLayout(self.color_box.layout())
-            clearLayout(self.ring_image_box.layout())
-
-            self.sse.has_ring = new_value
-            self.sse.ring = self.sse.get_ring()
-            self._set_ring_radio_button()
-            if new_value:
-                self.reset_influenced_labels()
-
-            self._set_parameters_box_cells()
-            self._set_color_box_cells()
-            self._set_ring_image_box_cells()
-
-    def _set_parameters_box_cells(self):
-        label = DetailsLabel('Planet has ring system:', 'celestial_bodies/ring.html')
-        self.parameter_box.layout().addRow(label, self.ring_radio_button)
-        if self.sse.has_ring:
-            self.parameter_box.layout().addRow('Inner Radius', self.influenced_labels['Inner Radius'])
-            self.parameter_box.layout().addRow('Outer Radius', self.influenced_labels['Outer Radius'])
-
-    def _set_color_box_cells(self):
-        if self.sse.has_ring:
-            self.color_box.layout().addWidget(RingColorsWidget(self.sse, self.ring_image))
-
-    def _set_ring_image_box_cells(self):
-        if self.sse.has_ring:
-            self.ring_image_box.layout().addWidget(self.ring_image)
-
-    def update_text(self):
-        if self.sse.has_ring:
-            if self.parameter_box is not None:
-                clearLayout(self.parameter_box.layout())
-                clearLayout(self.color_box.layout())
-                clearLayout(self.ring_image_box.layout())
-
-                self._set_ring_radio_button()
-                self.reset_influenced_labels()
-
-                self._set_parameters_box_cells()
-                self._set_color_box_cells()
-                self._set_ring_image_box_cells()
 
 
 class ImageTab(Tab):

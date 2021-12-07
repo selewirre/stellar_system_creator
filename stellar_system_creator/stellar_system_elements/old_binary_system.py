@@ -9,7 +9,7 @@ from stellar_system_creator.astrothings.astromechanical_calculations import \
     calculate_minimum_distance_to_barycenter, calculate_maximum_distance_to_barycenter, calculate_roche_limit, \
     calculate_hill_sphere, \
     calculate_earth_equivalent_orbit
-from stellar_system_creator.solar_system_elements.stellar_body import StellarBody, Star, Planet
+from stellar_system_creator.stellar_system_elements.stellar_body import StellarBody, Star, Planet
 from stellar_system_creator.astrothings.units import ureg, Q_
 
 # mass_dict_keys = ['mass']

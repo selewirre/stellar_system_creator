@@ -3,12 +3,12 @@ from typing import Union, Dict, List
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 
-from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QLabel
+from PyQt5.QtWidgets import QDialog, QDialogButtonBox
 
 from stellar_system_creator.gui.stellar_system_element_context_menus.stellar_bodies_context_menu.detail_dialog_widgets import \
     LineEdit, \
     UnitLineEdit, UnitLabel, Label, TextBrowser, CheckBox, InsolationModelRadioButtons, ImageLabel, ImageLineEdit, \
-    ComboBox, DetailsLabel
+    ComboBox
 from stellar_system_creator.stellar_system_elements.stellar_body import AsteroidBelt, Planet, Star, StellarBody, Satellite, Trojan
 
 
@@ -17,10 +17,7 @@ class BasicDetailsDialog(QDialog):
     def __init__(self, parent_item):
         from ..standard_items import TreeViewItemFromStellarSystemElement
         self.parent_item: TreeViewItemFromStellarSystemElement = parent_item
-        self.parent_item.ssc_object.__post_init__()
         super().__init__(self.parent_item.model().parent().parent())
-        self.setModal(False)
-        self.parent_item.ssc_object.__post_init__()
         self.__post_init__()
 
     def __post_init__(self):
@@ -40,7 +37,7 @@ class BasicDetailsDialog(QDialog):
 
     def _set_check_boxes(self):
         sse: Union[StellarBody, Star, Planet, AsteroidBelt,
-                   Satellite, Trojan] = self.parent_item.ssc_object
+                   Satellite, Trojan] = self.parent_item.stellar_system_element
 
         self.check_boxes: Dict[(str, CheckBox)] = {
             'Use Suggested Radius': CheckBox(self.ule['Radius']),
@@ -49,10 +46,11 @@ class BasicDetailsDialog(QDialog):
             'Use Suggested Age': CheckBox(self.ule['Age']),
             'Use Suggested Image': CheckBox(self.ule['Image Filename'])
                 }
+        self.random = [self.check_boxes[key].isChecked() for key in self.check_boxes]
 
     def _set_line_edits(self):
         sse: Union[StellarBody, Star, Planet, AsteroidBelt,
-                   Satellite, Trojan] = self.parent_item.ssc_object
+                   Satellite, Trojan] = self.parent_item.stellar_system_element
 
         self.le: Dict[(str, LineEdit)] = {'Name': LineEdit(sse, 'name', {})}
 
@@ -73,7 +71,7 @@ class BasicDetailsDialog(QDialog):
 
     def _set_labels(self):
         sse: Union[StellarBody, Star, Planet, AsteroidBelt,
-                   Satellite, Trojan] = self.parent_item.ssc_object
+                   Satellite, Trojan] = self.parent_item.stellar_system_element
 
         self.labels: Dict[(str, Union[Label, TextBrowser])] = {
             'Parent': Label(sse, 'parent', 'name'),
@@ -85,7 +83,7 @@ class BasicDetailsDialog(QDialog):
 
     def _set_unit_line_edits(self):
         sse: Union[StellarBody, Star, Planet, AsteroidBelt,
-                   Satellite, Trojan] = self.parent_item.ssc_object
+                   Satellite, Trojan] = self.parent_item.stellar_system_element
 
         self.ule: Dict[(str, UnitLineEdit)] = {'Mass': UnitLineEdit(sse, 'mass', self.all_labels),
                                                'Radius': UnitLineEdit(sse, 'radius', self.all_labels),
@@ -100,7 +98,7 @@ class BasicDetailsDialog(QDialog):
 
     def _set_unit_labels(self):
         sse: Union[StellarBody, Star, Planet, AsteroidBelt,
-                   Satellite, Trojan] = self.parent_item.ssc_object
+                   Satellite, Trojan] = self.parent_item.stellar_system_element
 
         self.ulabels: Dict[(str, UnitLabel)] = {'Suggested Radius': UnitLabel(sse, 'suggested_radius'),
                                                 'Circumference': UnitLabel(sse, 'circumference'),
@@ -115,29 +113,17 @@ class BasicDetailsDialog(QDialog):
                                                 'Tidal Locking Radius': UnitLabel(sse, 'tidal_locking_radius'),
                                                 'Hill Sphere': UnitLabel(sse, 'hill_sphere'),
                                                 'Dense Roche Limit': UnitLabel(sse, 'dense_roche_limit'),
-                                                'S-Type Critical Orbit': UnitLabel(sse, 'stype_critical_orbit'),
                                                 'Inner Orbit Limit': UnitLabel(sse, 'inner_orbit_limit'),
                                                 'Outer Orbit Limit': UnitLabel(sse, 'outer_orbit_limit'),
                                                 }
 
     @staticmethod
-    def add_key_to_layout(layout, dictionary: Dict, key, tooltip_directory=None):
-        if tooltip_directory is not None:
-            if not tooltip_directory.endswith('None.html'):
-                label = DetailsLabel(f"{key}:", tooltip_directory)
-            else:
-                label = QLabel(f"{key}:")
-        else:
-            label = QLabel(f"{key}:")
-        layout.addRow(label, dictionary[key])
+    def add_key_to_layout(layout, dictionary: Dict, key):
+        layout.addRow(f"{key}:", dictionary[key])
 
-    def add_keys_to_layout(self, layout, dictionary: Dict, keys: List, tooltip_directories: List = None):
-        if tooltip_directories is not None:
-            for i, key in enumerate(keys):
-                self.add_key_to_layout(layout, dictionary, key, tooltip_directories[i])
-        else:
-            for key in keys:
-                self.add_key_to_layout(layout, dictionary, key)
+    def add_keys_to_layout(self, layout, dictionary: Dict, keys: List):
+        for key in keys:
+            self.add_key_to_layout(layout, dictionary, key)
 
     def _set_button_box(self):
         self.button_box = QDialogButtonBox((QDialogButtonBox.Cancel | QDialogButtonBox.Ok), self)
@@ -153,7 +139,6 @@ class BasicDetailsDialog(QDialog):
         self.confirm_text_changes()
         self.parent_item.update_text()
         self.parent_item.set_stellar_system_element_icon()
-        self.parent_item.model().parent().update_tab_title()
         super().accept()
 
     def reject(self) -> None:
@@ -175,13 +160,11 @@ class BasicDetailsDialog(QDialog):
         qobj.change_text_action(process_change)
         qobj.clearFocus()
 
-    def confirm_text_changes(self, update_parent=False) -> None:
+    def confirm_text_changes(self) -> None:
         self.confirm_line_edit_changes()
         self.confirm_unit_line_edit_changes()
         self.confirm_other_edit_changes()
-        self.parent_item.ssc_object.update_children()
-        if update_parent:
-            self.parent_item.ssc_object.update_parent()
+        self.parent_item.stellar_system_element.update_children()
 
     def confirm_line_edit_changes(self) -> None:
         for key in self.le:
@@ -194,11 +177,11 @@ class BasicDetailsDialog(QDialog):
     def confirm_other_edit_changes(self) -> None:
         pass
 
-    def return_texts_to_initial_values(self, update_parent=False) -> None:
+    def return_texts_to_initial_values(self) -> None:
         self.return_line_edits_to_initial_values()
         self.return_unit_line_edits_to_initial_values()
         self.return_other_edits_to_initial_values()
-        self.parent_item.ssc_object.__post_init__(update_parent)
+        self.parent_item.stellar_system_element.__post_init__()
 
     def return_line_edits_to_initial_values(self) -> None:
         for key in self.le:

@@ -7,8 +7,8 @@ from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
 from stellar_system_creator.gui.gui_image_rendering import SystemImageWidget
 from PyQt5.Qt import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel
 
-from stellar_system_creator.solar_system_elements.planetary_system import PlanetarySystem
-from stellar_system_creator.solar_system_elements.solar_system import SolarSystem
+from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
+from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem
 
 
 class CentralWidget(QTabWidget):
@@ -106,7 +106,7 @@ class CentralWidget(QTabWidget):
         project_tree_view: ProjectTreeView = tree_widget_of_current_tab.findChild(ProjectTreeView)
         return project_tree_view
 
-    def get_ssc_object_of_current_tab(self) -> Union[SolarSystem, PlanetarySystem]:
+    def get_ssc_object_of_current_tab(self) -> Union[StellarSystem, PlanetarySystem]:
         project_tree_view = self.get_project_tree_view_of_current_tab()
-        ssc_object: Union[SolarSystem, PlanetarySystem] = project_tree_view.system_dict['Object']
+        ssc_object: Union[StellarSystem, PlanetarySystem] = project_tree_view.system_dict['Object']
         return ssc_object
