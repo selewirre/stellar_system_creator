@@ -328,7 +328,8 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         self.basic_limits_group_box = GroupBox('Basic Limits')
         basic_limits_box_layout = QFormLayout()
         self.basic_limits_group_box.setLayout(basic_limits_box_layout)
-        keys = ['Tidal Locking Radius', 'Dense Roche Limit', 'Hill Sphere', 'Inner Orbit Limit', 'Outer Orbit Limit']
+        keys = ['Tidal Locking Radius', 'Dense Roche Limit', 'Inner Orbit Limit',
+                'Hill Sphere', 'S-Type Critical Orbit', 'Outer Orbit Limit']
         self.add_keys_to_layout(basic_limits_box_layout, self.ulabels, keys)
 
         tab_layout.addWidget(self.basic_limits_group_box)
