@@ -89,7 +89,7 @@ def calculate_hill_sphere(child_stellar_body, parent_stellar_body) -> Q_:
                * (child_parent_mass_ratio / 3) ** (1 / 3)
 
 
-def calculate_roche_lobe(stellar_mass, companion_mass, mean_distance: Q_) -> Q_:
+def calculate_roche_lobe(stellar_mass, companion_mass, mean_distance: Q_, eccentricity: float) -> Q_:
     """
     Roche sphere (not to be confused with roche limit) is the region around a star in a binary system within which
      orbiting material is gravitationally bound to that star.
@@ -100,7 +100,7 @@ def calculate_roche_lobe(stellar_mass, companion_mass, mean_distance: Q_) -> Q_:
     q = q.to_reduced_units().m
     numerator = 0.49 * q ** (2/3)
     denominator = 0.6 * q ** (2/3) + np.log(1 + q ** (1/3))
-    return numerator / denominator * mean_distance
+    return numerator / denominator * mean_distance * (1 - eccentricity)
 
 
 def calculate_three_body_lagrange_point_smallest_body_mass_limit(m1: Q_, m2: Q_) -> Q_:

@@ -47,10 +47,9 @@
 4. Add trigger functions to Edit menu
 5. Add trigger functions to insert menu
 6. Add right-click functionalities for tree view.
-    - Make lagrange position a comboBox.
-    - fix details of binary system, so it can cross update with children.
     - add details on stellar system
     - add details on planetary system
+    - add details on MultiStellarSystem
 8. Add tree view header right-click functionalities (and allow name change like rest "system" types)
 
 

@@ -45,7 +45,7 @@ class StellarBinaryDetailsDialog(BasicDetailsDialog):
         self._set_physical_characteristics_tab()
         self._set_orbital_characteristics_tab()
         self._set_children_orbit_limits_tab()
-        self._set_grandchildren_orbit_limits_tab()
+        # self._set_grandchildren_orbit_limits_tab()
         self._set_insolation_tab()
         self._set_habitability_tab()
 
@@ -53,7 +53,7 @@ class StellarBinaryDetailsDialog(BasicDetailsDialog):
         self.tab_widget.addTab(self.physical_characteristics_tab, "Physical Characteristics")
         self.tab_widget.addTab(self.orbital_characteristics_tab, "Orbital Characteristics")
         self.tab_widget.addTab(self.children_orbit_limits_tab, "Children Orbit Limits")
-        self.tab_widget.addTab(self.grandchildren_orbit_limits_tab, "Grandchildren Orbit Limits")
+        # self.tab_widget.addTab(self.grandchildren_orbit_limits_tab, "Grandchildren Orbit Limits")
         self.tab_widget.addTab(self.insolation_tab, "Insolation")
         self.tab_widget.addTab(self.habitability_tab, "Habitability")
 
@@ -80,9 +80,10 @@ class StellarBinaryDetailsDialog(BasicDetailsDialog):
         self.ulabels: Dict[(str, UnitLabel)] = {
             'Total Mass': UnitLabel(sse, 'mass'),
             'Lifetime': UnitLabel(sse, 'lifetime'), 'Age': UnitLabel(sse, 'age'),
-            'Binary P-type Critical Orbit (Inner)': UnitLabel(sse, 'binary_ptype_critical_orbit'),
-            'Primary S-type Critical Orbit (Outer)': UnitLabel(sse, 'primary_stype_critical_orbit'),
-            'Secondary S-type Critical Orbit (Outer)': UnitLabel(sse, 'secondary_stype_critical_orbit'),
+            'Binary P-Type Critical Orbit (Inner)': UnitLabel(sse, 'binary_ptype_critical_orbit'),
+            'S-Type Critical Orbit': UnitLabel(sse, 'stype_critical_orbit'),
+            # 'Primary S-type Critical Orbit (Outer)': UnitLabel(sse, 'primary_stype_critical_orbit'),
+            # 'Secondary S-type Critical Orbit (Outer)': UnitLabel(sse, 'secondary_stype_critical_orbit'),
             'Tidal Locking Radius': UnitLabel(sse, 'tidal_locking_radius'),
             'Hill Sphere': UnitLabel(sse, 'hill_sphere'),
             'Rough Inner Orbit Limit': UnitLabel(sse, 'rough_inner_orbit_limit'),
@@ -213,9 +214,9 @@ class StellarBinaryDetailsDialog(BasicDetailsDialog):
         self.basic_limits_group_box = GroupBox('Basic Limits')
         basic_limits_box_layout = QFormLayout()
         self.basic_limits_group_box.setLayout(basic_limits_box_layout)
-        keys = ['Rough Inner Orbit Limit', 'Rough Outer Orbit Limit', 'Tidal Locking Radius',
-                'Binary P-type Critical Orbit (Inner)',
-                'Hill Sphere', 'Inner Orbit Limit', 'Outer Orbit Limit']
+        keys = ['Tidal Locking Radius', 'Rough Inner Orbit Limit', 'Binary P-Type Critical Orbit (Inner)',
+                'Inner Orbit Limit', 'Rough Outer Orbit Limit', 'Hill Sphere',
+                'S-Type Critical Orbit', 'Outer Orbit Limit']
         self.add_keys_to_layout(basic_limits_box_layout, self.ulabels, keys)
 
         # setting Rock Line group box

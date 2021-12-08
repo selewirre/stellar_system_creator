@@ -39,7 +39,7 @@ class StellarBody:
         self.image_filename = image_filename
         self.__post_init__()
 
-    def __post_init__(self):
+    def __post_init__(self, want_to_update_parent=False):
 
         from stellar_system_creator.stellar_system_elements.binary_system import BinarySystem
         self.part_of_binary = isinstance(self.parent, BinarySystem)
@@ -62,6 +62,9 @@ class StellarBody:
         self.habitability, self.habitability_violations = self.check_habitability()
 
         self._get_image()
+
+        if want_to_update_parent:
+            self.update_parent()
 
     def __repr__(self, precision=4) -> str:
         string = ''
@@ -132,13 +135,14 @@ class StellarBody:
             self._children.remove(old_child)
 
     def update_children(self):
-        from stellar_system_creator.stellar_system_elements.binary_system import BinarySystem
         for child in self._children:
-            if isinstance(child, StellarBody):
-                child.__post_init__()
-            elif isinstance(child, BinarySystem):
-                child.__post_init__(child.primary_body, child.secondary_body, child.mean_distance, child.eccentricity,
-                                    child.parent)
+            child.__post_init__()
+
+    def update_parent(self):
+        from stellar_system_creator.stellar_system_elements.binary_system import BinarySystem
+        if isinstance(self.parent, BinarySystem):
+            if self.parent.primary_body == self or self.parent.secondary_body == self:
+                self.parent.__post_init__()
 
     def _set_parent(self, parent):
         from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
@@ -251,15 +255,21 @@ class StellarBody:
             return np.nan * ureg.au
 
     def calculate_hill_sphere(self) -> Q_:
-        from .binary_system import StellarBinary
+        from .binary_system import BinarySystem
         if self.parent is not None:
-            if not isinstance(self.parent, StellarBinary):
-                return calculate_hill_sphere(self, self.parent)
-            else:
+            if isinstance(self.parent, BinarySystem):
                 if self.parent.primary_body == self:
-                    return calculate_hill_sphere(self, self.parent.secondary_body)
+                    return calculate_roche_lobe(self.parent.primary_body.mass, self.parent.secondary_body.mass,
+                                                self.parent.mean_distance, self.parent.eccentricity)
+                    # return calculate_hill_sphere(self, self.parent.secondary_body)
+                elif self.parent.secondary_body == self:
+                    return calculate_roche_lobe(self.parent.secondary_body.mass, self.parent.primary_body.mass,
+                                                self.parent.mean_distance, self.parent.eccentricity)
+                    # return calculate_hill_sphere(self, self.parent.primary_body)
                 else:
-                    return calculate_hill_sphere(self, self.parent.primary_body)
+                    return calculate_hill_sphere(self, self.parent)
+            else:
+                return calculate_hill_sphere(self, self.parent)
         else:
             return 2 * ureg.lightyears
 
@@ -384,7 +394,8 @@ class Star(StellarBody):
 
         model = self.insolation_model
         if self.habitable_zone_limits[relevant_zone_type][model.relaxed_max_name] \
-                < self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name]:
+                < self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name] or \
+                np.isnan(self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name]):
             habitability = False
             habitability_violations.append('There are no habitable zones in this system.')
         elif self.inner_orbit_limit > self.habitable_zone_limits[relevant_zone_type][model.relaxed_max_name] \
@@ -430,6 +441,8 @@ class Star(StellarBody):
 
             water_frost_lines_in_binary = {name: calculate_stype_average_habitable_limit(
                 model.swl[name], comp_model_swl[name], mean_distance, eccentricity) for name in model.names}
+            water_frost_lines_in_binary = {name: line if self.parent.minimum_distance > line > 0 else np.nan * line.u
+                                           for (name, line) in water_frost_lines_in_binary.items()}
         else:
             water_frost_lines_in_binary = None
 
@@ -460,6 +473,8 @@ class Star(StellarBody):
 
             rock_lines_in_binary = {name: calculate_stype_average_habitable_limit(
                 model.swl[name], comp_model_swl[name], mean_distance, eccentricity) for name in model.names}
+            rock_lines_in_binary = {name: line if self.parent.minimum_distance > line > 0 else np.nan * line.u
+                                    for (name, line) in rock_lines_in_binary.items()}
         else:
             rock_lines_in_binary = None
 
@@ -472,6 +487,7 @@ class Star(StellarBody):
         return calculate_spectrum_peak_wavelength(self.temperature)  # in nanometers
 
     def _set_orbit_values(self) -> None:
+        warnings.filterwarnings("ignore", category=UnitStrippedWarning)
         self.rough_inner_orbit_limit = calculate_rough_inner_orbit_limit(self.mass)
         self.rough_outer_orbit_limit = calculate_rough_outer_orbit_limit(self.mass)
         self.hill_sphere = self.calculate_hill_sphere()
@@ -490,13 +506,24 @@ class Star(StellarBody):
             self.rock_line = self.rock_lines['Outer Limit']
             self.prevailing_water_frost_lines = self.water_frost_lines
             self.prevailing_rock_lines = self.rock_lines
+        from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
+        if isinstance(self.parent, StellarBinary):
+            self.stype_critical_orbit = calculate_wide_binary_critical_orbit(
+                (self.mass / self.parent.mass).to_reduced_units().m, self.parent.mean_distance, self.parent.eccentricity)
+        else:
+            self.stype_critical_orbit = np.nan * self.rough_outer_orbit_limit.units
 
-        warnings.filterwarnings("ignore", category=UnitStrippedWarning)
         # self_inner_limits = np.array([self.rough_inner_orbit_limit, self.rock_line], dtype=Q_)
         # self_maximum_inner_limit_index = np.nanargmax(self_inner_limits)
         # self.inner_orbit_limit = self_inner_limits[self_maximum_inner_limit_index]
         self.inner_orbit_limit = self.rough_inner_orbit_limit
-        self.outer_orbit_limit = self.rough_outer_orbit_limit
+
+        outer_limits = np.array([self.stype_critical_orbit,
+                                 self.rough_outer_orbit_limit,
+                                 self.hill_sphere], dtype=Q_)
+        outer_limits = np.array([ol for ol in outer_limits if not np.isnan(ol.m)], dtype=Q_)
+        primary_minimum_outer_limit_index = np.nanargmin(outer_limits)
+        self.outer_orbit_limit = outer_limits[primary_minimum_outer_limit_index]
 
     def _set_other_characteristics(self):
         self.luminosity_class = self.get_luminosity_class()
@@ -785,9 +812,28 @@ class Planet(StellarBody):
         return 1
 
     def _set_orbit_values(self) -> None:
+        warnings.filterwarnings("ignore", category=UnitStrippedWarning)
         self.orbit_type_factor = self.get_orbit_type_factor()
         self.outer_orbit_limit = self.hill_sphere = self.calculate_hill_sphere()
         self.inner_orbit_limit = self.dense_roche_limit = calculate_approximate_inner_orbit_limit(self.radius)
+
+        from stellar_system_creator.stellar_system_elements.binary_system import BinarySystem
+        if isinstance(self.parent, BinarySystem):
+            if self.parent.primary_body == self or self.parent.secondary_body == self:
+                self.stype_critical_orbit = calculate_wide_binary_critical_orbit(
+                    (self.mass / self.parent.mass).to_reduced_units().m,
+                    self.parent.mean_distance, self.parent.eccentricity)
+            else:
+                self.stype_critical_orbit = np.nan * self.hill_sphere.units
+        else:
+            self.stype_critical_orbit = np.nan * self.hill_sphere.units
+
+        outer_limits = np.array([self.stype_critical_orbit,
+                                 self.hill_sphere], dtype=Q_)
+        outer_limits = np.array([ol for ol in outer_limits if not np.isnan(ol.m)], dtype=Q_)
+        primary_minimum_outer_limit_index = np.nanargmin(outer_limits)
+        self.outer_orbit_limit = outer_limits[primary_minimum_outer_limit_index]
+
         self.semi_major_axis_minimum_limit = self.get_semi_major_axis_minimum_limit()
         self.semi_major_axis_maximum_limit = self.get_semi_major_axis_maximum_limit()
 
