@@ -14,6 +14,7 @@
 # example on qdialog (popup windows) https://www.tutorialspoint.com/pyqt5/pyqt5_qdialog_class.htm
 # example on dialogbuttonbox with tabwidget https://codetorial.net/en/pyqt5/widget/qtabwidget_advanced.html
 # example on radiobutton https://pythonbasics.org/pyqt-radiobutton/
+# example on qthread https://stackoverflow.com/questions/6783194/background-thread-with-qthread-in-pyqt
 
 import sys
 

@@ -2,7 +2,7 @@ import tempfile
 from functools import partial
 from typing import Union
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QThread
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QVBoxLayout
 
@@ -12,9 +12,9 @@ from stellar_system_creator.stellar_system_elements.stellar_system import Stella
 
 class SystemRenderingWidget(QSvgWidget):
 
-    def __init__(self, ssc_object: Union[StellarSystem, PlanetarySystem, None] = None):
+    def __init__(self):
         super().__init__()
-        self.render_image(ssc_object)
+        self.hide()
 
     def render_image(self, ssc_object: Union[StellarSystem, PlanetarySystem, None]):
 
@@ -60,15 +60,37 @@ class SystemImageWidget(QWidget):
         self.options_widget = QWidget(self)
         layout = QHBoxLayout()
 
-        render_button = QPushButton('Render', self)
-        render_button.adjustSize()
-        render_button.pressed.connect(partial(self.system_rendering_widget.render_image, self.ssc_object))
+        self.render_button = QPushButton('Render', self)
+        self.render_button.adjustSize()
+        self.render_button.pressed.connect(self.render_process)
+        self.render_thread = None
 
-        layout.addWidget(render_button)
+        layout.addWidget(self.render_button)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
         self.options_widget.setLayout(layout)
         self.options_widget.setFixedSize(self.options_widget.sizeHint())
 
+    def render_process(self):
+        self.render_thread = ImageRenderingProcess(self.ssc_object, self.system_rendering_widget, self.render_button)
+        self.render_thread.start()
+
+
+class ImageRenderingProcess(QThread):
+
+    def __init__(self, ssc_object: Union[StellarSystem, PlanetarySystem, None],
+                 rendering_widget: SystemRenderingWidget, render_button: QPushButton):
+        super().__init__()
+        self.ssc_object = ssc_object
+        self.rendering_widget = rendering_widget
+        self.render_button = render_button
+
+    def run(self):
+        button_text = self.render_button.text()
+        self.render_button.setText('Loading')
+        self.render_button.setDisabled(True)
+        self.rendering_widget.render_image(self.ssc_object)
+        self.render_button.setEnabled(True)
+        self.render_button.setText(button_text)
 

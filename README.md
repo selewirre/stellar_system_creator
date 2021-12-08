@@ -8,7 +8,7 @@ To install this package, run:
 
 ```
 python3 setup.py sdist bdist_wheel
-pip3 install dist/stellar_system_creator-0.0.3.1.tar.gz
+pip3 install dist/stellar_system_creator-0.0.3.2.tar.gz
 ```
 
 If you want to check out the example code, look in the folder `examples/...`
@@ -36,10 +36,11 @@ if __name__ == "__main__":
     sys.exit(app.exec_())
 ```
 
-When rendering, allow the program to work through it (takes 20-60 seconds),
-since it is adding 500 images on a single plt.figure.
+Most buttons do not work. What does work are all the details buttons in the treeview and the Render button.
+You can modify any of the existing examples, but not create new ones yet.
 
-Most buttons do not work. What works is the star right-click menu.
+When rendering, allow the program to work through it (takes 20-60 seconds),
+since it is adding 500 images on a single plt.figure (due to solar system rendering ~460 images for a single asteroid belt).
 
 # License 
 GNU GPL v3 license.
