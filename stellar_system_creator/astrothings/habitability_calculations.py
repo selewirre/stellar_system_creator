@@ -114,6 +114,9 @@ def calculate_stype_permanent_habitable_limit(star_swl: Q_, star_companion_swl: 
         max_planetary_eccentricity = calculate_forced_eccentricity_in_wide_binary(
             planetary_semimajor_axis, binary_mean_distance, binary_eccentricity)
 
+    if max_planetary_eccentricity >= 1:
+        return np.nan * planetary_semimajor_axis.units
+
     qp = planetary_semimajor_axis * (1 - max_planetary_eccentricity)
     Qp = planetary_semimajor_axis * (1 + max_planetary_eccentricity)
 
@@ -170,6 +173,9 @@ def calculate_ptype_permanent_habitable_limit(primary_swl: Q_, secondary_swl: Q_
         max_planetary_eccentricity = calculate_forced_eccentricity_in_close_binary(
             planetary_semimajor_axis, binary_mean_distance, binary_eccentricity, mu)
 
+    if max_planetary_eccentricity >= 1:
+        return np.nan * planetary_semimajor_axis.units
+
     qp = planetary_semimajor_axis * (1 - max_planetary_eccentricity)
     Qp = planetary_semimajor_axis * (1 + max_planetary_eccentricity)
 
@@ -215,7 +221,10 @@ def calculate_stype_average_habitable_limit(star_swl: Q_, star_companion_swl: Q_
         max_planetary_eccentricity = calculate_forced_eccentricity_in_wide_binary(
             planetary_semimajor_axis, binary_mean_distance, binary_eccentricity)
 
+    if max_planetary_eccentricity >= 1:
+        return np.nan * planetary_semimajor_axis.units
     epmean2 = max_planetary_eccentricity ** 2
+
     rpmean = planetary_semimajor_axis * (1 - epmean2) ** 0.25
 
     first_term = Ls / (rpmean * (1 - epmean2) ** 0.25)
@@ -249,6 +258,8 @@ def calculate_ptype_average_habitable_limit(primary_swl: Q_, secondary_swl: Q_, 
         max_planetary_eccentricity = calculate_forced_eccentricity_in_close_binary(
             planetary_semimajor_axis, binary_mean_distance, binary_eccentricity, mu)
 
+    if max_planetary_eccentricity >= 1:
+        return np.nan * planetary_semimajor_axis.units
     epmean2 = max_planetary_eccentricity ** 2
     rpmean = planetary_semimajor_axis * (1 - epmean2) ** 0.25
 

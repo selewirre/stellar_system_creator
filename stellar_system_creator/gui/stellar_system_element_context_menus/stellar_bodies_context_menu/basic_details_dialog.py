@@ -17,6 +17,7 @@ class BasicDetailsDialog(QDialog):
     def __init__(self, parent_item):
         from ..standard_items import TreeViewItemFromStellarSystemElement
         self.parent_item: TreeViewItemFromStellarSystemElement = parent_item
+        self.parent_item.stellar_system_element.__post_init__()
         super().__init__(self.parent_item.model().parent().parent())
         self.parent_item.stellar_system_element.__post_init__()
         self.__post_init__()
@@ -113,6 +114,7 @@ class BasicDetailsDialog(QDialog):
                                                 'Tidal Locking Radius': UnitLabel(sse, 'tidal_locking_radius'),
                                                 'Hill Sphere': UnitLabel(sse, 'hill_sphere'),
                                                 'Dense Roche Limit': UnitLabel(sse, 'dense_roche_limit'),
+                                                'S-Type Critical Orbit': UnitLabel(sse, 'stype_critical_orbit'),
                                                 'Inner Orbit Limit': UnitLabel(sse, 'inner_orbit_limit'),
                                                 'Outer Orbit Limit': UnitLabel(sse, 'outer_orbit_limit'),
                                                 }
