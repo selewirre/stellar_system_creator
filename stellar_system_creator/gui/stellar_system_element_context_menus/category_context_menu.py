@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import QMenu, QAction
 from PyQt5.Qt import QStandardItem
+from stellar_system_creator.stellar_system_elements.stellar_body import MainSequenceStar, Planet, AsteroidBelt, \
+    Satellite, Trojan, TrojanSatellite
 
 
 class CategoryBasedTreeViewItemContextMenu(QMenu):
