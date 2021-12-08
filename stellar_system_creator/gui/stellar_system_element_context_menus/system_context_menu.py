@@ -15,16 +15,22 @@ class SystemTreeViewItemContextMenu(QMenu):
     def _create_menu(self):
         self.addSection(self.parent_item.text())
         self.addAction(self.details_action)
+        self.addSeparator()
+        self.addAction(self.delete_permanently_action)
 
     def _connect_actions(self):
         self.details_action.triggered.connect(self.details_action_process)
+        self.delete_permanently_action.triggered.connect(self.delete_permanently_process)
 
     def _create_menu_actions(self):
         self.details_action = QAction("&Details...", self)
+        self.delete_permanently_action = QAction(f"&Delete Permanently...", self)
 
     def details_action_process(self):
         pass
-        # details_dialog = ElementDetailsDialog(self.parent_item)
+
+    def delete_permanently_process(self):
+        pass
 
 
 class BinarySystemTreeViewItemContextMenu(SystemTreeViewItemContextMenu):

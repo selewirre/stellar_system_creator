@@ -40,8 +40,7 @@
 
 
 # GUI:
-0. updatable treeview
-1. Add to qthread: rendering, opening, saving
+1. updatable treeview
 2. Add zoom function for svgwidget
 3. Add S-type Binaries (multistellar systems) in treeview
 4. Add trigger functions to Edit menu
@@ -50,7 +49,7 @@
     - add details on stellar system
     - add details on planetary system
     - add details on MultiStellarSystem
-8. Add tree view header right-click functionalities (and allow name change like rest "system" types)
+7. Add tree view header right-click functionalities (and allow name change like rest "system" types)
 
 
 

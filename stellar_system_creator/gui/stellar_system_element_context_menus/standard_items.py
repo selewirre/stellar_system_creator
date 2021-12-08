@@ -5,7 +5,7 @@ from PyQt5 import QtGui
 from PyQt5.QtGui import QIcon
 from PyQt5.Qt import QStandardItem
 
-from .misc import CategoryBasedTreeViewItemContextMenu
+from .category_context_menu import CategoryBasedTreeViewItemContextMenu
 from .stellar_bodies_context_menu.binary_system_context_menu import StellarBinaryTreeViewItemContextMenu
 from .stellar_bodies_context_menu.planet_context_menu import \
     PlanetTreeViewItemContextMenu, SatelliteTreeViewItemContextMenu, AsteroidBeltTreeViewItemContextMenu, \
