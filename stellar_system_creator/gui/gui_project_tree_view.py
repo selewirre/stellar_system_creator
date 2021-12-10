@@ -191,16 +191,14 @@ def set_stellar_system_tree_model_from_ssc_object(tree_model, file):
 
 
 class ProjectTreeView(QTreeView):
-    # TODO: Add sorting function.
+
     def __init__(self, filename):
         super().__init__()
         self.filename = filename
-
-        self._get_scc_object_from_file()
+        self._get_ssc_object_from_file()
         self._get_system_tree()
-
+        self.ssc_object = load(self.filename)
         self.setHeaderHidden(True)
-
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.open_context_menu)
 
@@ -217,20 +215,20 @@ class ProjectTreeView(QTreeView):
 
         project_tree_view_item.context_menu.exec_(self.viewport().mapToGlobal(position))
 
-    def update_scc_object_from_file(self, filename):
+    def update_ssc_object_from_file(self, filename):
         self.filename = filename
         self._get_file()
 
-    def _get_scc_object_from_file(self):
-        self.scc_object = load(self.filename)
+    def _get_ssc_object_from_file(self):
+        self.ssc_object = load(self.filename)
 
     def _get_system_tree(self):
         tree_model = QStandardItemModel(self)
 
-        if self.scc_object.__class__ == StellarSystem:
-            self.system_dict = set_stellar_system_tree_model_from_ssc_object(tree_model, self.scc_object)
-        elif self.scc_object.__class__ == PlanetarySystem:
-            self.system_dict = set_planetary_system_tree_model_from_ssc_object(tree_model, self.scc_object)
+        if self.ssc_object.__class__ == StellarSystem:
+            self.system_dict = set_stellar_system_tree_model_from_ssc_object(tree_model, self.ssc_object)
+        elif self.ssc_object.__class__ == PlanetarySystem:
+            self.system_dict = set_planetary_system_tree_model_from_ssc_object(tree_model, self.ssc_object)
 
         self.setModel(tree_model)
         self.expandAll()

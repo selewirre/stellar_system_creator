@@ -24,7 +24,7 @@ class CentralWidget(QTabWidget):
 
     def add_new_tab(self, filename):
         tree_view = ProjectTreeView(filename)
-        tab_header = self.make_tab_header(tree_view.scc_object.name)
+        tab_header = self.make_tab_header(tree_view.ssc_object.name)
 
         left_side_widget = QWidget()
         left_side_layout = QVBoxLayout()
@@ -34,7 +34,7 @@ class CentralWidget(QTabWidget):
         left_side_layout.setSpacing(0)
         left_side_widget.setLayout(left_side_layout)
 
-        right_side_widget = SystemImageWidget(tree_view.system_dict['Object'])
+        right_side_widget = SystemImageWidget(tree_view)
 
         tab_content = QSplitter(Qt.Horizontal)
         tab_content.addWidget(left_side_widget)

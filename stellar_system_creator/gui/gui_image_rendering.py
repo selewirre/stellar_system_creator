@@ -6,6 +6,7 @@ from PyQt5.QtCore import Qt, QThread
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QVBoxLayout
 
+from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
 from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem
 
@@ -19,6 +20,7 @@ class SystemRenderingWidget(QSvgWidget):
     def render_image(self, ssc_object: Union[StellarSystem, PlanetarySystem, None]):
 
         if ssc_object is not None:
+            self.hide()
             save_format = 'svg'
             with tempfile.NamedTemporaryFile("r+b", delete=True) as fd:
                 if isinstance(ssc_object, StellarSystem):
@@ -27,7 +29,8 @@ class SystemRenderingWidget(QSvgWidget):
                     ssc_object.draw_planetary_system(save_fig=True, save_temp_file=fd, save_format=save_format)
                 fd.seek(0)
                 self.renderer().load(fd.name)
-
+            ssc_object.fig = None
+            ssc_object.ax = None
             self.renderer().setAspectRatioMode(Qt.KeepAspectRatio)
             self.show()
         else:
@@ -36,9 +39,9 @@ class SystemRenderingWidget(QSvgWidget):
 
 class SystemImageWidget(QWidget):
 
-    def __init__(self, ssc_object: Union[StellarSystem, PlanetarySystem, None] = None):
+    def __init__(self, tree_view: ProjectTreeView):
         super().__init__()
-        self.ssc_object = ssc_object
+        self.tree_view = tree_view
 
         self.system_rendering_widget = SystemRenderingWidget()
         self._set_options_widget()
@@ -73,16 +76,16 @@ class SystemImageWidget(QWidget):
         self.options_widget.setFixedSize(self.options_widget.sizeHint())
 
     def render_process(self):
-        self.render_thread = ImageRenderingProcess(self.ssc_object, self.system_rendering_widget, self.render_button)
+        self.render_thread = ImageRenderingProcess(self.tree_view, self.system_rendering_widget, self.render_button)
         self.render_thread.start()
 
 
 class ImageRenderingProcess(QThread):
 
-    def __init__(self, ssc_object: Union[StellarSystem, PlanetarySystem, None],
+    def __init__(self, tree_view: ProjectTreeView,
                  rendering_widget: SystemRenderingWidget, render_button: QPushButton):
         super().__init__()
-        self.ssc_object = ssc_object
+        self.ssc_object: Union[StellarSystem, PlanetarySystem, None] = tree_view.ssc_object
         self.rendering_widget = rendering_widget
         self.render_button = render_button
 

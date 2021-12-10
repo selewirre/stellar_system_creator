@@ -39,7 +39,7 @@ class StellarBodyTreeViewItemContextMenu(QMenu):
                 # if 'stellar_system_element' in parent.parent().__dict__:
                 ssc = self.parent_item.stellar_system_element
                 if parent.parent() is None:
-                    system = parent.model().parent().scc_object
+                    system = parent.model().parent().ssc_object
                 else:
                     system = parent.parent().stellar_system_element
                 system.remove_object(ssc)

@@ -159,6 +159,7 @@ class StellarBody:
             self.parent.remove_child(self)
             self.parent = parent
             self.parent.add_child(self)
+        self.part_of_binary = isinstance(self.parent, StellarBinary)
 
     def _get_radius(self) -> None:
         if 'suggested_radius' in self.__dict__:
@@ -680,6 +681,11 @@ class Planet(StellarBody):
                 if self.parent.parent.primary_body == self:
                     companion_body = self.parent.parent.primary_body
                 else:
+                    print(self.name)
+                    print(self.parent.part_of_binary)
+                    print(self.parent.name)
+                    print(self.parent.parent.name)
+                    print('=======')
                     companion_body = self.parent.parent.secondary_body
                 incident_flux = incident_flux + calculate_companion_incident_flux_in_wide_binary(
                     companion_body.luminosity, self.semi_major_axis, self.parent.mean_distance,

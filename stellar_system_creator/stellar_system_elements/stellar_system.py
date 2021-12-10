@@ -56,10 +56,14 @@ class StellarSystem:
     def replace_parent(self, new_parent) -> None:
         self.parent = new_parent
         for planetary_system in self.planetary_systems:
-            planetary_system.parent.parent = new_parent
+            planetary_system.parent._set_parent(new_parent)
+            # planetary_system.parent.parent = new_parent
+            # print(planetary_system.name, planetary_system.parent.name, planetary_system.parent.parent.name)
+            # print(type(planetary_system.parent.parent))
             planetary_system.parent.__post_init__()
         for asteroid_belt in self.asteroid_belts:
-            asteroid_belt.parent = new_parent
+            asteroid_belt._set_parent(new_parent)
+            # asteroid_belt.parent = new_parent
             asteroid_belt.__post_init__()
         self.min_drawing_orbit = self.get_min_drawing_orbit()
 
