@@ -33,9 +33,33 @@ class PlanetarySystem:
         self.want_draw_satellite_orbits = True
         self.want_orbit_label = True
 
+    def remove_object(self, garbage_object):
+        if garbage_object == self.parent:
+            self.remove_parent()
+        else:
+            self.remove_child(garbage_object)
+
+    def remove_parent(self) -> None:
+        for child in self.parent._children:
+            child.parent = None
+            child.__post_init__()
+        self.parent = None
+
     def replace_parent(self, new_parent) -> None:
         self.parent = new_parent
+        for satellite in self.satellite_list:
+            satellite.parent = new_parent
+            satellite.__post_init__()
+        for trojan in self.trojans_list:
+            trojan.parent = new_parent
+            trojan.__post_init__()
         self.min_drawing_orbit = self.get_min_drawing_orbit()
+
+    def remove_child(self, old_child) -> None:
+        if old_child.__class__ == Satellite:
+            self.remove_satellite(old_child)
+        if old_child.__class__ == Trojan:
+            self.remove_trojan(old_child)
 
     def add_satellite(self, satellite: Satellite):
         self.satellite_list.append(satellite)

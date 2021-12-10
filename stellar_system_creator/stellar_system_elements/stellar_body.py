@@ -522,8 +522,11 @@ class Star(StellarBody):
                                  self.rough_outer_orbit_limit,
                                  self.hill_sphere], dtype=Q_)
         outer_limits = np.array([ol for ol in outer_limits if not np.isnan(ol.m)], dtype=Q_)
-        primary_minimum_outer_limit_index = np.nanargmin(outer_limits)
-        self.outer_orbit_limit = outer_limits[primary_minimum_outer_limit_index]
+        if len(outer_limits):
+            minimum_outer_limit_index = np.nanargmin(outer_limits)
+            self.outer_orbit_limit = outer_limits[minimum_outer_limit_index]
+        else:
+            self.outer_orbit_limit = np.nan * self.stype_critical_orbit.units
 
     def _set_other_characteristics(self):
         self.luminosity_class = self.get_luminosity_class()
@@ -806,7 +809,7 @@ class Planet(StellarBody):
         if self.parent is not None:
             return self.parent.outer_orbit_limit * self.orbit_type_factor
         else:
-            return np.nan * self.semi_major_axis_minimum_limit.units()
+            return np.nan * self.semi_major_axis_minimum_limit.units
 
     def get_orbit_type_factor(self):
         return 1
@@ -831,8 +834,11 @@ class Planet(StellarBody):
         outer_limits = np.array([self.stype_critical_orbit,
                                  self.hill_sphere], dtype=Q_)
         outer_limits = np.array([ol for ol in outer_limits if not np.isnan(ol.m)], dtype=Q_)
-        primary_minimum_outer_limit_index = np.nanargmin(outer_limits)
-        self.outer_orbit_limit = outer_limits[primary_minimum_outer_limit_index]
+        if len(outer_limits):
+            minimum_outer_limit_index = np.nanargmin(outer_limits)
+            self.outer_orbit_limit = outer_limits[minimum_outer_limit_index]
+        else:
+            self.outer_orbit_limit = np.nan * self.stype_critical_orbit.units
 
         self.semi_major_axis_minimum_limit = self.get_semi_major_axis_minimum_limit()
         self.semi_major_axis_maximum_limit = self.get_semi_major_axis_maximum_limit()
@@ -1060,21 +1066,34 @@ class Trojan(Planet):
                          parent.axial_tilt, albedo, age=age, image_filename=image_filename)
 
     def __post_init__(self):
-        self.semi_major_axis = self.parent.semi_major_axis
-        self.orbital_eccentricity = self.parent.orbital_eccentricity
-        self.orbit_type = self.parent.orbit_type
-        self.inclination = self.parent.inclination
-        self.longitude_of_ascending_node = self.parent.longitude_of_ascending_node
-        self.argument_of_periapsis = self.parent.argument_of_periapsis
-        self.axial_tilt = self.parent.axial_tilt
+        if self.parent is not None:
+            self.semi_major_axis = self.parent.semi_major_axis
+            self.orbital_eccentricity = self.parent.orbital_eccentricity
+            self.orbit_type = self.parent.orbit_type
+            self.inclination = self.parent.inclination
+            self.longitude_of_ascending_node = self.parent.longitude_of_ascending_node
+            self.argument_of_periapsis = self.parent.argument_of_periapsis
+            self.axial_tilt = self.parent.axial_tilt
+        else:
+            self.semi_major_axis = np.nan * ureg.au
+            self.orbital_eccentricity = np.nan
+            self.orbit_type = 'prograde'
+            self.inclination = np.nan * ureg.deg
+            self.longitude_of_ascending_node = np.nan * ureg.deg
+            self.argument_of_periapsis = np.nan * ureg.deg
+            self.axial_tilt = np.nan * ureg.deg
 
-        if np.isnan(self.extend):
-            self.extend = self.parent.semi_major_axis / 8
-        if self.composition == '':
-            if self.semi_major_axis < self.parent.parent.water_frost_line or np.isnan(self.semi_major_axis.m):
-                self.composition = 'Rockworld70'
-            else:
-                self.composition = 'Waterworld100'
+        if self.parent is not None:
+            if np.isnan(self.extend):
+                self.extend = self.parent.semi_major_axis / 8
+            if self.composition == '':
+                if self.semi_major_axis < self.parent.parent.water_frost_line or np.isnan(self.semi_major_axis.m):
+                    self.composition = 'Rockworld70'
+                else:
+                    self.composition = 'Waterworld100'
+        else:
+            if self.composition == '':
+                self.composition = 'Waterworld45'
 
         super().__post_init__()
 
@@ -1100,10 +1119,16 @@ class Trojan(Planet):
         return image_arrays
 
     def calculate_orbital_period(self):
-        return self.parent.orbital_period
+        if self.parent is not None:
+            return self.parent.orbital_period
+        else:
+            return np.nan * ureg.days
 
     def calculate_orbital_velocity(self):
-        return self.parent.orbital_velocity
+        if self.parent is not None:
+            return self.parent.orbital_velocity
+        else:
+            return np.nan * ureg.vorb_e
 
     def calculate_incident_flux(self, ecc_correction='flux') -> Q_:
         if self.parent is not None:
@@ -1117,9 +1142,9 @@ class Trojan(Planet):
             if self.parent.parent is not None:
                 return calculate_roche_limit(self, self.parent.parent)
             else:
-                return np.nan * self.semi_major_axis.units()
+                return np.nan * self.semi_major_axis.units
         else:
-            return np.nan * self.semi_major_axis.units()
+            return np.nan * self.semi_major_axis.units
 
     def get_semi_major_axis_minimum_limit(self):
         return self.calculate_roche_limit()
@@ -1129,9 +1154,9 @@ class Trojan(Planet):
             if self.parent.parent is not None:
                 return self.parent.parent.outer_orbit_limit
             else:
-                return np.nan * self.semi_major_axis_minimum_limit.units()
+                return np.nan * self.semi_major_axis_minimum_limit.units
         else:
-            return np.nan * self.semi_major_axis_minimum_limit.units()
+            return np.nan * self.semi_major_axis_minimum_limit.units
 
     def _set_orbit_values(self) -> None:
         Planet._set_orbit_values(self)
@@ -1141,7 +1166,10 @@ class Trojan(Planet):
     #     self.orbital_velocity = self.calculate_orbital_velocity()
 
     def get_orbital_stability(self) -> Tuple[bool, str]:
-        return self.parent.orbital_stability, self.parent.stability_violations
+        if self.parent is not None:
+            return self.parent.orbital_stability, self.parent.stability_violations
+        else:
+            return False, 'Parent was not defined'
 
     def check_habitability(self) -> Tuple[bool, str]:
         return Satellite.check_habitability(self)
@@ -1159,19 +1187,21 @@ class Satellite(Planet):
                  luminosity=np.nan * ureg.L_s, age: Q_ = np.nan * ureg.T_s, image_filename=None) -> None:
 
         if not isinstance(parent, Planet):
-            raise TypeError(f'Parent of {self.name} must be a planetary class object')
+            raise TypeError(f'Parent of {name} must be a planetary class object')
         Planet.__init__(self, name, mass, radius, parent, semi_major_axis, orbital_eccentricity, orbit_type,
                         composition, spin_period, inclination, longitude_of_ascending_node, argument_of_periapsis,
                         axial_tilt, albedo, normalized_greenhouse, heat_distribution, emissivity, luminosity, age,
                         image_filename)
 
     def __post_init__(self):
-        if self.composition == '':
+        if self.composition == '' and self.parent is not None:
             if self.parent.semi_major_axis < self.parent.parent.water_frost_line \
                     or np.isnan(self.parent.semi_major_axis.m):
                 self.composition = 'Rockworld70'
             else:
                 self.composition = 'Waterworld100'
+        elif self.composition == '':
+            self.composition = 'Waterworld45'
 
         Planet.__post_init__(self)
 
@@ -1198,19 +1228,31 @@ class Satellite(Planet):
         return incident_flux
 
     def calculate_prograde_orbit_limit_factor(self) -> float:
-        return calculate_satellite_prograde_orbit_limit_factor(
-            self.parent.orbital_eccentricity, self.orbital_eccentricity)
+        if self.parent is not None:
+            return calculate_satellite_prograde_orbit_limit_factor(
+                self.parent.orbital_eccentricity, self.orbital_eccentricity)
+        else:
+            return 1
 
     def calculate_retrograde_orbit_limit_factor(self) -> float:
-        return calculate_satellite_retrograde_orbit_limit_factor(
-            self.parent.orbital_eccentricity, self.orbital_eccentricity)
+        if self.parent is not None:
+            return calculate_satellite_retrograde_orbit_limit_factor(
+                self.parent.orbital_eccentricity, self.orbital_eccentricity)
+        else:
+            return 1
 
     def calculate_max_satellite_mass(self):
-        return calculate_max_satellite_mass(self.parent.mass, self.parent.radius, self.parent.outer_orbit_limit,
-                                            self.orbit_type_factor, self.farthest_parent.lifetime)
+        if self.parent is not None:
+            return calculate_max_satellite_mass(self.parent.mass, self.parent.radius, self.parent.outer_orbit_limit,
+                                                self.orbit_type_factor, self.farthest_parent.lifetime)
+        else:
+            return np.nan * self.mass.u
 
     def calculate_day_period(self):
-        return calculate_synodic_period(self.spin_period, self.parent.orbital_period)
+        if self.parent is not None:
+            return calculate_synodic_period(self.spin_period, self.parent.orbital_period)
+        else:
+            return np.nan * ureg.days
 
     def get_orbit_type_factor(self):
         if self.orbit_type.lower() == 'prograde':
@@ -1248,32 +1290,36 @@ class Satellite(Planet):
         #                                   ' gravity units.')
 
         # checking habitable zone. First we regard the s-type HZ on the system caused by another system, and then p-type
-        habitable_zone_limit_keys = self.parent.parent.habitable_zone_limits.keys()
-        if 'AHZ' in habitable_zone_limit_keys:
-            relevant_zone_type = 'AHZ'
-        elif 'PHZ' in habitable_zone_limit_keys:
-            relevant_zone_type = 'PHZ'
-        elif 'RHZ' in habitable_zone_limit_keys:
-            relevant_zone_type = 'RHZ'
-        elif 'ptypeAHZ' in habitable_zone_limit_keys:
-            relevant_zone_type = 'ptypeAHZ'
-        elif 'ptypePHZ' in habitable_zone_limit_keys:
-            relevant_zone_type = 'ptypePHZ'
-        elif 'ptypeRHZ' in habitable_zone_limit_keys:
-            relevant_zone_type = 'ptypeRHZ'
+        if self.parent is not None:
+            habitable_zone_limit_keys = self.parent.parent.habitable_zone_limits.keys()
+            if 'AHZ' in habitable_zone_limit_keys:
+                relevant_zone_type = 'AHZ'
+            elif 'PHZ' in habitable_zone_limit_keys:
+                relevant_zone_type = 'PHZ'
+            elif 'RHZ' in habitable_zone_limit_keys:
+                relevant_zone_type = 'RHZ'
+            elif 'ptypeAHZ' in habitable_zone_limit_keys:
+                relevant_zone_type = 'ptypeAHZ'
+            elif 'ptypePHZ' in habitable_zone_limit_keys:
+                relevant_zone_type = 'ptypePHZ'
+            elif 'ptypeRHZ' in habitable_zone_limit_keys:
+                relevant_zone_type = 'ptypeRHZ'
+            else:
+                relevant_zone_type = 'SSHZ'
+
+            model = self.parent.parent.insolation_model
+            inner_limit = self.parent.parent.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name]
+            outer_limit = self.parent.parent.habitable_zone_limits[relevant_zone_type][model.relaxed_max_name]
+
+            if inner_limit > outer_limit:
+                habitability = False
+                habitability_violation.append('Parent lacks a proper HZ.')
+            elif not inner_limit < self.parent.semi_major_axis < outer_limit:
+                habitability = False
+                habitability_violation.append('Planetary semi-major axis is not within the habitable zone of the parent.')
         else:
-            relevant_zone_type = 'SSHZ'
-
-        model = self.parent.parent.insolation_model
-        inner_limit = self.parent.parent.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name]
-        outer_limit = self.parent.parent.habitable_zone_limits[relevant_zone_type][model.relaxed_max_name]
-
-        if inner_limit > outer_limit:
             habitability = False
-            habitability_violation.append('Parent lacks a proper HZ.')
-        elif not inner_limit < self.parent.semi_major_axis < outer_limit:
-            habitability = False
-            habitability_violation.append('Planetary semi-major axis is not within the habitable zone of the parent.')
+            habitability_violation.append('Parent planet was not defined.')
 
         if not self.orbital_stability:
             habitability = False
@@ -1308,19 +1354,33 @@ class TrojanSatellite(Satellite, Trojan):
                            luminosity, age=age, image_filename=image_filename)
 
     def __post_init__(self):
-        self.semi_major_axis = self.parent.semi_major_axis
-        self.orbital_eccentricity = self.parent.orbital_eccentricity
-        self.orbit_type = self.parent.orbit_type
-        self.inclination = self.parent.inclination
-        self.longitude_of_ascending_node = self.parent.longitude_of_ascending_node
-        self.argument_of_periapsis = self.parent.argument_of_periapsis
+        if self.parent is not None:
+            self.semi_major_axis = self.parent.semi_major_axis
+            self.orbital_eccentricity = self.parent.orbital_eccentricity
+            self.orbit_type = self.parent.orbit_type
+            self.inclination = self.parent.inclination
+            self.longitude_of_ascending_node = self.parent.longitude_of_ascending_node
+            self.argument_of_periapsis = self.parent.argument_of_periapsis
+        else:
+            self.semi_major_axis = np.nan * ureg.au
+            self.orbital_eccentricity = np.nan
+            self.orbit_type = 'prograde'
+            self.inclination = np.nan * ureg.deg
+            self.longitude_of_ascending_node = np.nan * ureg.deg
+            self.argument_of_periapsis = np.nan * ureg.deg
         super().__post_init__()
 
     def calculate_orbital_period(self):
-        return self.parent.orbital_period
+        if self.parent is not None:
+            return self.parent.orbital_period
+        else:
+            return np.nan * ureg.years
 
     def calculate_orbital_velocity(self):
-        return self.parent.orbital_velocity
+        if self.parent is not None:
+            return self.parent.orbital_velocity
+        else:
+            return np.nan * ureg.vorb_e
 
     def calculate_incident_flux(self, ecc_correction='flux') -> Q_:
         if self.parent is not None:
@@ -1334,12 +1394,15 @@ class TrojanSatellite(Satellite, Trojan):
             if self.parent.parent is not None:
                 return calculate_roche_limit(self, self.parent.parent)
             else:
-                return np.nan * self.semi_major_axis.units()
+                return np.nan * self.semi_major_axis.units
         else:
-            return np.nan * self.semi_major_axis.units()
+            return np.nan * self.semi_major_axis.units
 
     def get_orbital_stability(self) -> Tuple[bool, str]:
-        return self.parent.orbital_stability, self.parent.stability_violations
+        if self.parent is not None:
+            return self.parent.orbital_stability, self.parent.stability_violations
+        else:
+            return False, 'Parent was not defined'
 
     def get_orbit_type_factor(self):
         Planet.get_orbit_type_factor(self)
@@ -1349,12 +1412,15 @@ class TrojanSatellite(Satellite, Trojan):
             if self.parent.parent is not None:
                 return self.parent.parent.outer_orbit_limit
             else:
-                return np.nan * self.semi_major_axis_minimum_limit.units()
+                return np.nan * self.semi_major_axis_minimum_limit.units
         else:
-            return np.nan * self.semi_major_axis_minimum_limit.units()
+            return np.nan * self.semi_major_axis_minimum_limit.units
 
     def _set_orbit_values(self) -> None:
         Planet._set_orbit_values(self)
 
     def calculate_max_satellite_mass(self):
-        return calculate_three_body_lagrange_point_smallest_body_mass_limit(self.parent.parent.mass, self.parent.mass)
+        if self.parent is not None:
+            return calculate_three_body_lagrange_point_smallest_body_mass_limit(self.parent.parent.mass, self.parent.mass)
+        else:
+            return np.nan * self.mass.u

@@ -30,7 +30,17 @@ class SystemTreeViewItemContextMenu(QMenu):
         pass
 
     def delete_permanently_process(self):
-        pass
+        from .standard_items import TreeViewItemFromStellarSystemElement
+        parent: TreeViewItemFromStellarSystemElement = self.parent_item.parent()
+        for i in range(parent.rowCount()):
+            if parent.child(i) == self.parent_item:
+                ssc = self.parent_item.stellar_system_element
+                if parent.parent() is None:
+                    system = parent.model().parent().scc_object
+                else:
+                    system = parent.parent().stellar_system_element
+                system.remove_object(ssc)
+                parent.removeRow(i)
 
 
 class BinarySystemTreeViewItemContextMenu(SystemTreeViewItemContextMenu):

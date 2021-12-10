@@ -41,9 +41,33 @@ class StellarSystem:
         self.draw_detailed_trojans = True
         self.relevant_zone_type = None
 
+    def remove_object(self, garbage_object):
+        if garbage_object == self.parent:
+            self.remove_parent()
+        else:
+            self.remove_child(garbage_object)
+
+    def remove_parent(self) -> None:
+        for child in self.parent._children:
+            child.parent = None
+            child.__post_init__()
+        self.parent = None
+
     def replace_parent(self, new_parent) -> None:
         self.parent = new_parent
+        for planetary_system in self.planetary_systems:
+            planetary_system.parent.parent = new_parent
+            planetary_system.parent.__post_init__()
+        for asteroid_belt in self.asteroid_belts:
+            asteroid_belt.parent = new_parent
+            asteroid_belt.__post_init__()
         self.min_drawing_orbit = self.get_min_drawing_orbit()
+
+    def remove_child(self, old_child) -> None:
+        if old_child.__class__ == PlanetarySystem:
+            self.remove_planetary_system(old_child)
+        if old_child.__class__ == AsteroidBelt:
+            self.remove_asteroid_belt(old_child)
 
     def add_planetary_system(self, planetary_system: PlanetarySystem):
         self.planetary_systems.append(planetary_system)
