@@ -212,27 +212,21 @@ class BinarySystem:
         binary_inner_limits = np.array([self.rough_inner_orbit_limit,
                                         self.binary_ptype_critical_orbit], dtype=Q_)
         binary_inner_limits = np.array([bil for bil in binary_inner_limits if not np.isnan(bil.m)], dtype=Q_)
-        binary_maximum_inner_limit_index = np.nanargmax(binary_inner_limits)
-        self.inner_orbit_limit = binary_inner_limits[binary_maximum_inner_limit_index]
+        if len(binary_inner_limits):
+            binary_maximum_inner_limit_index = np.nanargmax(binary_inner_limits)
+            self.inner_orbit_limit = binary_inner_limits[binary_maximum_inner_limit_index]
+        else:
+            self.inner_orbit_limit = np.nan * self.binary_ptype_critical_orbit.units
 
         outer_limits = np.array([self.stype_critical_orbit,
                                  self.rough_outer_orbit_limit,
                                  self.hill_sphere], dtype=Q_)
         outer_limits = np.array([ol for ol in outer_limits if not np.isnan(ol.m)], dtype=Q_)
-        primary_minimum_outer_limit_index = np.nanargmin(outer_limits)
-        self.outer_orbit_limit = outer_limits[primary_minimum_outer_limit_index]
-
-        # primary_outer_limits = np.array([self.primary_stype_critical_orbit,
-        #                                  self.primary_body.rough_outer_orbit_limit,
-        #                                  self.primary_body.hill_sphere], dtype=Q_)
-        # primary_minimum_outer_limit_index = np.nanargmin(primary_outer_limits)
-        # self.primary_body.outer_orbit_limit = primary_outer_limits[primary_minimum_outer_limit_index]
-        #
-        # secondary_outer_limits = np.array([self.secondary_stype_critical_orbit,
-        #                                    self.secondary_body.rough_outer_orbit_limit,
-        #                                    self.secondary_body.hill_sphere], dtype=Q_)
-        # secondary_minimum_outer_limit_index = np.nanargmin(secondary_outer_limits)
-        # self.secondary_body.outer_orbit_limit = secondary_outer_limits[secondary_minimum_outer_limit_index]
+        if len(outer_limits):
+            minimum_outer_limit_index = np.nanargmin(outer_limits)
+            self.outer_orbit_limit = outer_limits[minimum_outer_limit_index]
+        else:
+            self.outer_orbit_limit = np.nan * self.stype_critical_orbit.units
 
     def get_farthest_parent(self):
         parent = self.parent
@@ -374,11 +368,6 @@ class StellarBinary(BinarySystem):
             self.rock_line = self.rock_lines['Outer Limit']
             self.prevailing_water_frost_lines = self.water_frost_lines
             self.prevailing_rock_lines = self.rock_lines
-
-        # warnings.filterwarnings("ignore", category=UnitStrippedWarning)
-        # self_inner_limits = np.array([self.inner_orbit_limit, self.rock_line], dtype=Q_)
-        # self_maximum_inner_limit_index = np.nanargmax(self_inner_limits)
-        # self.inner_orbit_limit = self_inner_limits[self_maximum_inner_limit_index]
 
     def reset_insolation_model_and_habitability_for_children(self, model_name=''):
         if model_name == '':

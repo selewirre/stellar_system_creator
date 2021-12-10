@@ -22,10 +22,10 @@ from stellar_system_creator.stellar_system_elements.binary_system import BinaryS
 
 
 class TreeViewItemFromString(QStandardItem):
-    def __init__(self, category: str):
+    def __init__(self, category: str, ssc_parent):
         super().__init__()
         self.setEditable(False)
-
+        self.ssc_parent = ssc_parent
         self.category = category
         self.setText(self.category)
 
@@ -36,7 +36,7 @@ class TreeViewItemFromString(QStandardItem):
         self.context_menu_class = CategoryBasedTreeViewItemContextMenu
 
     def _set_context_menu(self):
-        self.context_menu = self.context_menu_class(self)
+        self.context_menu = self.context_menu_class(self, self.ssc_parent)
 
 
 class TreeViewItemFromStellarSystemElement(QStandardItem):
