@@ -57,7 +57,8 @@ def get_binary_system_dict(binary_system: BinarySystem) -> Dict:
     target_keys = ['Name', 'Object', 'TreeViewItem', 'BinaryChildren']
     children_dicts = get_accumulated_dict([primary_dict, secondary_dict], target_keys)
 
-    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items import TreeViewItemFromStellarSystemElement
+    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
+        import TreeViewItemFromStellarSystemElement
     binary_system_item = TreeViewItemFromStellarSystemElement(binary_system)
     binary_system_dict = {'Name': binary_system.name, 'Object': binary_system,
                           'TreeViewItem': binary_system_item, 'BinaryChildren': children_dicts}
@@ -80,18 +81,18 @@ def get_planetary_system_dict(planetary_system: PlanetarySystem) -> Dict:
     elif isinstance(planetary_system.parent, BinarySystem):
         parent_dict = get_binary_system_dict(planetary_system.parent)
 
-    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items import TreeViewItemFromStellarSystemElement
+    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
+        import TreeViewItemFromStellarSystemElement
     planetary_system_item = TreeViewItemFromStellarSystemElement(planetary_system)
     planetary_system_dict = {'Name': planetary_system.name, 'Object': planetary_system,
-                             'TreeViewItem': planetary_system_item, 'Parent': parent_dict,
+                             'TreeViewItem': planetary_system_item, 'Planetary Parent': parent_dict,
                              'Satellites': satellite_dicts, 'Trojans': trojan_dicts}
-
     return planetary_system_dict
 
 
 def get_stellar_system_dict(stellar_system: StellarSystem) -> Dict:
 
-    keys = ['Name', 'Object', 'TreeViewItem', 'Parent', 'Satellites', 'Trojans']
+    keys = ['Name', 'Object', 'TreeViewItem', 'Planetary Parent', 'Satellites', 'Trojans']
     planetary_dicts = get_accumulated_dict([get_planetary_system_dict(planetary_system)
                                             for planetary_system in stellar_system.planetary_systems], keys)
 
@@ -105,20 +106,24 @@ def get_stellar_system_dict(stellar_system: StellarSystem) -> Dict:
     elif isinstance(stellar_system.parent, BinarySystem):
         parent_dict = get_binary_system_dict(stellar_system.parent)
 
-    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items import TreeViewItemFromStellarSystemElement
+    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
+        import TreeViewItemFromStellarSystemElement
     stellar_system_item = TreeViewItemFromStellarSystemElement(stellar_system)
     stellar_system_dict = {'Name': stellar_system.name, 'Object': stellar_system,
-                           'TreeViewItem': stellar_system_item, 'Parent': parent_dict,
-                           'Planets': planetary_dicts, 'Asteroid Belts': asteroid_belt_dicts}
+                           'TreeViewItem': stellar_system_item, 'Stellar Parent': parent_dict,
+                           'Planetary Systems': planetary_dicts, 'Asteroid Belts': asteroid_belt_dicts}
 
     return stellar_system_dict
 
 
-def set_system_parent_tree_model_from_dict(parent_dict, tree_model):
-    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items import TreeViewItemFromStellarSystemElement
+def set_system_parent_tree_model_from_dict(parent_dict, tree_model, name):
+    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
+        import TreeViewItemFromStellarSystemElement
     if parent_dict != {}:
+        set_system_element_tree_model_from_dict(name, parent_dict, tree_model)
+        parent_dict = parent_dict[name]
         parent_tree_item: TreeViewItemFromStellarSystemElement = parent_dict['TreeViewItem']
-        tree_model.appendRow(parent_tree_item)
+        # tree_model.appendRow(parent_tree_item)
 
         # set parent's children branches if parent is binary
         if 'BinaryChildren' in parent_dict.keys():
@@ -133,25 +138,31 @@ def set_system_parent_tree_model_from_dict(parent_dict, tree_model):
 
 def set_system_element_tree_model_from_dict(element_string: str, system_dict, tree_model, subsystem_function=None):
     element_dict = system_dict[element_string]
-    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items import TreeViewItemFromString
+    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
+        import TreeViewItemFromString
 
-    element_tree_item = TreeViewItemFromString(element_string)
+    element_tree_item = TreeViewItemFromString(element_string, system_dict['Object'].parent)
     tree_model.appendRow(element_tree_item)
-    if len(element_dict['TreeViewItem']):
-        element_tree_item.appendRows(element_dict['TreeViewItem'])
-        if subsystem_function is not None:
-            for i in range(len(element_dict['TreeViewItem'])):
-                subsystem_function(element_dict['TreeViewItem'][i], element_dict['Object'][i])
+    try:
+        if len(element_dict['TreeViewItem']):
+            element_tree_item.appendRows(element_dict['TreeViewItem'])
+            if subsystem_function is not None:
+                for i in range(len(element_dict['TreeViewItem'])):
+                    subsystem_function(element_dict['TreeViewItem'][i], element_dict['Object'][i])
+    except TypeError:
+        element_tree_item.appendRow(element_dict['TreeViewItem'])
 
 
 def set_planetary_system_tree_model_from_ssc_object(tree_model, file):
     planetary_system_dict = get_planetary_system_dict(file)
-
     # set parent root
-    parent_dict: Dict = planetary_system_dict['Parent']
-    set_system_parent_tree_model_from_dict(parent_dict, tree_model)
+    # parent_dict: Dict = planetary_system_dict['Parent']
+    # set_system_element_tree_model_from_dict('Planetary Parent', planetary_system_dict, tree_model)
+    # set_system_parent_tree_model_from_dict(parent_dict, tree_model)
+    set_system_parent_tree_model_from_dict(planetary_system_dict, tree_model, 'Planetary Parent')
 
     # set satellite root and branches if there are satellites
+
     set_system_element_tree_model_from_dict('Satellites', planetary_system_dict, tree_model)
 
     # set trojan root and branches if there are trojans
@@ -164,11 +175,13 @@ def set_stellar_system_tree_model_from_ssc_object(tree_model, file):
     stellar_system_dict = get_stellar_system_dict(file)
 
     # set parent root
-    parent_dict: Dict = stellar_system_dict['Parent']
-    set_system_parent_tree_model_from_dict(parent_dict, tree_model)
+    # parent_dict: Dict = stellar_system_dict['Parent']
+    # set_system_element_tree_model_from_dict('Parent', stellar_system_dict, tree_model)
+    # set_system_parent_tree_model_from_dict(parent_dict, tree_model)
+    set_system_parent_tree_model_from_dict(stellar_system_dict, tree_model, 'Stellar Parent')
 
     # set planet root and branches if there are planets
-    set_system_element_tree_model_from_dict('Planets', stellar_system_dict, tree_model,
+    set_system_element_tree_model_from_dict('Planetary Systems', stellar_system_dict, tree_model,
                                             set_planetary_system_tree_model_from_ssc_object)
 
     # set asteroid belt root and branches if there are asteroid belts
@@ -178,7 +191,7 @@ def set_stellar_system_tree_model_from_ssc_object(tree_model, file):
 
 
 class ProjectTreeView(QTreeView):
-
+    # TODO: Add sorting function.
     def __init__(self, filename):
         super().__init__()
         self.filename = filename
@@ -195,8 +208,8 @@ class ProjectTreeView(QTreeView):
 
     def open_context_menu(self, position):
 
-        from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items import TreeViewItemFromStellarSystemElement, \
-            TreeViewItemFromString
+        from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
+            import TreeViewItemFromStellarSystemElement, TreeViewItemFromString
 
         index = self.selectedIndexes()[0]
         project_tree_view_item: Union[TreeViewItemFromStellarSystemElement,
