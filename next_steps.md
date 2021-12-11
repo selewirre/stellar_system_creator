@@ -40,15 +40,14 @@
 
 
 # GUI:
-1. Add zoom function for svgwidget
-2. Add S-type Binaries (multistellar systems) in treeview
-3. Add trigger functions to Edit menu
-4. Add trigger functions to insert menu
-5. Add right-click functionalities for tree view.
-    - add details on stellar system
-    - add details on planetary system
+1. Add zoom function and save image function for svgwidget
+2. Add line drawing options for rendering
+3. Add S-type Binaries (multistellar systems) in treeview
+4. Add trigger functions to Edit menu
+5. Add trigger functions to insert menu
+6. Add right-click functionalities for tree view.
     - add details on MultiStellarSystem
-6. Add tree view header right-click functionalities (and allow name change like rest "system" types)
+7. Add tree view header right-click functionalities (and allow name change like rest "system" types)
 
 
 

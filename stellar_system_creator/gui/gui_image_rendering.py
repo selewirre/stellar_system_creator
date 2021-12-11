@@ -2,14 +2,16 @@ import tempfile
 from functools import partial
 from typing import Union
 
+from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, QThread
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QMenu, QAction, QFileDialog
 
 from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
 from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem
 
+# https://stackoverflow.com/questions/57432570/generate-a-svg-file-with-pyqt5
 
 class SystemRenderingWidget(QSvgWidget):
 
@@ -20,19 +22,22 @@ class SystemRenderingWidget(QSvgWidget):
     def render_image(self, ssc_object: Union[StellarSystem, PlanetarySystem, None]):
 
         if ssc_object is not None:
-            self.hide()
-            save_format = 'svg'
-            with tempfile.NamedTemporaryFile("r+b", delete=True) as fd:
-                if isinstance(ssc_object, StellarSystem):
-                    ssc_object.draw_stellar_system(save_fig=True, save_temp_file=fd, save_format=save_format)
-                elif isinstance(ssc_object, PlanetarySystem):
-                    ssc_object.draw_planetary_system(save_fig=True, save_temp_file=fd, save_format=save_format)
-                fd.seek(0)
-                self.renderer().load(fd.name)
-            ssc_object.fig = None
-            ssc_object.ax = None
-            self.renderer().setAspectRatioMode(Qt.KeepAspectRatio)
-            self.show()
+            if ssc_object.parent is not None:
+                self.hide()
+                save_format = 'svg'
+                with tempfile.NamedTemporaryFile("r+b", delete=True) as fd:
+                    if isinstance(ssc_object, StellarSystem):
+                        ssc_object.draw_stellar_system(save_fig=True, save_temp_file=fd, save_format=save_format)
+                    elif isinstance(ssc_object, PlanetarySystem):
+                        ssc_object.draw_planetary_system(save_fig=True, save_temp_file=fd, save_format=save_format)
+                    fd.seek(0)
+                    self.renderer().load(fd.name)
+                ssc_object.fig = None
+                ssc_object.ax = None
+                self.renderer().setAspectRatioMode(Qt.KeepAspectRatio)
+                self.show()
+            else:
+                self.hide()
         else:
             self.hide()
 
@@ -97,3 +102,28 @@ class ImageRenderingProcess(QThread):
         self.render_button.setEnabled(True)
         self.render_button.setText(button_text)
 
+
+# class ImageContextMenu(QMenu):
+#
+#     def __init__(self):
+#         super().__init__()
+#
+#         self._create_menu_actions()
+#         self._connect_actions()
+#         self._create_menu()
+#
+#     def _create_menu(self):
+#         self.addAction(self.save_image_action)
+#
+#     def _connect_actions(self):
+#         self.save_image_action.triggered.connect(self.save_image_process)
+#
+#     def _create_menu_actions(self):
+#         self.save_image_action = QAction(f"&Save Image...", self)
+#
+#     def save_image_process(self):
+#         filename: str = QFileDialog.getSaveFileName(self.parent(), 'Save Project')[0]
+#         if filename != '':
+#             self.parent().
+#         else:
+#             return

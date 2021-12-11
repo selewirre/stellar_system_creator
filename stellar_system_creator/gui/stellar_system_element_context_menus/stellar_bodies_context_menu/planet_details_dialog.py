@@ -58,7 +58,7 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         self.other_labels = {'Habitability Tab': self.habitability_tab}
 
     def _set_other_edits(self):
-        sse: Planet = self.parent_item.stellar_system_element
+        sse: Planet = self.parent_item.ssc_object
         self.other_edits = {'Composition Type': ComboBox(sse, 'composition',
                                                          list(planet_compositions.keys()), self.all_labels),
                             'Orbit Type': ComboBox(sse, 'orbit_type', ['Prograde', 'Retrograde'], self.all_labels)
@@ -69,7 +69,7 @@ class PlanetDetailsDialog(BasicDetailsDialog):
                                        'Orbit Type': self.other_edits['Orbit Type'].currentText()}
 
     def _set_line_edits(self):
-        sse: Planet = self.parent_item.stellar_system_element
+        sse: Planet = self.parent_item.ssc_object
         super()._set_line_edits()
 
         self.le['Albedo'] = LineEdit(sse, 'albedo', self.all_labels)
@@ -79,7 +79,7 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         self.le['Eccentricity'] = LineEdit(sse, 'orbital_eccentricity', self.all_labels)
 
     def _set_labels(self):
-        sse: Planet = self.parent_item.stellar_system_element
+        sse: Planet = self.parent_item.ssc_object
         super()._set_labels()
 
         self.labels['Chemical Composition'] = Label(sse, 'chemical_composition')
@@ -89,7 +89,7 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         self.labels['Orbital Stability Violations'] = TextBrowser(sse, 'stability_violations')
 
     def _set_unit_line_edits(self):
-        sse: Planet = self.parent_item.stellar_system_element
+        sse: Planet = self.parent_item.ssc_object
         super()._set_unit_line_edits()
 
         self.ule['Axial Tilt'] = UnitLineEdit(sse, 'axial_tilt', self.all_labels)
@@ -99,7 +99,7 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         self.ule['Longitude of the Ascending Node'] = UnitLineEdit(sse, 'longitude_of_ascending_node', self.all_labels)
 
     def _set_unit_labels(self):
-        sse: Planet = self.parent_item.stellar_system_element
+        sse: Planet = self.parent_item.ssc_object
         super()._set_unit_labels()
 
         self.ulabels['Day Period'] = UnitLabel(sse, 'day_period')
@@ -129,7 +129,7 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         self.ulabels['Angular Diameter of Parent'] = UnitLabel(sse, 'angular_diameter_of_parent')
 
     def _set_general_tab(self):
-        sse: Planet = self.parent_item.stellar_system_element
+        sse: Planet = self.parent_item.ssc_object
         self.general_tab = Tab()
         widget = QWidget(self.tab_widget)
         self.general_tab.setWidget(widget)
@@ -161,7 +161,7 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         tab_layout.addStretch()
 
     def _set_physical_characteristics_tab(self):
-        sse: Planet = self.parent_item.stellar_system_element
+        sse: Planet = self.parent_item.ssc_object
         self.physical_characteristics_tab = Tab()
         widget = QWidget(self.tab_widget)
         self.physical_characteristics_tab.setWidget(widget)
@@ -221,7 +221,7 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         tab_layout.addStretch()
 
     def _set_orbital_characteristics_tab(self):
-        sse: Planet = self.parent_item.stellar_system_element
+        sse: Planet = self.parent_item.ssc_object
         self.orbital_characteristics_tab = Tab()
         widget = QWidget(self.tab_widget)
         self.orbital_characteristics_tab.setWidget(widget)
@@ -269,7 +269,7 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         tab_layout.addStretch()
 
     def _set_surface_characteristics_tab(self):
-        sse: Planet = self.parent_item.stellar_system_element
+        sse: Planet = self.parent_item.ssc_object
         self.surface_characteristics_tab = Tab()
         widget = QWidget(self.tab_widget)
         self.surface_characteristics_tab.setWidget(widget)
@@ -317,7 +317,7 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         tab_layout.addStretch()
 
     def _set_children_orbit_limits_tab(self):
-        sse: Planet = self.parent_item.stellar_system_element
+        sse: Planet = self.parent_item.ssc_object
         self.children_orbit_limits_tab = Tab()
         widget = QWidget(self.tab_widget)
         self.children_orbit_limits_tab.setWidget(widget)
@@ -336,7 +336,7 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         tab_layout.addStretch()
 
     def _set_miscellaneous_tab(self):
-        sse: Planet = self.parent_item.stellar_system_element
+        sse: Planet = self.parent_item.ssc_object
         self.miscellaneous_tab = Tab()
         widget = QWidget(self.tab_widget)
         self.miscellaneous_tab.setWidget(widget)
@@ -355,25 +355,25 @@ class PlanetDetailsDialog(BasicDetailsDialog):
 
 
     # def _initialize_insolation_tab(self):
-    #     sse: Planet = self.parent_item.stellar_system_element
+    #     sse: Planet = self.parent_item.ssc_object
     #     self.insolation_tab = InsolationTab(sse, self.tab_widget, self.habitability_tab)
     #
     # def _set_insolation_tab(self):
-    #     sse: Planet = self.parent_item.stellar_system_element
+    #     sse: Planet = self.parent_item.ssc_object
     #     self.insolation_tab.set_influenced_labels(self.all_labels)
 
     def _initialize_habitability_tab(self):
-        sse: Planet = self.parent_item.stellar_system_element
+        sse: Planet = self.parent_item.ssc_object
         self.habitability_tab = ChildHabitabilityTab(sse, self.tab_widget)
 
     def _set_habitability_tab(self):
-        sse: Planet = self.parent_item.stellar_system_element
+        sse: Planet = self.parent_item.ssc_object
         label_keys = ['Habitability', 'Habitability Violations']
         self.habitability_tab.influenced_labels = {key: self.all_labels[key] for key in label_keys}
         self.habitability_tab.set_boxes()
 
     def _set_image_tab(self):
-        sse: Planet = self.parent_item.stellar_system_element
+        sse: Planet = self.parent_item.ssc_object
         image_label = self.all_labels['Image Array']
         image_line_edit = self.ule['Image Filename']
         image_check_box = self.check_boxes['Use Suggested Image']
@@ -385,20 +385,20 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         self.other_edits['Orbit Type'].setCurrentText(self.other_edit_init_values['Orbit Type'])
 
     def confirm_other_edit_changes(self):
-        self.other_edit_init_values['Composition Type'] = self.parent_item.stellar_system_element.chemical_composition
-        self.other_edit_init_values['Orbit Type'] = self.parent_item.stellar_system_element.orbit_type
+        self.other_edit_init_values['Composition Type'] = self.parent_item.ssc_object.chemical_composition
+        self.other_edit_init_values['Orbit Type'] = self.parent_item.ssc_object.orbit_type
 
 
 class SatelliteDetailsDialog(PlanetDetailsDialog):
 
     def _set_unit_labels(self):
-        sse: Satellite = self.parent_item.stellar_system_element
+        sse: Satellite = self.parent_item.ssc_object
         super()._set_unit_labels()
 
         self.ulabels['Maximum Mass Limit'] = UnitLabel(sse, 'maximum_mass_limit')
 
     def _set_physical_characteristics_tab(self):
-        sse: Planet = self.parent_item.stellar_system_element
+        sse: Planet = self.parent_item.ssc_object
         super()._set_physical_characteristics_tab()
         material_characteristics_box_layout = self.material_characteristics_group_box.layout()
         key = 'Maximum Mass Limit'
@@ -408,7 +408,7 @@ class SatelliteDetailsDialog(PlanetDetailsDialog):
 class TrojanSatelliteDetailsDialog(SatelliteDetailsDialog):
 
     def _set_line_edits(self):
-        sse: TrojanSatellite = self.parent_item.stellar_system_element
+        sse: TrojanSatellite = self.parent_item.ssc_object
         super()._set_line_edits()
 
     def _set_tabs(self):
@@ -416,11 +416,11 @@ class TrojanSatelliteDetailsDialog(SatelliteDetailsDialog):
         self.tab_widget.removeTab(4)
 
     def _set_children_orbit_limits_tab(self):
-        sse: Planet = self.parent_item.stellar_system_element
+        sse: Planet = self.parent_item.ssc_object
         self.children_orbit_limits_tab = Tab()
 
     def _set_orbital_characteristics_tab(self):
-        sse: Planet = self.parent_item.stellar_system_element
+        sse: Planet = self.parent_item.ssc_object
         super()._set_orbital_characteristics_tab()
         basic_orbital_characteristics_box_layout = self.basic_orbital_characteristics_group_box.layout()
         key = 'Lagrange Position'
@@ -435,7 +435,7 @@ class TrojanSatelliteDetailsDialog(SatelliteDetailsDialog):
 
     def _set_other_edits(self):
         super()._set_other_edits()
-        sse: Planet = self.parent_item.stellar_system_element
+        sse: Planet = self.parent_item.ssc_object
         self.other_edits['Lagrange Position'] = ComboBox(sse, 'orbit_type', ['1', '-1'], self.all_labels)
 
     def _set_other_edit_init_values(self):
@@ -448,19 +448,19 @@ class TrojanSatelliteDetailsDialog(SatelliteDetailsDialog):
 
     def confirm_other_edit_changes(self):
         super().confirm_other_edit_changes()
-        self.other_edit_init_values['Lagrange Position'] = self.parent_item.stellar_system_element.lagrange_position
+        self.other_edit_init_values['Lagrange Position'] = self.parent_item.ssc_object.lagrange_position
 
 
 class TrojanDetailsDialog(PlanetDetailsDialog):
 
     def _set_line_edits(self):
-        sse: Trojan = self.parent_item.stellar_system_element
+        sse: Trojan = self.parent_item.ssc_object
         super()._set_line_edits()
 
         self.le['Relative Count'] = LineEdit(sse, 'relative_count', self.all_labels)
 
     def _set_unit_line_edits(self):
-        sse: Trojan = self.parent_item.stellar_system_element
+        sse: Trojan = self.parent_item.ssc_object
         super()._set_unit_line_edits()
 
         self.ule['Extent'] = UnitLineEdit(sse, 'extend', self.all_labels)
@@ -472,7 +472,7 @@ class TrojanDetailsDialog(PlanetDetailsDialog):
         self.tab_widget.removeTab(3)
 
     def _set_physical_characteristics_tab(self):
-        sse: Trojan = self.parent_item.stellar_system_element
+        sse: Trojan = self.parent_item.ssc_object
         self.physical_characteristics_tab = Tab()
         widget = QWidget(self.tab_widget)
         self.physical_characteristics_tab.setWidget(widget)
@@ -507,11 +507,11 @@ class TrojanDetailsDialog(PlanetDetailsDialog):
         tab_layout.addStretch()
 
     def _set_children_orbit_limits_tab(self):
-        sse: Planet = self.parent_item.stellar_system_element
+        sse: Planet = self.parent_item.ssc_object
         self.children_orbit_limits_tab = Tab()
 
     def _set_orbital_characteristics_tab(self):
-        sse: Trojan = self.parent_item.stellar_system_element
+        sse: Trojan = self.parent_item.ssc_object
         super()._set_orbital_characteristics_tab()
         basic_orbital_characteristics_box_layout = self.basic_orbital_characteristics_group_box.layout()
         key = 'Lagrange Position'
@@ -529,7 +529,7 @@ class TrojanDetailsDialog(PlanetDetailsDialog):
 
     def _set_other_edits(self):
         super()._set_other_edits()
-        sse: Planet = self.parent_item.stellar_system_element
+        sse: Planet = self.parent_item.ssc_object
         self.other_edits['Lagrange Position'] = ComboBox(sse, 'orbit_type', ['1', '-1'], self.all_labels)
 
     def _set_other_edit_init_values(self):
@@ -542,19 +542,19 @@ class TrojanDetailsDialog(PlanetDetailsDialog):
 
     def confirm_other_edit_changes(self):
         super().confirm_other_edit_changes()
-        self.other_edit_init_values['Lagrange Position'] = self.parent_item.stellar_system_element.lagrange_position
+        self.other_edit_init_values['Lagrange Position'] = self.parent_item.ssc_object.lagrange_position
 
 
 class AsteroidBeltDetailsDialog(PlanetDetailsDialog):
 
     def _set_line_edits(self):
-        sse: AsteroidBelt = self.parent_item.stellar_system_element
+        sse: AsteroidBelt = self.parent_item.ssc_object
         super()._set_line_edits()
 
         self.le['Relative Count'] = LineEdit(sse, 'relative_count', self.all_labels)
 
     def _set_unit_line_edits(self):
-        sse: AsteroidBelt = self.parent_item.stellar_system_element
+        sse: AsteroidBelt = self.parent_item.ssc_object
         super()._set_unit_line_edits()
 
         self.ule['Extent'] = UnitLineEdit(sse, 'extend', self.all_labels)
@@ -566,7 +566,7 @@ class AsteroidBeltDetailsDialog(PlanetDetailsDialog):
         self.tab_widget.removeTab(3)
 
     def _set_physical_characteristics_tab(self):
-        sse: AsteroidBelt = self.parent_item.stellar_system_element
+        sse: AsteroidBelt = self.parent_item.ssc_object
         self.physical_characteristics_tab = Tab()
         widget = QWidget(self.tab_widget)
         self.physical_characteristics_tab.setWidget(widget)
@@ -594,11 +594,11 @@ class AsteroidBeltDetailsDialog(PlanetDetailsDialog):
         tab_layout.addStretch()
 
     def _set_children_orbit_limits_tab(self):
-        sse: Planet = self.parent_item.stellar_system_element
+        sse: Planet = self.parent_item.ssc_object
         self.children_orbit_limits_tab = Tab()
 
     def _set_orbital_characteristics_tab(self):
-        sse: Trojan = self.parent_item.stellar_system_element
+        sse: Trojan = self.parent_item.ssc_object
         super()._set_orbital_characteristics_tab()
         orbital_distance_characteristics_box_layout = self.orbital_distance_characteristics_group_box.layout()
         key = 'Extent'

@@ -17,9 +17,9 @@ class BasicDetailsDialog(QDialog):
     def __init__(self, parent_item):
         from ..standard_items import TreeViewItemFromStellarSystemElement
         self.parent_item: TreeViewItemFromStellarSystemElement = parent_item
-        self.parent_item.stellar_system_element.__post_init__()
+        self.parent_item.ssc_object.__post_init__()
         super().__init__(self.parent_item.model().parent().parent())
-        self.parent_item.stellar_system_element.__post_init__()
+        self.parent_item.ssc_object.__post_init__()
         self.__post_init__()
 
     def __post_init__(self):
@@ -39,7 +39,7 @@ class BasicDetailsDialog(QDialog):
 
     def _set_check_boxes(self):
         sse: Union[StellarBody, Star, Planet, AsteroidBelt,
-                   Satellite, Trojan] = self.parent_item.stellar_system_element
+                   Satellite, Trojan] = self.parent_item.ssc_object
 
         self.check_boxes: Dict[(str, CheckBox)] = {
             'Use Suggested Radius': CheckBox(self.ule['Radius']),
@@ -51,7 +51,7 @@ class BasicDetailsDialog(QDialog):
 
     def _set_line_edits(self):
         sse: Union[StellarBody, Star, Planet, AsteroidBelt,
-                   Satellite, Trojan] = self.parent_item.stellar_system_element
+                   Satellite, Trojan] = self.parent_item.ssc_object
 
         self.le: Dict[(str, LineEdit)] = {'Name': LineEdit(sse, 'name', {})}
 
@@ -72,7 +72,7 @@ class BasicDetailsDialog(QDialog):
 
     def _set_labels(self):
         sse: Union[StellarBody, Star, Planet, AsteroidBelt,
-                   Satellite, Trojan] = self.parent_item.stellar_system_element
+                   Satellite, Trojan] = self.parent_item.ssc_object
 
         self.labels: Dict[(str, Union[Label, TextBrowser])] = {
             'Parent': Label(sse, 'parent', 'name'),
@@ -84,7 +84,7 @@ class BasicDetailsDialog(QDialog):
 
     def _set_unit_line_edits(self):
         sse: Union[StellarBody, Star, Planet, AsteroidBelt,
-                   Satellite, Trojan] = self.parent_item.stellar_system_element
+                   Satellite, Trojan] = self.parent_item.ssc_object
 
         self.ule: Dict[(str, UnitLineEdit)] = {'Mass': UnitLineEdit(sse, 'mass', self.all_labels),
                                                'Radius': UnitLineEdit(sse, 'radius', self.all_labels),
@@ -99,7 +99,7 @@ class BasicDetailsDialog(QDialog):
 
     def _set_unit_labels(self):
         sse: Union[StellarBody, Star, Planet, AsteroidBelt,
-                   Satellite, Trojan] = self.parent_item.stellar_system_element
+                   Satellite, Trojan] = self.parent_item.ssc_object
 
         self.ulabels: Dict[(str, UnitLabel)] = {'Suggested Radius': UnitLabel(sse, 'suggested_radius'),
                                                 'Circumference': UnitLabel(sse, 'circumference'),
@@ -166,7 +166,7 @@ class BasicDetailsDialog(QDialog):
         self.confirm_line_edit_changes()
         self.confirm_unit_line_edit_changes()
         self.confirm_other_edit_changes()
-        self.parent_item.stellar_system_element.update_children()
+        self.parent_item.ssc_object.update_children()
 
     def confirm_line_edit_changes(self) -> None:
         for key in self.le:
@@ -183,7 +183,7 @@ class BasicDetailsDialog(QDialog):
         self.return_line_edits_to_initial_values()
         self.return_unit_line_edits_to_initial_values()
         self.return_other_edits_to_initial_values()
-        self.parent_item.stellar_system_element.__post_init__()
+        self.parent_item.ssc_object.__post_init__()
 
     def return_line_edits_to_initial_values(self) -> None:
         for key in self.le:
