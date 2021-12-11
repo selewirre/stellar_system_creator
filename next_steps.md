@@ -31,24 +31,21 @@
 
 # Plotting:
 0. plotting of trinaries/quaternaries
-1. fix ploting bug in planetary and stellar systems (delete figure once done)
-2. try to plot in processing instead of matplotlib? (supposed to be faster)
+1. try to plot in processing instead of matplotlib? (supposed to be faster)
     - https://github.com/jdf/processing-py-site
     - https://py.processing.org/
     - https://py.processing.org/tutorials/gettingstarted/
     - https://discourse.processing.org/t/writing-a-python-script-that-runs-a-processing-program/16456/2
-3. add an automatic script creator for celestia simulators https://celestia.space/guides.html, https://celestia.space/docs/CELScriptingGuide/Cel_Script_Guide_v1_0g.htm
+2. add an automatic script creator for celestia simulators https://celestia.space/guides.html, https://celestia.space/docs/CELScriptingGuide/Cel_Script_Guide_v1_0g.htm
 
 
 # GUI:
-1. updatable treeview
-2. Add zoom function for svgwidget
+1. Add zoom function and save image function for svgwidget
+2. Add line drawing options for rendering
 3. Add S-type Binaries (multistellar systems) in treeview
 4. Add trigger functions to Edit menu
 5. Add trigger functions to insert menu
 6. Add right-click functionalities for tree view.
-    - add details on stellar system
-    - add details on planetary system
     - add details on MultiStellarSystem
 7. Add tree view header right-click functionalities (and allow name change like rest "system" types)
 

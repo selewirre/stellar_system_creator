@@ -58,12 +58,12 @@ class StellarBinaryDetailsDialog(BasicDetailsDialog):
         self.tab_widget.addTab(self.habitability_tab, "Habitability")
 
     def _set_check_boxes(self):
-        sse: StellarBinary = self.parent_item.stellar_system_element
+        sse: StellarBinary = self.parent_item.ssc_object
 
         self.check_boxes: Dict[(str, CheckBox)] = {}
 
     def _set_labels(self):
-        sse: StellarBinary = self.parent_item.stellar_system_element
+        sse: StellarBinary = self.parent_item.ssc_object
         sse.check_habitability()
         self.labels: Dict[(str, Union[Label, TextBrowser])] = {
             'Primary': Label(sse, 'primary_body', 'name'),
@@ -75,7 +75,7 @@ class StellarBinaryDetailsDialog(BasicDetailsDialog):
             'Habitability Violations': TextBrowser(sse, 'habitability_violations')}
 
     def _set_unit_labels(self):
-        sse: StellarBinary = self.parent_item.stellar_system_element
+        sse: StellarBinary = self.parent_item.ssc_object
 
         self.ulabels: Dict[(str, UnitLabel)] = {
             'Total Mass': UnitLabel(sse, 'mass'),
@@ -100,13 +100,13 @@ class StellarBinaryDetailsDialog(BasicDetailsDialog):
             'Outer Rock Formation Limit': UnitLabel(sse, 'prevailing_rock_lines', 'Outer Limit')}
 
     def _set_line_edits(self):
-        sse: StellarBinary = self.parent_item.stellar_system_element
+        sse: StellarBinary = self.parent_item.ssc_object
 
         self.le: Dict[(str, LineEdit)] = {'Name': LineEdit(sse, 'name', {}),
                                           'Eccentricity': LineEdit(sse, 'eccentricity', self.all_labels)}
 
     def _set_unit_line_edits(self):
-        sse: StellarBinary = self.parent_item.stellar_system_element
+        sse: StellarBinary = self.parent_item.ssc_object
 
         self.ule: Dict[(str, UnitLineEdit)] = {'Mean Distance': UnitLineEdit(sse, 'mean_distance', self.all_labels)}
 
@@ -119,10 +119,10 @@ class StellarBinaryDetailsDialog(BasicDetailsDialog):
 
     def _set_other_edit_init_values(self):
         self.other_edit_init_values = {'Insolation Model Radio Button':
-                                       self.parent_item.stellar_system_element.insolation_model.name}
+                                       self.parent_item.ssc_object.insolation_model.name}
 
     def _set_general_tab(self):
-        sse: StellarBinary = self.parent_item.stellar_system_element
+        sse: StellarBinary = self.parent_item.ssc_object
         self.general_tab = Tab()
         widget = QWidget(self.tab_widget)
         self.general_tab.setWidget(widget)
@@ -145,7 +145,7 @@ class StellarBinaryDetailsDialog(BasicDetailsDialog):
         tab_layout.addStretch()
 
     def _set_physical_characteristics_tab(self):
-        sse: StellarBinary = self.parent_item.stellar_system_element
+        sse: StellarBinary = self.parent_item.ssc_object
         self.physical_characteristics_tab = Tab()
         widget = QWidget(self.tab_widget)
         self.physical_characteristics_tab.setWidget(widget)
@@ -170,7 +170,7 @@ class StellarBinaryDetailsDialog(BasicDetailsDialog):
         tab_layout.addStretch()
 
     def _set_orbital_characteristics_tab(self):
-        sse: StellarBinary = self.parent_item.stellar_system_element
+        sse: StellarBinary = self.parent_item.ssc_object
         self.orbital_characteristics_tab = Tab()
         widget = QWidget(self.tab_widget)
         self.orbital_characteristics_tab.setWidget(widget)
@@ -203,7 +203,7 @@ class StellarBinaryDetailsDialog(BasicDetailsDialog):
         tab_layout.addStretch()
 
     def _set_children_orbit_limits_tab(self):
-        sse: StellarBinary = self.parent_item.stellar_system_element
+        sse: StellarBinary = self.parent_item.ssc_object
         self.children_orbit_limits_tab = Tab()
         widget = QWidget(self.tab_widget)
         self.children_orbit_limits_tab.setWidget(widget)
@@ -239,7 +239,7 @@ class StellarBinaryDetailsDialog(BasicDetailsDialog):
         tab_layout.addStretch()
 
     def _set_grandchildren_orbit_limits_tab(self):
-        sse: StellarBinary = self.parent_item.stellar_system_element
+        sse: StellarBinary = self.parent_item.ssc_object
         self.grandchildren_orbit_limits_tab = Tab()
         widget = QWidget(self.tab_widget)
         self.grandchildren_orbit_limits_tab.setWidget(widget)
@@ -257,19 +257,19 @@ class StellarBinaryDetailsDialog(BasicDetailsDialog):
         tab_layout.addStretch()
 
     def _initialize_insolation_tab(self):
-        sse: StellarBinary = self.parent_item.stellar_system_element
+        sse: StellarBinary = self.parent_item.ssc_object
         self.insolation_tab = InsolationTab(sse, self.tab_widget, self.habitability_tab)
 
     def _set_insolation_tab(self):
-        sse: StellarBinary = self.parent_item.stellar_system_element
+        sse: StellarBinary = self.parent_item.ssc_object
         self.insolation_tab.set_influenced_labels(self.all_labels)
 
     def _initialize_habitability_tab(self):
-        sse: StellarBinary = self.parent_item.stellar_system_element
+        sse: StellarBinary = self.parent_item.ssc_object
         self.habitability_tab = ParentHabitabilityTab(sse, self.tab_widget)
 
     def _set_habitability_tab(self):
-        sse: StellarBinary = self.parent_item.stellar_system_element
+        sse: StellarBinary = self.parent_item.ssc_object
         label_keys = ['Habitability', 'Habitability Violations']
         self.habitability_tab.influenced_labels = {key: self.all_labels[key] for key in label_keys}
         self.habitability_tab.set_boxes()
@@ -280,4 +280,4 @@ class StellarBinaryDetailsDialog(BasicDetailsDialog):
 
     def confirm_other_edit_changes(self):
         self.other_edit_init_values['Insolation Model Radio Button'] = \
-            self.parent_item.stellar_system_element.insolation_model.name
+            self.parent_item.ssc_object.insolation_model.name

@@ -1,8 +1,10 @@
 from typing import Union
 
+from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QSplitter, QMessageBox
 
+from stellar_system_creator.filing import load
 from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
 from stellar_system_creator.gui.gui_image_rendering import SystemImageWidget
 from PyQt5.Qt import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel
@@ -23,8 +25,9 @@ class CentralWidget(QTabWidget):
         self.tabCloseRequested.connect(self.close_tab)
 
     def add_new_tab(self, filename):
-        tree_view = ProjectTreeView(filename)
-        tab_header = self.make_tab_header(tree_view.scc_object.name)
+        ssc_object = load(filename)
+        tree_view = ProjectTreeView(ssc_object)
+        tab_header = self.make_tab_header(tree_view.ssc_object.name)
 
         left_side_widget = QWidget()
         left_side_layout = QVBoxLayout()
@@ -34,7 +37,7 @@ class CentralWidget(QTabWidget):
         left_side_layout.setSpacing(0)
         left_side_widget.setLayout(left_side_layout)
 
-        right_side_widget = SystemImageWidget(tree_view.system_dict['Object'])
+        right_side_widget = SystemImageWidget(tree_view)
 
         tab_content = QSplitter(Qt.Horizontal)
         tab_content.addWidget(left_side_widget)
@@ -44,7 +47,7 @@ class CentralWidget(QTabWidget):
         tab_content.setSizes([1.5*left_side_widget.sizeHint().width(),
                               1.5*right_side_widget.sizeHint().width()])
 
-        tab_label = tree_view.filename.split('/')[-1].split('.')[0]
+        tab_label = filename.split('/')[-1].split('.')[0]
         tab_index = self.addTab(tab_content, tab_label)
         self.setCurrentIndex(tab_index)
         # tab_content.widget(0).hide()
@@ -56,6 +59,12 @@ class CentralWidget(QTabWidget):
         label = QLabel(label_text)
         label.adjustSize()
         layout.addWidget(label)
+
+        def mousePressEvent(a0: QtGui.QMouseEvent) -> None:
+            if a0.button() == QtCore.Qt.LeftButton:
+                print('I will add functionality soon!')
+
+        label.mousePressEvent = mousePressEvent
         # hide_button_icon = self.style().standardIcon(getattr(QStyle, 'SP_TitleBarMinButton'))
         # hide_button = QPushButton(hide_button_icon, '', self)
         hide_button = QPushButton('-', tab_header)
@@ -108,5 +117,4 @@ class CentralWidget(QTabWidget):
 
     def get_ssc_object_of_current_tab(self) -> Union[StellarSystem, PlanetarySystem]:
         project_tree_view = self.get_project_tree_view_of_current_tab()
-        ssc_object: Union[StellarSystem, PlanetarySystem] = project_tree_view.system_dict['Object']
-        return ssc_object
+        return project_tree_view.ssc_object

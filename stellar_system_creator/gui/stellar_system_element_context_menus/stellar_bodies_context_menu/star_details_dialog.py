@@ -55,25 +55,25 @@ class StarDetailsDialog(BasicDetailsDialog):
 
     def _set_other_edit_init_values(self):
         self.other_edit_init_values = {'Insolation Model Radio Button':
-                                       self.parent_item.stellar_system_element.insolation_model.name}
+                                       self.parent_item.ssc_object.insolation_model.name}
 
     def _set_line_edits(self):
-        sse: Star = self.parent_item.stellar_system_element
+        sse: Star = self.parent_item.ssc_object
         super()._set_line_edits()
 
     def _set_labels(self):
-        sse: Star = self.parent_item.stellar_system_element
+        sse: Star = self.parent_item.ssc_object
         super()._set_labels()
 
         self.labels['Luminosity Class'] = Label(sse, 'luminosity_class')
         self.labels['Appearance Frequency'] = Label(sse, 'appearance_frequency')
 
     def _set_unit_line_edits(self):
-        sse: Star = self.parent_item.stellar_system_element
+        sse: Star = self.parent_item.ssc_object
         super()._set_unit_line_edits()
 
     def _set_unit_labels(self):
-        sse: Star = self.parent_item.stellar_system_element
+        sse: Star = self.parent_item.ssc_object
         super()._set_unit_labels()
 
         self.ulabels['Peak Wavelength'] = UnitLabel(sse, 'peak_wavelength')
@@ -87,7 +87,7 @@ class StarDetailsDialog(BasicDetailsDialog):
         self.ulabels['Outer Rock Formation Limit'] = UnitLabel(sse, 'prevailing_rock_lines', 'Outer Limit')
 
     def _set_general_tab(self):
-        sse: Star = self.parent_item.stellar_system_element
+        sse: Star = self.parent_item.ssc_object
         self.general_tab = Tab()
         widget = QWidget(self.tab_widget)
         self.general_tab.setWidget(widget)
@@ -113,7 +113,7 @@ class StarDetailsDialog(BasicDetailsDialog):
         tab_layout.addStretch()
 
     def _set_physical_characteristics_tab(self):
-        sse: Star = self.parent_item.stellar_system_element
+        sse: Star = self.parent_item.ssc_object
         self.physical_characteristics_tab = Tab()
         widget = QWidget(self.tab_widget)
         self.physical_characteristics_tab.setWidget(widget)
@@ -170,7 +170,7 @@ class StarDetailsDialog(BasicDetailsDialog):
         tab_layout.addStretch()
 
     def _set_children_orbit_limits_tab(self):
-        sse: Star = self.parent_item.stellar_system_element
+        sse: Star = self.parent_item.ssc_object
         self.children_orbit_limits_tab = Tab()
         widget = QWidget(self.tab_widget)
         self.children_orbit_limits_tab.setWidget(widget)
@@ -205,25 +205,25 @@ class StarDetailsDialog(BasicDetailsDialog):
         tab_layout.addStretch()
 
     def _initialize_insolation_tab(self):
-        sse: Star = self.parent_item.stellar_system_element
+        sse: Star = self.parent_item.ssc_object
         self.insolation_tab = InsolationTab(sse, self.tab_widget, self.habitability_tab)
 
     def _set_insolation_tab(self):
-        sse: Star = self.parent_item.stellar_system_element
+        sse: Star = self.parent_item.ssc_object
         self.insolation_tab.set_influenced_labels(self.all_labels)
 
     def _initialize_habitability_tab(self):
-        sse: Star = self.parent_item.stellar_system_element
+        sse: Star = self.parent_item.ssc_object
         self.habitability_tab = ParentHabitabilityTab(sse, self.tab_widget)
 
     def _set_habitability_tab(self):
-        sse: Star = self.parent_item.stellar_system_element
+        sse: Star = self.parent_item.ssc_object
         label_keys = ['Habitability', 'Habitability Violations']
         self.habitability_tab.influenced_labels = {key: self.all_labels[key] for key in label_keys}
         self.habitability_tab.set_boxes()
 
     def _set_image_tab(self):
-        sse: Star = self.parent_item.stellar_system_element
+        sse: Star = self.parent_item.ssc_object
         image_label = self.all_labels['Image Array']
         image_line_edit = self.ule['Image Filename']
         image_check_box = self.check_boxes['Use Suggested Image']
@@ -236,5 +236,5 @@ class StarDetailsDialog(BasicDetailsDialog):
 
     def confirm_other_edit_changes(self):
         self.other_edit_init_values['Insolation Model Radio Button'] = \
-            self.parent_item.stellar_system_element.insolation_model.name
+            self.parent_item.ssc_object.insolation_model.name
 

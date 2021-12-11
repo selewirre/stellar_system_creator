@@ -5,8 +5,10 @@ from PyQt5.QtWidgets import QMenu, QAction
 class SystemTreeViewItemContextMenu(QMenu):
 
     def __init__(self, parent_item):
-        self.parent_item: QStandardItem = parent_item
-        super().__init__(self.parent_item.parent())
+        from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items import \
+            TreeViewItemFromStellarSystemElement
+        self.parent_item: TreeViewItemFromStellarSystemElement = parent_item
+        super().__init__()
 
         self._create_menu_actions()
         self._connect_actions()
@@ -30,15 +32,15 @@ class SystemTreeViewItemContextMenu(QMenu):
         pass
 
     def delete_permanently_process(self):
-        from .standard_items import TreeViewItemFromStellarSystemElement
-        parent: TreeViewItemFromStellarSystemElement = self.parent_item.parent()
+        from .standard_items import TreeViewItemFromString
+        parent: TreeViewItemFromString = self.parent_item.parent()
         for i in range(parent.rowCount()):
             if parent.child(i) == self.parent_item:
-                ssc = self.parent_item.stellar_system_element
+                ssc = self.parent_item.ssc_object
                 if parent.parent() is None:
-                    system = parent.model().parent().scc_object
+                    system = parent.model().parent().ssc_object
                 else:
-                    system = parent.parent().stellar_system_element
+                    system = parent.parent().ssc_object
                 system.remove_object(ssc)
                 parent.removeRow(i)
 

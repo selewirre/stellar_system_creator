@@ -7,8 +7,9 @@ from .stellar_body_details_dialog import StellarBodyDetailsDialog
 class StellarBodyTreeViewItemContextMenu(QMenu):
 
     def __init__(self, parent_item):
-        self.parent_item: QStandardItem = parent_item
-        super().__init__(self.parent_item.parent())
+        from ..standard_items import TreeViewItemFromStellarSystemElement
+        self.parent_item: TreeViewItemFromStellarSystemElement = parent_item
+        super().__init__()
 
         self._create_menu_actions()
         self._connect_actions()
@@ -32,23 +33,14 @@ class StellarBodyTreeViewItemContextMenu(QMenu):
         pass
 
     def delete_permanently_process(self):
-        from ..standard_items import TreeViewItemFromStellarSystemElement
-        parent: TreeViewItemFromStellarSystemElement = self.parent_item.parent()
+        from ..standard_items import TreeViewItemFromString
+        parent: TreeViewItemFromString = self.parent_item.parent()
         for i in range(parent.rowCount()):
             if parent.child(i) == self.parent_item:
-                # if 'stellar_system_element' in parent.parent().__dict__:
-                ssc = self.parent_item.stellar_system_element
+                ssc = self.parent_item.ssc_object
                 if parent.parent() is None:
                     system = parent.model().parent().scc_object
                 else:
-                    system = parent.parent().stellar_system_element
+                    system = parent.parent().ssc_object
                 system.remove_object(ssc)
                 parent.removeRow(i)
-
-        # print(parent)
-        # print(parent.removeRow())
-        # print(self.parent_item.parent().model().findChild(self.parent_item.__class__, name=self.parent_item.text()))
-        # parent.rowCount()
-        # self.parent_item.removeRow()
-        # self.deleteLater()
-        pass
