@@ -1,116 +1,201 @@
+from typing import Union
+
 from PyQt5.QtWidgets import QMenu, QAction, QDialog, QDialogButtonBox, QVBoxLayout, QWidget, QLineEdit, QFormLayout, \
     QComboBox, QHBoxLayout, QRadioButton, QSizePolicy
 from PyQt5.Qt import QStandardItem
+
+from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
 from stellar_system_creator.stellar_system_elements.stellar_body import MainSequenceStar, Planet, AsteroidBelt, \
     Satellite, Trojan, TrojanSatellite
 from stellar_system_creator.astrothings.units import ureg
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
 from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem
 
-category_add_element_class = {'Stellar Parent': MainSequenceStar,
-                              'Planetary Parent': Planet,
-                              'Planetary System': PlanetarySystem,
-                              'Asteroid Belt': AsteroidBelt,
-                              'Satellite': Satellite,
-                              'Trojan': {'Trojan Asteroids': Trojan, 'Trojan Satellite': TrojanSatellite}
-                              }
-
-category_add_element_init_values = {'Stellar Parent': {'mass': 1 * ureg.M_s},
-                                    'Planetary Parent': {'mass': 1 * ureg.M_e},
-                                    'Planetary System': {},
-                                    'Asteroid Belt': {},
-                                    'Satellite': {'mass': 0.01 * ureg.M_e},
-                                    'Trojan': {'Trojan Asteroids': {'lagrange_position': 1},
-                                               'Trojan Satellite': {'mass': 0.01 * ureg.M_e, 'lagrange_position': 1}}
-                                    }
+category_add_element_init_values = {
+    'Stellar Parent': {'Star': {'mass': 1 * ureg.M_s},
+                       'Stellar Binary': {'mean_distance': 0.1 * ureg.au, 'eccentricity': 0.2}},
+    'Planetary Parent': {'Planet': {'mass': 1 * ureg.M_e}},
+    'Asteroid Belt': {},
+    'Satellite': {'mass': 0.01 * ureg.M_e},
+    'Trojan': {'Trojan Asteroids': {'lagrange_position': 1},
+               'Trojan Satellite': {'mass': 0.01 * ureg.M_e, 'lagrange_position': 1}}
+}
 
 
-def add_star(tree_view_item, ssc_parent, init_values):
-    from stellar_system_creator.gui.gui_project_tree_view import get_stellar_body_dict
-    if tree_view_item.parent() is None:
-        system = tree_view_item.model().parent().scc_object
+# add_element_function = {'Star': add_star,
+#                         'Stellar Binary': add_stellar_binary,
+#                         'Planetary System': add_planetary_system,
+#                         'Planetary Parent': add_planet,
+#                         'Asteroid Belt': add_asteroid_belt,
+#                         'Satellite': add_satellite,
+#                         'Trojan': add_trojan,
+#                         'Trojan Satellite': add_trojan_satellite}
+
+def add_stellar_binary(name, tree_view_item):
+    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
+        import TreeViewItemFromStellarSystemElement as tvifsse, TreeViewItemFromString
+    tree_view_item: TreeViewItemFromString
+
+    init_values_star = category_add_element_init_values['Stellar Parent']['Star']
+    new_star1 = MainSequenceStar('Star1', **init_values_star)
+    new_star2 = MainSequenceStar('Star2', **init_values_star)
+
+    init_values_binary = category_add_element_init_values['Stellar Parent']['Stellar Binary']
+    if tree_view_item.ssc_parent.parent is not None:
+        new_object = StellarBinary(name=name, parent=tree_view_item.ssc_parent.parent.parent, **init_values_binary,
+                                   primary_body=new_star1, secondary_body=new_star2)
     else:
-        system = tree_view_item.parent().parent().ssc_parent
-    new_object = MainSequenceStar(parent=system.parent, **init_values)
-    new_object_dict = get_stellar_body_dict(new_object)
+        new_object = StellarBinary(name=name, parent=None, **init_values_binary,
+                                   primary_body=new_star1, secondary_body=new_star2)
+
     if tree_view_item.rowCount():
         tree_view_item.child(0).context_menu.delete_permanently_process()
-        tree_view_item.appendRow(new_object_dict['TreeViewItem'])
-    system.replace_parent(new_object)
+
+    tree_view_item.ssc_parent.replace_parent(new_object)
+    new_tree_view_item = tvifsse(new_object)
+    tree_view_item.appendRow(new_tree_view_item)
+
+    new_star1_tree_view_item = tvifsse(new_star1)
+    new_star2_tree_view_item = tvifsse(new_star2)
+    new_tree_view_item.appendRow(new_star1_tree_view_item)
+    new_tree_view_item.appendRow(new_star2_tree_view_item)
 
 
-def add_planetary_system(tree_view_item, ssc_parent, init_values):
-    new_planet = Planet(init_values['name'], parent=ssc_parent,
-                        **category_add_element_init_values['Planetary Parent'])
-    new_object = PlanetarySystem(**init_values, parent=new_planet)
+def add_star(name, tree_view_item):
+    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
+        import TreeViewItemFromStellarSystemElement as tvifsse, TreeViewItemFromString
+    tree_view_item: TreeViewItemFromString
 
-    from stellar_system_creator.gui.gui_project_tree_view import get_planetary_system_dict, \
-        set_planetary_system_tree_model_from_ssc_object
+    init_values = category_add_element_init_values['Stellar Parent']['Star']
+    if tree_view_item.ssc_parent.parent is not None:
+        new_object = MainSequenceStar(name=name, parent=tree_view_item.ssc_parent.parent.parent, **init_values)
+    else:
+        new_object = MainSequenceStar(name=name, parent=None, **init_values)
 
-    new_object_dict = get_planetary_system_dict(new_object)
-
-    set_planetary_system_tree_model_from_ssc_object(new_object_dict['TreeViewItem'], new_object)
-    tree_view_item.appendRow(new_object_dict['TreeViewItem'])
-
-
-def add_planet(tree_view_item, ssc_parent, init_values):
-    from stellar_system_creator.gui.gui_project_tree_view import get_stellar_body_dict
-    new_object = Planet(parent=tree_view_item.parent().parent().ssc_parent, **init_values)
-    new_object_dict = get_stellar_body_dict(new_object)
     if tree_view_item.rowCount():
         tree_view_item.child(0).context_menu.delete_permanently_process()
-        tree_view_item.appendRow(new_object_dict['TreeViewItem'])
-    ssc: PlanetarySystem = tree_view_item.parent().stellar_system_element
-    ssc.replace_parent(new_object)
+
+    tree_view_item.ssc_parent.replace_parent(new_object)
+    new_tree_view_item = tvifsse(new_object)
+    tree_view_item.appendRow(new_tree_view_item)
 
 
-def add_asteroid_belt(tree_view_item, ssc_parent, init_values):
-    from stellar_system_creator.gui.gui_project_tree_view import get_stellar_body_dict
-    new_object = AsteroidBelt(parent=ssc_parent, **init_values)
-    new_object_dict = get_stellar_body_dict(new_object)
-    tree_view_item.appendRow(new_object_dict['TreeViewItem'])
+def add_planetary_system(name, tree_view_item):
+    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
+        import TreeViewItemFromStellarSystemElement as tvifsse, TreeViewItemFromString
+    tree_view_item: TreeViewItemFromString
+
+    init_values = category_add_element_init_values['Planetary Parent']['Planet']
+    new_object = Planet(name=name, parent=tree_view_item.ssc_parent.parent, **init_values)
+    new_object_system = PlanetarySystem(name, new_object)
+    tree_view_item.ssc_parent.add_planetary_system(new_object_system)
+
+    new_tree_view_item = tvifsse(new_object_system)
+    tree_view_item.appendRow(new_tree_view_item)
+
+    planetary_parent_treeview = TreeViewItemFromString('Planetary Parent', new_object_system)
+    satellite_treeview = TreeViewItemFromString('Satellites', new_object_system)
+    trojan_treeview = TreeViewItemFromString('Trojans', new_object_system)
+    new_tree_view_item.appendRow(planetary_parent_treeview)
+    new_tree_view_item.appendRow(satellite_treeview)
+    new_tree_view_item.appendRow(trojan_treeview)
+
+    new_planet_tree_view_item = tvifsse(new_object)
+    planetary_parent_treeview.appendRow(new_planet_tree_view_item)
 
 
-def add_satellite(tree_view_item, ssc_parent, init_values):
-    from stellar_system_creator.gui.gui_project_tree_view import get_stellar_body_dict
-    new_object = Satellite(parent=ssc_parent, **init_values)
-    new_object_dict = get_stellar_body_dict(new_object)
-    tree_view_item.appendRow(new_object_dict['TreeViewItem'])
+def add_planet(name, tree_view_item):
+    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
+        import TreeViewItemFromStellarSystemElement as tvifsse, TreeViewItemFromString
+    tree_view_item: TreeViewItemFromString
+
+    init_values = category_add_element_init_values['Planetary Parent']['Planet']
+    new_object = Planet(name=name, parent=tree_view_item.ssc_parent.parent.parent, **init_values)
+
+    if tree_view_item.rowCount():
+        tree_view_item.child(0).context_menu.delete_permanently_process()
+
+    tree_view_item.ssc_parent.replace_parent(new_object)
+    new_tree_view_item = tvifsse(new_object)
+    tree_view_item.appendRow(new_tree_view_item)
 
 
-def add_trojan(tree_view_item, ssc_parent, init_values):
-    from stellar_system_creator.gui.gui_project_tree_view import get_stellar_body_dict
-    new_object = Trojan(parent=ssc_parent, **init_values)
-    new_object_dict = get_stellar_body_dict(new_object)
-    tree_view_item.appendRow(new_object_dict['TreeViewItem'])
+def add_asteroid_belt(name, tree_view_item):
+    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
+        import TreeViewItemFromStellarSystemElement as tvifsse, TreeViewItemFromString
+    tree_view_item: TreeViewItemFromString
+
+    init_values = category_add_element_init_values['Asteroid Belt']
+    new_object = AsteroidBelt(name=name, parent=tree_view_item.ssc_parent.parent, **init_values)
+    tree_view_item.ssc_parent.add_asteroid_belt(new_object)
+
+    new_tree_view_item = tvifsse(new_object)
+    tree_view_item.appendRow(new_tree_view_item)
 
 
-def add_trojan_satellite(tree_view_item, ssc_parent, init_values):
-    from stellar_system_creator.gui.gui_project_tree_view import get_stellar_body_dict
-    new_object = TrojanSatellite(parent=ssc_parent, **init_values)
-    new_object_dict = get_stellar_body_dict(new_object)
-    tree_view_item.appendRow(new_object_dict['TreeViewItem'])
+def add_satellite(name, tree_view_item):
+    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
+        import TreeViewItemFromStellarSystemElement as tvifsse, TreeViewItemFromString
+    tree_view_item: TreeViewItemFromString
+
+    init_values = category_add_element_init_values['Satellite']
+    new_object = Satellite(name=name, parent=tree_view_item.ssc_parent.parent, **init_values)
+    tree_view_item.ssc_parent.add_satellite(new_object)
+
+    new_tree_view_item = tvifsse(new_object)
+    tree_view_item.appendRow(new_tree_view_item)
 
 
-add_element_function = {'Stellar Parent': add_star,
+def add_trojan(name, tree_view_item):
+    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
+        import TreeViewItemFromStellarSystemElement as tvifsse, TreeViewItemFromString
+    tree_view_item: TreeViewItemFromString
+
+    init_values = category_add_element_init_values['Trojan']['Trojan Asteroids']
+    new_object = Trojan(name=name, parent=tree_view_item.ssc_parent.parent, **init_values)
+    tree_view_item.ssc_parent.add_trojan(new_object)
+
+    new_tree_view_item = tvifsse(new_object)
+    tree_view_item.appendRow(new_tree_view_item)
+
+
+def add_trojan_satellite(name, tree_view_item):
+    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
+        import TreeViewItemFromStellarSystemElement as tvifsse, TreeViewItemFromString
+    tree_view_item: TreeViewItemFromString
+
+    init_values = category_add_element_init_values['Trojan']['Trojan Satellite']
+    new_object = TrojanSatellite(name=name, parent=tree_view_item.ssc_parent.parent, **init_values)
+    tree_view_item.ssc_parent.add_trojan(new_object)
+
+    new_tree_view_item = tvifsse(new_object)
+    tree_view_item.appendRow(new_tree_view_item)
+
+
+add_element_function = {'Stellar Binary': add_stellar_binary,
+                        'Star': add_star,
                         'Planetary System': add_planetary_system,
                         'Planetary Parent': add_planet,
                         'Asteroid Belt': add_asteroid_belt,
                         'Satellite': add_satellite,
-                        'Trojan': add_trojan,
+                        'Trojan Asteroids': add_trojan,
                         'Trojan Satellite': add_trojan_satellite}
 
 
 class CategoryBasedTreeViewItemContextMenu(QMenu):
 
-    def __init__(self, parent_item, ssc_parent):
-        self.parent_item: QStandardItem = parent_item
-        super().__init__(self.parent_item.parent())
+    def __init__(self, parent_item):
+        from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items import \
+            TreeViewItemFromString
+        self.parent_item: TreeViewItemFromString = parent_item
+        super().__init__()
         self.category = self.parent_item.text()
+        self.add_element_text = f"&Add {self.category}..."
         if self.category.endswith('s'):
             self.category = self.category[:-1]
+        else:
+            self.add_element_text = f"&Replace {self.category}..."
 
-        self.ssc_parent = ssc_parent
         self._create_menu_actions()
         self._connect_actions()
         self._create_menu()
@@ -121,24 +206,27 @@ class CategoryBasedTreeViewItemContextMenu(QMenu):
         self.addSeparator()
         self.addAction(self.expand_all_action)
         self.addAction(self.collapse_all_action)
+        # if self.category != 'Stellar Parent':
+        self.addSeparator()
+        self.addAction(self.delete_all_action)
 
     def _connect_actions(self):
         self.add_element_action.triggered.connect(self.add_element_process)
         self.expand_all_action.triggered.connect(self.expand_all_process)
         self.collapse_all_action.triggered.connect(self.collapse_all_process)
+        self.delete_all_action.triggered.connect(self.delete_all_process)
 
     def _create_menu_actions(self):
-        self.add_element_action = QAction(f"&Add {self.category}...", self)
+        self.add_element_action = QAction(self.add_element_text, self)
         self.expand_all_action = QAction(f"&Expand all", self)
         self.collapse_all_action = QAction(f"&Collapse all", self)
+        self.delete_all_action = QAction(f"&Delete all...", self)
 
     def add_element_process(self):
-        print(f'clicked {self.parent_item.text()}')
         aed = AddElementDialog(self)
         aed.exec()
-        if aed.init_values is not None:
-            add_element_function[self.category](self.parent_item, self.ssc_parent, aed.init_values)
-            # self.parent_item.appendRow()
+        if aed.category is not None:
+            add_element_function[aed.category](aed.name_line_edit.text(), self.parent_item)
 
     def expand_all_process(self):
         from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
@@ -150,6 +238,10 @@ class CategoryBasedTreeViewItemContextMenu(QMenu):
         tree_view: ProjectTreeView = self.parent_item.model().parent()
         tree_view.collapse_recursively(self.parent_item)
 
+    def delete_all_process(self):
+        for i in reversed(range(self.parent_item.rowCount())):
+            self.parent_item.child(i).context_menu.delete_permanently_process()
+
 
 class AddElementDialog(QDialog):
 
@@ -159,12 +251,11 @@ class AddElementDialog(QDialog):
         self.__post_init__()
 
     def __post_init__(self):
+        self.setWindowTitle(f"Add {self.parent_item.category}")
         self._set_main_widget()
         self._set_button_box()
+        self.category = None
 
-        self.setWindowTitle(f"Add {self.parent_item.category}")
-
-        self.init_values = None
         layout = QVBoxLayout()
         layout.addWidget(self.main_widget)
         layout.addWidget(self.button_box)
@@ -182,7 +273,9 @@ class AddElementDialog(QDialog):
         self.option_buttons = None
         if self.parent_item.category == 'Trojan':
             self.option_buttons = OptionRadioButtons(['Trojan Asteroids', 'Trojan Satellite'])
-
+            layout.addRow('Options', self.option_buttons)
+        elif self.parent_item.category == 'Stellar Parent':
+            self.option_buttons = OptionRadioButtons(['Star', 'Stellar Binary'])
             layout.addRow('Options', self.option_buttons)
 
         layout.addRow('Name', self.name_line_edit)
@@ -194,11 +287,11 @@ class AddElementDialog(QDialog):
 
     def accept(self) -> None:
         if self.name_line_edit.text() != '':
-            self.init_values = category_add_element_init_values[self.parent_item.category]
             if isinstance(self.option_buttons, OptionRadioButtons):
-                self.init_values = self.init_values[self.option_buttons.text()]
+                self.category = self.option_buttons.text()
+            else:
+                self.category = self.parent_item.category
 
-            self.init_values['name'] = self.name_line_edit.text()
             super().accept()
 
 

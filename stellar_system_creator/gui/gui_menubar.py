@@ -5,9 +5,11 @@ from functools import partial
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMenu, QAction, QFileDialog, QMenuBar, QMessageBox
 
+from stellar_system_creator.astrothings.units import ureg
 from stellar_system_creator.filing import save as save_ssc_object, add_extension_if_necessary
 from stellar_system_creator.gui.gui_central_widget import CentralWidget
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
+from stellar_system_creator.stellar_system_elements.stellar_body import MainSequenceStar, Planet
 from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem
 
 
@@ -48,7 +50,7 @@ class FileMenu(QMenu):
         self.addAction(self.exit_action)
 
     def _connect_actions(self):
-        self.new_project_stellar_system_action.triggered.connect(partial(new_project, self, 'Solar System'))
+        self.new_project_stellar_system_action.triggered.connect(partial(new_project, self, 'Stellar System'))
         self.new_project_planetary_system_action.triggered.connect(partial(new_project, self, 'Planetary System'))
         self.open_project_action.triggered.connect(partial(open_project, self))
         self.save_project_action.triggered.connect(partial(save_project, self))
@@ -56,7 +58,7 @@ class FileMenu(QMenu):
 
     def _create_menu_actions(self, menubar):
         self.new_project_submenu = QMenu("&New Project", menubar)
-        self.new_project_stellar_system_action = QAction("&Solar System...", menubar)
+        self.new_project_stellar_system_action = QAction("&Stellar System...", menubar)
         self.new_project_planetary_system_action = QAction("&Planetary System...", menubar)
 
         self.open_project_action = QAction(QIcon.fromTheme("document-open"), "&Open Project...", menubar)
@@ -187,10 +189,12 @@ def new_project(parent, system_type):
     system_name = filename.split('/')[-1].split('.')[0]
     if filename != '':
         filename = add_extension_if_necessary(filename, 'ssc')
-        if system_type == 'Solar System':
-            ssc_object = StellarSystem(system_name)
+        if system_type == 'Stellar System':
+            parent_star = MainSequenceStar(system_name, 1 * ureg.M_s)
+            ssc_object = StellarSystem(system_name, parent_star)
         elif system_type == 'Planetary System':
-            ssc_object = PlanetarySystem(system_name)
+            parent_planet = Planet(system_name, 1 * ureg.M_e)
+            ssc_object = PlanetarySystem(system_name, parent_planet)
 
         save_ssc_object(ssc_object, filename)
         central_widget: CentralWidget = parent.parent().parent().central_widget

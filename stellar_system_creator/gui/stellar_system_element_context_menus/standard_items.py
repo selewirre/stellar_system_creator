@@ -25,7 +25,7 @@ class TreeViewItemFromString(QStandardItem):
     def __init__(self, category: str, ssc_parent):
         super().__init__()
         self.setEditable(False)
-        self.ssc_parent = ssc_parent
+        self.ssc_parent: Union[PlanetarySystem, StellarSystem] = ssc_parent
         self.category = category
         self.setText(self.category)
 
@@ -36,15 +36,15 @@ class TreeViewItemFromString(QStandardItem):
         self.context_menu_class = CategoryBasedTreeViewItemContextMenu
 
     def _set_context_menu(self):
-        self.context_menu = self.context_menu_class(self, self.ssc_parent)
+        self.context_menu = self.context_menu_class(self)
 
 
 class TreeViewItemFromStellarSystemElement(QStandardItem):
-    def __init__(self, stellar_system_element: Union[StellarBody, Star, Planet, StellarBinary,
-                                                     BinarySystem, PlanetarySystem, StellarSystem]):
+    def __init__(self, ssc_object: Union[StellarBody, Star, Planet, StellarBinary,
+                                         BinarySystem, PlanetarySystem, StellarSystem]):
         super().__init__()
         self.setEditable(False)
-        self.stellar_system_element = stellar_system_element
+        self.ssc_object = ssc_object
         self.update_text()
 
         self._get_context_menu_class()
@@ -53,23 +53,23 @@ class TreeViewItemFromStellarSystemElement(QStandardItem):
         self.set_stellar_system_element_icon()
 
     def _get_context_menu_class(self):
-        if isinstance(self.stellar_system_element, StellarBinary):
+        if isinstance(self.ssc_object, StellarBinary):
             self.context_menu_class = StellarBinaryTreeViewItemContextMenu
-        elif isinstance(self.stellar_system_element, StellarSystem):
+        elif isinstance(self.ssc_object, StellarSystem):
             self.context_menu_class = StellarSystemTreeViewItemContextMenu
-        elif isinstance(self.stellar_system_element, PlanetarySystem):
+        elif isinstance(self.ssc_object, PlanetarySystem):
             self.context_menu_class = PlanetarySystemTreeViewItemContextMenu
-        elif isinstance(self.stellar_system_element, Star):
+        elif isinstance(self.ssc_object, Star):
             self.context_menu_class = StarTreeViewItemContextMenu
-        elif isinstance(self.stellar_system_element, TrojanSatellite):
+        elif isinstance(self.ssc_object, TrojanSatellite):
             self.context_menu_class = TrojanSatelliteTreeViewItemContextMenu
-        elif isinstance(self.stellar_system_element, Satellite):
+        elif isinstance(self.ssc_object, Satellite):
             self.context_menu_class = SatelliteTreeViewItemContextMenu
-        elif isinstance(self.stellar_system_element, Trojan):
+        elif isinstance(self.ssc_object, Trojan):
             self.context_menu_class = TrojanTreeViewItemContextMenu
-        elif isinstance(self.stellar_system_element, AsteroidBelt):
+        elif isinstance(self.ssc_object, AsteroidBelt):
             self.context_menu_class = AsteroidBeltTreeViewItemContextMenu
-        elif isinstance(self.stellar_system_element, Planet):
+        elif isinstance(self.ssc_object, Planet):
             self.context_menu_class = PlanetTreeViewItemContextMenu
 
     def _set_context_menu(self):
@@ -77,7 +77,7 @@ class TreeViewItemFromStellarSystemElement(QStandardItem):
 
     def set_stellar_system_element_icon(self):
         try:
-            image_array = self.stellar_system_element.image_array
+            image_array = self.ssc_object.image_array
             if image_array.shape[0] > image_array.shape[1]:
                 padding = (image_array.shape[0] - image_array.shape[1]) // 2
                 image_array = np.pad(image_array, ((0, 0), (padding, padding), (0, 0)))
@@ -95,4 +95,4 @@ class TreeViewItemFromStellarSystemElement(QStandardItem):
             pass
 
     def update_text(self):
-        self.setText(f"{self.stellar_system_element.name}")
+        self.setText(f"{self.ssc_object.name}")
