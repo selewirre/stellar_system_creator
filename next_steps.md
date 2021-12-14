@@ -42,12 +42,15 @@
 # GUI:
 1. Add zoom function and save image function for svgwidget
 2. Add line drawing options for rendering
-3. Add S-type Binaries (multistellar systems) in treeview
-4. Add trigger functions to Edit menu
-5. Add trigger functions to insert menu
-6. Add right-click functionalities for tree view.
+3. Add S-type Binaries (multi-stellar systems) in treeview
+4. Add trigger functions to Edit menu (maybe not? )
+5. Add trigger functions to insert menu (maybe not?)
+6. Add right-click functionalities for tree view
     - add details on MultiStellarSystem
+    - make "details" process run if you double-click.
 7. Add tree view header right-click functionalities (and allow name change like rest "system" types)
+8. Add hovering suggestions/explanations.
+9. Add help/documentation functions.
 
 
 

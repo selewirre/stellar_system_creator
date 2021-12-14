@@ -551,7 +551,27 @@ def get_unit_bidict(value: Q_):
                                   'rho_j': 'ρj',
                                   'rho_s': 'ρs'})
         elif unit_dimensions['[mass]'] == 1 and unit_dimensions['[time]'] == -3:
-            dict_pretty = bidict({'W/m²': 'W/m²', 'S_s': 'Ss', 'L_s/au²': 'Ls/au²'})
+            dict_pretty = bidict({'W/m²': 'W/m²',
+                                  'S_s': 'Ss',
+                                  'L_s/au²': 'Ls/au²',
+                                  'L_s/mi²': 'Ls/mi²',
+                                  'L_s/m²': 'Ls/m²',
+                                  'L_s/ft²': 'Ls/ft²',
+                                  'L_s/km²': 'Ls/km²',
+                                  'L_s/nm²': 'Ls/nm²',
+                                  'L_s/R_e²': 'Ls/Re²',
+                                  'L_s/R_j²': 'Ls/Rj²',
+                                  'L_s/R_s²': 'Ls/Rs²',
+                                  'L_s/ly²': 'Ls/ly²',
+                                  'W/nm²': 'W/nm²',
+                                  'W/ft²': 'W/ft²',
+                                  'W/km²': 'W/km²',
+                                  'W/mi²': 'W/mi²',
+                                  'W/au²': 'W/au²',
+                                  'W/R_e²': 'W/R_e²',
+                                  'W/R_j²': 'W/R_j²',
+                                  'W/R_s²': 'W/R_s²',
+                                  'W/ly²': 'W/ly²'})
     elif len(unit_dimensions) == 3:
         if unit_dimensions['[length]'] == 2 and unit_dimensions['[mass]'] == 1 and unit_dimensions['[time]'] == -3:
             dict_pretty = bidict({'W': 'W', 'L_s': 'Ls'})

@@ -8,7 +8,7 @@ To install this package, run:
 
 ```
 python3 setup.py sdist bdist_wheel
-pip3 install dist/stellar_system_creator-0.0.5.0.tar.gz
+pip3 install dist/stellar_system_creator-0.0.5.1.tar.gz
 ```
 
 If you want to check out the example code, look in the folder `examples/...`
@@ -47,6 +47,10 @@ GNU GPL v3 license.
 
 # Copyright
 Copyright (C) 2021 Selewirre Iskvary
+
+# User Support
+I would greatly appreciate it if users clearly state that their illustrations and calculations were made 
+(partially or completely) with this project. 
 
 # Contact
 Please report any questions, issues, concerns, suggestions at <selewirre@gmail.com>

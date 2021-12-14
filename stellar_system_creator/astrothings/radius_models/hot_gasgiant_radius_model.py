@@ -3,6 +3,8 @@ Source: https://arxiv.org/pdf/1804.03075.pdf
 Modified it a bit, to adhere to the composition model as well.
 For internal temp: https://www.aanda.org/articles/aa/pdf/2021/01/aa38361-20.pdf
 """
+import numpy as np
+
 from stellar_system_creator.astrothings.units import Q_
 
 hot_gas_giant_classes = {'very low mass': {'upper mass limit': 0.37, 'a': -0.33, 'log10_fs': 6.1},
@@ -34,10 +36,12 @@ def is_gasgiant_hot(log10_flux, hot_gas_giant_mass_class) -> bool:
 
 
 def gasgiant_radius_modification(log10_flux, hot_gas_giant_mass_class) -> float:
-
-    if is_gasgiant_hot(log10_flux, hot_gas_giant_mass_class):
-        a = hot_gas_giant_classes[hot_gas_giant_mass_class]['a']
-        log10_fs = hot_gas_giant_classes[hot_gas_giant_mass_class]['log10_fs']
-        return 1 + a * (log10_flux - log10_fs)
+    if not np.isnan(log10_flux):
+        if is_gasgiant_hot(log10_flux, hot_gas_giant_mass_class):
+            a = hot_gas_giant_classes[hot_gas_giant_mass_class]['a']
+            log10_fs = hot_gas_giant_classes[hot_gas_giant_mass_class]['log10_fs']
+            return 1 + a * (log10_flux - log10_fs)
+        else:
+            return 1
     else:
         return 1

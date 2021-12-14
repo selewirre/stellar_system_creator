@@ -190,9 +190,9 @@ class CategoryBasedTreeViewItemContextMenu(QMenu):
         self.parent_item: TreeViewItemFromString = parent_item
         super().__init__()
         self.category = self.parent_item.text()
-        self.add_element_text = f"&Add {self.category}..."
         if self.category.endswith('s'):
             self.category = self.category[:-1]
+            self.add_element_text = f"&Add {self.category}..."
         else:
             self.add_element_text = f"&Replace {self.category}..."
 
