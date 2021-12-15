@@ -8,6 +8,9 @@ Orbital
     semi_minor_axis
     apoapsis
     periapsis
+    lagrange_position
+    contact
+    roche_lobe
     orbital_period
     orbital_velocity
     orbit_type

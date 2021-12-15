@@ -8,5 +8,6 @@ Emission
     heat_distribution
     normalized_greenhouse
     incident_flux
-    luminosity
     temperature
+    luminosity
+    peak_wavelength
