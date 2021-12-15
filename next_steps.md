@@ -51,6 +51,11 @@
 7. Add tree view header right-click functionalities (and allow name change like rest "system" types)
 8. Add hovering suggestions/explanations.
 9. Add help/documentation functions.
+10. Add help and documentation functionalities:
+    - Use sphinx to make documentation in multiple forms, like html and pdf: https://www.sphinx-doc.org/en/master/index.html
+    - Make labels of "details" to show text from html as tool tip. 
+    - Connect html files to GUI and help menu via PYQT5WebEngineView: https://zetcode.com/pyqt/qwebengineview/
+    - Add navigation functionality (search, back, forward buttons) in the webengineview for easier look-up
 
 
 
