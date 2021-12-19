@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2021.10.24)  14 DEC 2021 17:32
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2021.10.24)  14 DEC 2021 18:31
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -781,43 +781,47 @@ Chapter 1.
 
 ]
 Chapter 2.
-[3] [4]
+[3] [4] [5]
+Overfull \vbox (64.7329pt too high) has occurred while \output is active []
+
+
+[6] [7] [8
+
+]
 Chapter 3.
-LaTeX Font Info:    Trying to load font information for TS1+qtm on input line 2
-43.
+LaTeX Font Info:    Trying to load font information for TS1+qtm on input line 3
+69.
 (/usr/share/texmf/tex/latex/tex-gyre/ts1qtm.fd
 File: ts1qtm.fd 2009/09/25 v1.2 font definition file for TS1/qtm
 ) (./stellarsystemcreator.ind)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 261.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 387.
 
-[5
-
-]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 261.
+[9]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 387.
  (./stellarsystemcreator.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 261.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 261.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 387.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 387.
 Package rerunfilecheck Info: File `stellarsystemcreator.out' has not changed.
-(rerunfilecheck)             Checksum: 2218BA85BAF7B5300B5E8762A4C83C17;3978.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 261.
+(rerunfilecheck)             Checksum: 126EF407F7D77EA0858E00C54DFE9B3A;9920.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 387.
  ) 
 Here is how much of TeX's memory you used:
- 13806 strings out of 483140
- 198753 string characters out of 5965150
- 470961 words of memory out of 5000000
- 28427 multiletter control sequences out of 15000+600000
+ 13974 strings out of 483140
+ 204511 string characters out of 5965150
+ 476045 words of memory out of 5000000
+ 28550 multiletter control sequences out of 15000+600000
  579436 words of font info for 60 fonts, out of 8000000 for 9000
  37 hyphenation exceptions out of 8191
- 38i,11n,51p,262b,388s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 38i,12n,51p,337b,464s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf/fonts/enc/dvips/tex-gyre/q-ts1.enc}{/usr/share/texmf/fonts/
 enc/dvips/tex-gyre/q-ec.enc}</usr/share/texmf/fonts/type1/public/tex-gyre/qhvb.
 pfb></usr/share/texmf/fonts/type1/public/tex-gyre/qhvbi.pfb></usr/share/texmf/f
 onts/type1/public/tex-gyre/qtmb.pfb></usr/share/texmf/fonts/type1/public/tex-gy
 re/qtmr.pfb>
-Output written on stellarsystemcreator.pdf (9 pages, 105211 bytes).
+Output written on stellarsystemcreator.pdf (13 pages, 112798 bytes).
 PDF statistics:
- 238 PDF objects out of 1000 (max. 8388607)
- 215 compressed objects within 3 object streams
- 53 named destinations out of 1000 (max. 500000)
- 285 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 435 PDF objects out of 1000 (max. 8388607)
+ 406 compressed objects within 5 object streams
+ 98 named destinations out of 1000 (max. 500000)
+ 613 words of extra memory for PDF output out of 10000 (max. 10000000)
 

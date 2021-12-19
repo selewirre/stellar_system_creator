@@ -1,5 +1,9 @@
 from typing import Union, Dict, List
 
+import pkg_resources
+from bs4 import BeautifulSoup
+import codecs
+
 import numpy as np
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import Qt
@@ -14,6 +18,15 @@ from bidict import bidict
 from stellar_system_creator.astrothings.insolation_models.insolation_models import InsolationThresholdModel
 from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
 from stellar_system_creator.stellar_system_elements.stellar_body import StellarBody, Star, Planet, Satellite
+
+
+class DetailsLabel(QLabel):
+    def __init__(self, text: str, relative_tooltip_url_directory: str):
+        super().__init__(text)
+        filename = pkg_resources.resource_filename(
+            'stellar_system_creator', f'documentation/build/html/quantities/{relative_tooltip_url_directory}')
+        tooltip_text = get_html_script(filename)
+        self.setToolTip(tooltip_text)
 
 
 class UnitLineEdit(QWidget):
@@ -580,3 +593,19 @@ def get_unit_bidict(value: Q_):
         dict_pretty = bidict({unit_str: unit_str})
 
     return dict_pretty, unit_str
+
+
+def get_html_script(url: str) -> str:
+    """Source: https://stackoverflow.com/questions/328356/extracting-text-from-html-file-using-python"""
+    # url = '../../../documentation/build/html/quantities/geometric/radius.html'
+    html = codecs.open(url, 'r')
+    soup = BeautifulSoup(html, features="html.parser")
+
+    # kill all script and style elements
+    for script in soup(["script", "style"]):
+        script.extract()  # rip it out
+
+    text = '\n'.join([element.get_text() for element in soup.body.find_all('p')][:-1])
+
+    return text
+

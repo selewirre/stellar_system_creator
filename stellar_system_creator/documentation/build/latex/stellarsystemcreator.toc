@@ -4,31 +4,72 @@
 \contentsline {section}{\numberline {2.1}Material}{3}{section.2.1}%
 \contentsline {subsection}{\numberline {2.1.1}Mass}{3}{subsection.2.1.1}%
 \contentsline {subsection}{\numberline {2.1.2}Density}{3}{subsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.1.3}Composition Type}{3}{subsection.2.1.3}%
+\contentsline {subsection}{\numberline {2.1.4}Chemical Composition}{3}{subsection.2.1.4}%
 \contentsline {section}{\numberline {2.2}Geometric}{3}{section.2.2}%
 \contentsline {subsection}{\numberline {2.2.1}Radius}{3}{subsection.2.2.1}%
 \contentsline {subsection}{\numberline {2.2.2}Circumference}{4}{subsection.2.2.2}%
 \contentsline {subsection}{\numberline {2.2.3}Surface Area}{4}{subsection.2.2.3}%
 \contentsline {subsection}{\numberline {2.2.4}Volume}{4}{subsection.2.2.4}%
-\contentsline {section}{\numberline {2.3}Surface}{4}{section.2.3}%
-\contentsline {subsection}{\numberline {2.3.1}Emission}{4}{subsection.2.3.1}%
+\contentsline {section}{\numberline {2.3}Rotational}{4}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Spin Period}{4}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Day Period}{4}{subsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.3.3}Axial Tilt}{4}{subsection.2.3.3}%
+\contentsline {section}{\numberline {2.4}Life}{4}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Age}{4}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}Lifetime}{4}{subsection.2.4.2}%
+\contentsline {section}{\numberline {2.5}Surface}{4}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}Emission}{4}{subsection.2.5.1}%
 \contentsline {subsubsection}{Albedo}{4}{subsubsection*.4}%
 \contentsline {subsubsection}{Emissivity}{4}{subsubsection*.5}%
 \contentsline {subsubsection}{Heat Distribution}{4}{subsubsection*.6}%
 \contentsline {subsubsection}{Normalized Greenhouse}{4}{subsubsection*.7}%
 \contentsline {subsubsection}{Incident Flux}{4}{subsubsection*.8}%
-\contentsline {subsubsection}{Luminosity}{4}{subsubsection*.9}%
-\contentsline {subsubsection}{Temperature}{4}{subsubsection*.10}%
-\contentsline {subsection}{\numberline {2.3.2}Gravity}{4}{subsection.2.3.2}%
-\contentsline {subsubsection}{Surface Gravity}{4}{subsubsection*.11}%
-\contentsline {subsubsection}{Escape Velocity}{4}{subsubsection*.12}%
-\contentsline {subsection}{\numberline {2.3.3}Internal Heating}{4}{subsection.2.3.3}%
-\contentsline {subsubsection}{Tectonic Activity}{4}{subsubsection*.13}%
-\contentsline {subsubsection}{Primordial Heating}{4}{subsubsection*.14}%
-\contentsline {subsubsection}{Radiogenic Heating}{4}{subsubsection*.15}%
-\contentsline {subsubsection}{Tidal Heating}{4}{subsubsection*.16}%
-\contentsline {subsection}{\numberline {2.3.4}Induced Tide}{4}{subsection.2.3.4}%
-\contentsline {section}{\numberline {2.4}Rotational}{4}{section.2.4}%
-\contentsline {subsection}{\numberline {2.4.1}Spin Period}{4}{subsection.2.4.1}%
-\contentsline {subsection}{\numberline {2.4.2}Day Period}{4}{subsection.2.4.2}%
-\contentsline {subsection}{\numberline {2.4.3}Axial Tilt}{4}{subsection.2.4.3}%
-\contentsline {chapter}{\numberline {3}Indices and tables}{5}{chapter.3}%
+\contentsline {subsubsection}{Temperature}{4}{subsubsection*.9}%
+\contentsline {subsubsection}{Luminosity}{4}{subsubsection*.10}%
+\contentsline {subsubsection}{Peak Wavelength}{4}{subsubsection*.11}%
+\contentsline {subsection}{\numberline {2.5.2}Gravity}{4}{subsection.2.5.2}%
+\contentsline {subsubsection}{Surface Gravity}{4}{subsubsection*.12}%
+\contentsline {subsubsection}{Escape Velocity}{5}{subsubsection*.13}%
+\contentsline {subsection}{\numberline {2.5.3}Internal Heating}{5}{subsection.2.5.3}%
+\contentsline {subsubsection}{Tectonic Activity}{5}{subsubsection*.14}%
+\contentsline {subsubsection}{Primordial Heating}{5}{subsubsection*.15}%
+\contentsline {subsubsection}{Radiogenic Heating}{5}{subsubsection*.16}%
+\contentsline {subsubsection}{Tidal Heating}{6}{subsubsection*.17}%
+\contentsline {subsection}{\numberline {2.5.4}Induced Tide}{6}{subsection.2.5.4}%
+\contentsline {subsection}{\numberline {2.5.5}Angular Diameter}{6}{subsection.2.5.5}%
+\contentsline {section}{\numberline {2.6}Orbital}{6}{section.2.6}%
+\contentsline {subsection}{\numberline {2.6.1}Eccentricity}{6}{subsection.2.6.1}%
+\contentsline {subsection}{\numberline {2.6.2}Semi\sphinxhyphen {}Major Axis}{6}{subsection.2.6.2}%
+\contentsline {subsection}{\numberline {2.6.3}Semi\sphinxhyphen {}Minor Axis}{6}{subsection.2.6.3}%
+\contentsline {subsection}{\numberline {2.6.4}Apoapsis}{6}{subsection.2.6.4}%
+\contentsline {subsection}{\numberline {2.6.5}Periapsis}{6}{subsection.2.6.5}%
+\contentsline {subsection}{\numberline {2.6.6}Lagrange Position}{6}{subsection.2.6.6}%
+\contentsline {subsection}{\numberline {2.6.7}Contact}{6}{subsection.2.6.7}%
+\contentsline {subsection}{\numberline {2.6.8}Roche Lobe}{6}{subsection.2.6.8}%
+\contentsline {subsection}{\numberline {2.6.9}Orbital Period}{6}{subsection.2.6.9}%
+\contentsline {subsection}{\numberline {2.6.10}Orbital Velocity}{6}{subsection.2.6.10}%
+\contentsline {subsection}{\numberline {2.6.11}Orbit Type}{6}{subsection.2.6.11}%
+\contentsline {subsection}{\numberline {2.6.12}Orbit Type Factor}{6}{subsection.2.6.12}%
+\contentsline {subsection}{\numberline {2.6.13}Orbital Stability}{6}{subsection.2.6.13}%
+\contentsline {subsection}{\numberline {2.6.14}Inclination}{6}{subsection.2.6.14}%
+\contentsline {subsection}{\numberline {2.6.15}Argument of Periapsis}{6}{subsection.2.6.15}%
+\contentsline {subsection}{\numberline {2.6.16}Longitude of the Ascending Node}{6}{subsection.2.6.16}%
+\contentsline {section}{\numberline {2.7}Children Orbit Limits}{6}{section.2.7}%
+\contentsline {subsection}{\numberline {2.7.1}Tidal Locking Radius}{6}{subsection.2.7.1}%
+\contentsline {subsection}{\numberline {2.7.2}Dense Roche Limit}{6}{subsection.2.7.2}%
+\contentsline {subsection}{\numberline {2.7.3}P\sphinxhyphen {}type binary Critical Orbit}{6}{subsection.2.7.3}%
+\contentsline {subsection}{\numberline {2.7.4}Inner Orbit Limit}{6}{subsection.2.7.4}%
+\contentsline {subsection}{\numberline {2.7.5}Hill Sphere}{6}{subsection.2.7.5}%
+\contentsline {subsection}{\numberline {2.7.6}S\sphinxhyphen {}type binary Critical Orbit}{7}{subsection.2.7.6}%
+\contentsline {subsection}{\numberline {2.7.7}Outer Orbit Limit}{7}{subsection.2.7.7}%
+\contentsline {subsection}{\numberline {2.7.8}Inner Rock Formation Limit}{7}{subsection.2.7.8}%
+\contentsline {subsection}{\numberline {2.7.9}Outer Rock Formation Limit}{7}{subsection.2.7.9}%
+\contentsline {subsection}{\numberline {2.7.10}Inner Water Frost Limit}{7}{subsection.2.7.10}%
+\contentsline {subsection}{\numberline {2.7.11}Sol\sphinxhyphen {}Equivalent Water Frost Limit}{7}{subsection.2.7.11}%
+\contentsline {subsection}{\numberline {2.7.12}Outer Water Frost Limit}{7}{subsection.2.7.12}%
+\contentsline {section}{\numberline {2.8}Insolation Models}{7}{section.2.8}%
+\contentsline {subsection}{\numberline {2.8.1}Kopparapu}{7}{subsection.2.8.1}%
+\contentsline {subsection}{\numberline {2.8.2}Selsis}{7}{subsection.2.8.2}%
+\contentsline {section}{\numberline {2.9}Habitability}{7}{section.2.9}%
+\contentsline {chapter}{\numberline {3}Indices and tables}{9}{chapter.3}%

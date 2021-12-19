@@ -599,14 +599,14 @@ def calculate_satellite_prograde_orbit_limit_factor(parent_eccentricity: float, 
     return 0.4895 * (1 - 1.0305 * parent_eccentricity - 0.2738 * child_ecentricity)
 
 
-def calculate_satellite_retrograde_orbit_limit_factor(parent_eccentricity: float, child_ecentricity: float) -> float:
+def calculate_satellite_retrograde_orbit_limit_factor(parent_eccentricity: float, child_eccentricity: float) -> float:
     """
     Within the Hill Sphere, satellites are even more limited on the maximum orbital distance they can be at.
     This is determined by the parent's eccentricity, their own eccentricity, and if the orbit is prograde or retrograde.
 
     More info on: https://www.aanda.org/articles/aa/pdf/2010/13/aa14955-10.pdf Eq. 4
     """
-    return 0.9309 * (1 - 1.0764 * parent_eccentricity - 0.9812 * child_ecentricity)
+    return 0.9309 * (1 - 1.0764 * parent_eccentricity - 0.9812 * child_eccentricity)
 
 
 def calculate_max_satellite_mass(parent_mass: Q_, parent_radius: Q_, hill_sphere: Q_, orbit_type_limit_factor: float,

@@ -19,3 +19,5 @@ Orbital
     inclination
     argument_of_periapsis
     longitude_of_the_ascending_node
+    semi_major_axis_minimum_limit
+    semi_major_axis_maximum_limit

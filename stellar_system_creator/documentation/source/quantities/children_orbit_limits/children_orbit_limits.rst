@@ -1,9 +1,11 @@
 Children Orbit Limits
 =====================
 
+.. _children_orbit_limits:
 
 .. toctree::
     tidal_locking_radius
+    roche_limit
     dense_roche_limit
     p_type_critical_orbit
     inner_orbit_limit

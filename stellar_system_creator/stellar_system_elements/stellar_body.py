@@ -636,7 +636,7 @@ class Planet(StellarBody):
     def calculate_suggested_spin_period(self) -> Q_:
         """
         From our own stellar system averages. Does not account for atmospheric tides (like Venus) or tidal locking
-        (like Mercury). Spin is also going to be affected by other crushing objects, and exchage of angular momentum with
+        (like Mercury). Spin is also going to be affected by other crushing objects, and exchange of angular momentum with
         heavy satellites (e.g. moon).
         """
         if self.parent is not None:
