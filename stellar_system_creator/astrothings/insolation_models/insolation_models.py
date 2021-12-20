@@ -257,7 +257,7 @@ class InsolationForWaterFrostline(InsolationBySelsis):
 
 class InsolationForRockLine(InsolationBySelsis):
     """
-     We use Selsis model since it allows for easy, Solar system comparisons.
+    We use Selsis model since it allows for easy, Solar system comparisons.
     Rockline is the distance at which iron and rock can form clusters, planetesimals and eventually planets.
     Since the rockline is determined by when rock and iron are more or less solid, I decided to use:
     For the inner limit, the boiling point of a fast rotating iron ball (heating distribution 1, albedo 0.15) @ 2870 K.

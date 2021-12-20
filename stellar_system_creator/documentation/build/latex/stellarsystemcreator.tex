@@ -60,7 +60,7 @@
 
 
 \title{Stellar System Creator}
-\date{Dec 14, 2021}
+\date{Dec 19, 2021}
 \release{0.0.5.1}
 \author{Selewirre Iskvary}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -96,10 +96,12 @@ Here, we will explore the various physical quantities found in this package.
 \label{\detokenize{quantities/material/material:material}}\label{\detokenize{quantities/material/material::doc}}
 
 \subsection{Mass}
-\label{\detokenize{quantities/material/mass:mass}}\label{\detokenize{quantities/material/mass::doc}}
+\label{\detokenize{quantities/material/mass:mass}}\label{\detokenize{quantities/material/mass::doc}}\phantomsection\label{\detokenize{quantities/material/mass:id1}}
 \sphinxAtStartPar
 Mass is the quantity of mater in a physical body.
-In the context of this package, mass determines most of other physical characteristics.
+In the context of this package, mass determines most of other physical characteristics,
+like {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{radius}}}}, {\hyperref[\detokenize{quantities/surface/emission/luminosity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{luminosity}}}}, {\hyperref[\detokenize{quantities/rotational/spin_period:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{spin period}}}} and
+{\hyperref[\detokenize{quantities/life/lifetime:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{lifetime}}}}.
 
 \sphinxAtStartPar
 Suggested (approximate) masses:
@@ -107,7 +109,11 @@ Suggested (approximate) masses:
 \sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
 \item {} 
 \sphinxAtStartPar
-For rocky planets: up to around 5 earth masses (Me)
+For mon\sphinxhyphen{}like satellites, less than 0.05 earth masses (Me)
+
+\item {} 
+\sphinxAtStartPar
+For rocky planets: up to around 5 earth masses
 
 \item {} 
 \sphinxAtStartPar
@@ -133,22 +139,51 @@ For short\sphinxhyphen{}live, big blue stars: 1.4 to 50 solar masses.
 
 
 \subsection{Density}
-\label{\detokenize{quantities/material/density:density}}\label{\detokenize{quantities/material/density::doc}}
+\label{\detokenize{quantities/material/density:density}}\label{\detokenize{quantities/material/density::doc}}\phantomsection\label{\detokenize{quantities/material/density:id1}}
+\sphinxAtStartPar
+Density (\(\rho = \frac{M}{V}\)) is the {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} per unit {\hyperref[\detokenize{quantities/geometric/volume:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{volume}}}} of an a substance (or celestial object).
+Usual densities in the solar system are between 0.5 and 7 grams/cm\textasciicircum{}3.
+
 
 \subsection{Composition Type}
-\label{\detokenize{quantities/material/composition_type:composition-type}}\label{\detokenize{quantities/material/composition_type::doc}}
+\label{\detokenize{quantities/material/composition_type:composition-type}}\label{\detokenize{quantities/material/composition_type::doc}}\phantomsection\label{\detokenize{quantities/material/composition_type:id1}}
+\sphinxAtStartPar
+The composition type of planets, planetoids, asteroids etc. is
+what the approximate composition of a celestial object will be.
+There are two types of iron worlds, two types of rocky worlds,
+four types of water worlds, one type of ice\sphinxhyphen{} and one of gas\sphinxhyphen{}giants.
+
+\sphinxAtStartPar
+Even though the composition is not accurate by itself, I find
+that the {\hyperref[\detokenize{quantities/material/density:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{density}}}} and {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{radius}}}} of asteroids and moons that are not rocky,
+can be generally approximated by the four different water worlds.
+Same for small gassy worlds (like Pluto).
+
 
 \subsection{Chemical Composition}
-\label{\detokenize{quantities/material/chemical_composition:chemical-composition}}\label{\detokenize{quantities/material/chemical_composition::doc}}
+\label{\detokenize{quantities/material/chemical_composition:chemical-composition}}\label{\detokenize{quantities/material/chemical_composition::doc}}\phantomsection\label{\detokenize{quantities/material/chemical_composition:id1}}
+\sphinxAtStartPar
+Chemical composition is the ratio of different chemical compounds that constitute a substance.
+There are 3 main substances that are portraited in this package.
+That does not mean that there can not be other, it is just what the planetary {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{radius}}}} models represent.
+
+\sphinxAtStartPar
+The main chemical compounds are iron (Fe), rock (MgSiO3), water (H2O),
+helium (He), Hydrogen (H2) and methane (CH4).
+
 
 \section{Geometric}
 \label{\detokenize{quantities/geometric/geometric:geometric}}\label{\detokenize{quantities/geometric/geometric::doc}}
 
 \subsection{Radius}
-\label{\detokenize{quantities/geometric/radius:radius}}\label{\detokenize{quantities/geometric/radius::doc}}
+\label{\detokenize{quantities/geometric/radius:radius}}\label{\detokenize{quantities/geometric/radius::doc}}\phantomsection\label{\detokenize{quantities/geometric/radius:id1}}
 \sphinxAtStartPar
 Radius is the variable that defines the size of celestial objects.
-The suggested radius is determined by the \DUrole{xref,std,std-doc}{mass} of the object via various radius models.
+The radius determines the {\hyperref[\detokenize{quantities/geometric/circumference:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{circumference}}}}, {\hyperref[\detokenize{quantities/geometric/surface_area:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{surface area}}}}, {\hyperref[\detokenize{quantities/geometric/volume:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{volume}}}} and {\hyperref[\detokenize{quantities/material/density:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{density}}}}.
+among other characteristics.
+The suggested radius is determined by the {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} of the
+object via various radius models. Use values \(\pm 8\) \% around
+the suggested value.
 
 \sphinxAtStartPar
 Models used:
@@ -164,40 +199,86 @@ For hot gas\sphinxhyphen{}giant models, see \sphinxurl{https://arxiv.org/pdf/180
 
 \item {} 
 \sphinxAtStartPar
-For stellar models, see \sphinxurl{https://academic.oup.com/mnras/article/479/4/5491/5056185}.
+For star models, see \sphinxurl{https://academic.oup.com/mnras/article/479/4/5491/5056185}.
 
 \end{enumerate}
 
 
 \subsection{Circumference}
-\label{\detokenize{quantities/geometric/circumference:circumference}}\label{\detokenize{quantities/geometric/circumference::doc}}
+\label{\detokenize{quantities/geometric/circumference:circumference}}\label{\detokenize{quantities/geometric/circumference::doc}}\phantomsection\label{\detokenize{quantities/geometric/circumference:id1}}
+\sphinxAtStartPar
+The circumference is determined by the radius \(C = 2 \pi r\).
+
 
 \subsection{Surface Area}
 \label{\detokenize{quantities/geometric/surface_area:surface-area}}\label{\detokenize{quantities/geometric/surface_area::doc}}\phantomsection\label{\detokenize{quantities/geometric/surface_area:id1}}
+\sphinxAtStartPar
+The surface area is determined by the radius \(A = 4 \pi r^2\).
+
 
 \subsection{Volume}
-\label{\detokenize{quantities/geometric/volume:volume}}\label{\detokenize{quantities/geometric/volume::doc}}
+\label{\detokenize{quantities/geometric/volume:volume}}\label{\detokenize{quantities/geometric/volume::doc}}\phantomsection\label{\detokenize{quantities/geometric/volume:id1}}
+\sphinxAtStartPar
+The volume is determined by the radius \(V = \frac{4\pi}{3}r^3\).
+
 
 \section{Rotational}
 \label{\detokenize{quantities/rotational/rotational:rotational}}\label{\detokenize{quantities/rotational/rotational::doc}}
 
 \subsection{Spin Period}
-\label{\detokenize{quantities/rotational/spin_period:spin-period}}\label{\detokenize{quantities/rotational/spin_period::doc}}
+\label{\detokenize{quantities/rotational/spin_period:spin-period}}\label{\detokenize{quantities/rotational/spin_period::doc}}\phantomsection\label{\detokenize{quantities/rotational/spin_period:id1}}
+\sphinxAtStartPar
+The spin period is the amount of time it takes for a celestial body to
+rotate around itself compared to the distant stars.
+
+\sphinxAtStartPar
+Planetary spin period is determined by the {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} and {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{radius}}}} of the celestial body.
+The more massive the body, the faster it rotates.
+If there are satellites around the planet large enough
+(e.g. earth\sphinxhyphen{}moon), there is a substantial transfer of
+angular momentum between the two bodies, making the planet
+slow down (earth spin period would have been around 16 hr).
+
 
 \subsection{Day Period}
-\label{\detokenize{quantities/rotational/day_period:day-period}}\label{\detokenize{quantities/rotational/day_period::doc}}
+\label{\detokenize{quantities/rotational/day_period:day-period}}\label{\detokenize{quantities/rotational/day_period::doc}}\phantomsection\label{\detokenize{quantities/rotational/day_period:id1}}
+\sphinxAtStartPar
+The day period of a child body is determined by the {\hyperref[\detokenize{quantities/rotational/spin_period:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{spin period}}}}
+and the {\hyperref[\detokenize{quantities/orbital/orbital_period:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{orbital period}}}} around the parent body.
+
 
 \subsection{Axial Tilt}
-\label{\detokenize{quantities/rotational/axial_tilt:axial-tilt}}\label{\detokenize{quantities/rotational/axial_tilt::doc}}
+\label{\detokenize{quantities/rotational/axial_tilt:axial-tilt}}\label{\detokenize{quantities/rotational/axial_tilt::doc}}\phantomsection\label{\detokenize{quantities/rotational/axial_tilt:id1}}
+\sphinxAtStartPar
+The axial tilt of a child body, also known as obliquity, is
+the angle between an object’s rotational axis and its orbital axis.
+
+\sphinxAtStartPar
+As of now, it is cosmetic and does not determine any other characteristics.
+
 
 \section{Life}
 \label{\detokenize{quantities/life/life:life}}\label{\detokenize{quantities/life/life::doc}}
 
 \subsection{Age}
-\label{\detokenize{quantities/life/age:age}}\label{\detokenize{quantities/life/age::doc}}
+\label{\detokenize{quantities/life/age:age}}\label{\detokenize{quantities/life/age::doc}}\phantomsection\label{\detokenize{quantities/life/age:id1}}
+\sphinxAtStartPar
+The suggested age of a star is set to be half of its {\hyperref[\detokenize{quantities/life/lifetime:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{lifetime}}}}.
+The suggested age of any other object is determined by it’s
+parent age.
+
 
 \subsection{Lifetime}
-\label{\detokenize{quantities/life/lifetime:lifetime}}\label{\detokenize{quantities/life/lifetime::doc}}
+\label{\detokenize{quantities/life/lifetime:lifetime}}\label{\detokenize{quantities/life/lifetime::doc}}\phantomsection\label{\detokenize{quantities/life/lifetime:id1}}
+\sphinxAtStartPar
+The lifetime of stars is determined by its mass and its luminosity (\(T=\frac{M}{L}\)).
+
+\sphinxAtStartPar
+The lifetime of each other body is determined by the lifetime of the parent
+minus a hundred million years, which is roughly the amount of time it takes
+for planets to form around stars (or satellites to be captured). It is by
+no means binding.
+
 
 \section{Surface}
 \label{\detokenize{quantities/surface/surface:surface}}\label{\detokenize{quantities/surface/surface::doc}}
@@ -224,7 +305,7 @@ For stellar models, see \sphinxurl{https://academic.oup.com/mnras/article/479/4/
 \label{\detokenize{quantities/surface/emission/temperature:temperature}}\label{\detokenize{quantities/surface/emission/temperature::doc}}
 
 \subsubsection{Luminosity}
-\label{\detokenize{quantities/surface/emission/luminosity:luminosity}}\label{\detokenize{quantities/surface/emission/luminosity::doc}}
+\label{\detokenize{quantities/surface/emission/luminosity:luminosity}}\label{\detokenize{quantities/surface/emission/luminosity::doc}}\phantomsection\label{\detokenize{quantities/surface/emission/luminosity:id1}}
 
 \subsubsection{Peak Wavelength}
 \label{\detokenize{quantities/surface/emission/peak_wavelength:peak-wavelength}}\label{\detokenize{quantities/surface/emission/peak_wavelength::doc}}
@@ -263,70 +344,201 @@ For stellar models, see \sphinxurl{https://academic.oup.com/mnras/article/479/4/
 \label{\detokenize{quantities/orbital/orbital:orbital}}\label{\detokenize{quantities/orbital/orbital::doc}}
 
 \subsection{Eccentricity}
-\label{\detokenize{quantities/orbital/eccentricity:eccentricity}}\label{\detokenize{quantities/orbital/eccentricity::doc}}
+\label{\detokenize{quantities/orbital/eccentricity:eccentricity}}\label{\detokenize{quantities/orbital/eccentricity::doc}}\phantomsection\label{\detokenize{quantities/orbital/eccentricity:id1}}
+\sphinxAtStartPar
+Eccentricity \(e\) determines how elliptic the orbit of a child around a parent body is.
+\(e = 0\) means that the orbit is circular, and \(e = 1\) means
+that the orbit resembles a line (not a stable orbit).
+
 
 \subsection{Semi\sphinxhyphen{}Major Axis}
-\label{\detokenize{quantities/orbital/semi_major_axis:semi-major-axis}}\label{\detokenize{quantities/orbital/semi_major_axis::doc}}
+\label{\detokenize{quantities/orbital/semi_major_axis:semi-major-axis}}\label{\detokenize{quantities/orbital/semi_major_axis::doc}}\phantomsection\label{\detokenize{quantities/orbital/semi_major_axis:id1}}
+\sphinxAtStartPar
+Semi\sphinxhyphen{}major axis \(a\) is the mean distance between a child and a parent body.
+
 
 \subsection{Semi\sphinxhyphen{}Minor Axis}
-\label{\detokenize{quantities/orbital/semi_minor_axis:semi-minor-axis}}\label{\detokenize{quantities/orbital/semi_minor_axis::doc}}
+\label{\detokenize{quantities/orbital/semi_minor_axis:semi-minor-axis}}\label{\detokenize{quantities/orbital/semi_minor_axis::doc}}\phantomsection\label{\detokenize{quantities/orbital/semi_minor_axis:id1}}
+\sphinxAtStartPar
+Semi\sphinxhyphen{}minor axis \(b\) is determined by the {\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{semi\sphinxhyphen{}major axis}}}} \(a\) and the
+{\hyperref[\detokenize{quantities/orbital/eccentricity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{eccentricity}}}} \(e\): \(b = a \sqrt{1 - e^2}\).
+
 
 \subsection{Apoapsis}
-\label{\detokenize{quantities/orbital/apoapsis:apoapsis}}\label{\detokenize{quantities/orbital/apoapsis::doc}}
+\label{\detokenize{quantities/orbital/apoapsis:apoapsis}}\label{\detokenize{quantities/orbital/apoapsis::doc}}\phantomsection\label{\detokenize{quantities/orbital/apoapsis:id1}}
+\sphinxAtStartPar
+Apoapsis (\(a (1 + e)\)) is the furthest distance between a child and a parent body.
+It is determined by the {\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{semi\sphinxhyphen{}major axis}}}} \(a\) and the
+{\hyperref[\detokenize{quantities/orbital/eccentricity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{eccentricity}}}} \(e\).
+
 
 \subsection{Periapsis}
-\label{\detokenize{quantities/orbital/periapsis:periapsis}}\label{\detokenize{quantities/orbital/periapsis::doc}}
+\label{\detokenize{quantities/orbital/periapsis:periapsis}}\label{\detokenize{quantities/orbital/periapsis::doc}}\phantomsection\label{\detokenize{quantities/orbital/periapsis:id1}}
+\sphinxAtStartPar
+Periapsis (\(a (1 - e)\)) is the nearest distance between a child and a parent body.
+It is determined by the {\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{semi\sphinxhyphen{}major axis}}}} \(a\) and the
+{\hyperref[\detokenize{quantities/orbital/eccentricity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{eccentricity}}}} \(e\).
+
 
 \subsection{Lagrange Position}
-\label{\detokenize{quantities/orbital/lagrange_position:lagrange-position}}\label{\detokenize{quantities/orbital/lagrange_position::doc}}
+\label{\detokenize{quantities/orbital/lagrange_position:lagrange-position}}\label{\detokenize{quantities/orbital/lagrange_position::doc}}\phantomsection\label{\detokenize{quantities/orbital/lagrange_position:id1}}
+\sphinxAtStartPar
+Lagrange positions (L\#) are (semi\sphinxhyphen{})stable positions between two orbiting objects.
+Trojans are objects in the L4 and L5 positions, in front and behind the child
+object (denoted as +1 and \sphinxhyphen{}1 respectively) that is orbiting a parent object.
+
 
 \subsection{Contact}
-\label{\detokenize{quantities/orbital/contact:contact}}\label{\detokenize{quantities/orbital/contact::doc}}
+\label{\detokenize{quantities/orbital/contact:contact}}\label{\detokenize{quantities/orbital/contact::doc}}\phantomsection\label{\detokenize{quantities/orbital/contact:id1}}
+\sphinxAtStartPar
+In this context, contact between two binary stars happens if the radius of at least
+one of the two stars resides outside the roche lobe while the stars are in {\hyperref[\detokenize{quantities/orbital/periapsis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{periapsis}}}}.
+
 
 \subsection{Roche Lobe}
-\label{\detokenize{quantities/orbital/roche_lobe:roche-lobe}}\label{\detokenize{quantities/orbital/roche_lobe::doc}}
+\label{\detokenize{quantities/orbital/roche_lobe:roche-lobe}}\label{\detokenize{quantities/orbital/roche_lobe::doc}}\phantomsection\label{\detokenize{quantities/orbital/roche_lobe:id1}}
+\sphinxAtStartPar
+The Roche lobe is the region around a star in a binary system within which orbiting material is gravitationally bound
+to that star.
+
 
 \subsection{Orbital Period}
-\label{\detokenize{quantities/orbital/orbital_period:orbital-period}}\label{\detokenize{quantities/orbital/orbital_period::doc}}
+\label{\detokenize{quantities/orbital/orbital_period:orbital-period}}\label{\detokenize{quantities/orbital/orbital_period::doc}}\phantomsection\label{\detokenize{quantities/orbital/orbital_period:id1}}
+\sphinxAtStartPar
+Orbital period (\(\sqrt{\frac{a^3}{M_{tot}}}\)) is the time it takes for a child body to orbit around their parent.
+It is given by the {\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{semi\sphinxhyphen{}major axis}}}} \(a\), and the total mass \(M_{tot}\) of child
+and parent objects.
+
 
 \subsection{Orbital Velocity}
-\label{\detokenize{quantities/orbital/orbital_velocity:orbital-velocity}}\label{\detokenize{quantities/orbital/orbital_velocity::doc}}
+\label{\detokenize{quantities/orbital/orbital_velocity:orbital-velocity}}\label{\detokenize{quantities/orbital/orbital_velocity::doc}}\phantomsection\label{\detokenize{quantities/orbital/orbital_velocity:id1}}
+\sphinxAtStartPar
+Orbital velocity (\(\sqrt{\frac{M_{tot}}{a}}\)) is the mean speed at which the child body
+travels around the parent body. It is given by the {\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{semi\sphinxhyphen{}major axis}}}} \(a\), and the
+total mass \(M_{tot}\) of child and parent objects.
+
 
 \subsection{Orbit Type}
-\label{\detokenize{quantities/orbital/orbit_type:orbit-type}}\label{\detokenize{quantities/orbital/orbit_type::doc}}
+\label{\detokenize{quantities/orbital/orbit_type:orbit-type}}\label{\detokenize{quantities/orbital/orbit_type::doc}}\phantomsection\label{\detokenize{quantities/orbital/orbit_type:id1}}
+\sphinxAtStartPar
+Orbital type of a child object can be either prograde or retrograde \sphinxhyphen{} orbiting
+along or against the rotation of the parent.
+
 
 \subsection{Orbit Type Factor}
-\label{\detokenize{quantities/orbital/orbit_type_factor:orbit-type-factor}}\label{\detokenize{quantities/orbital/orbit_type_factor::doc}}
+\label{\detokenize{quantities/orbital/orbit_type_factor:orbit-type-factor}}\label{\detokenize{quantities/orbital/orbit_type_factor::doc}}\phantomsection\label{\detokenize{quantities/orbital/orbit_type_factor:id1}}
+\sphinxAtStartPar
+Orbit type factor determines the {\hyperref[\detokenize{quantities/orbital/semi_major_axis_maximum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{semi\sphinxhyphen{}major axis maximum limit}}}}.
+It depends on the {\hyperref[\detokenize{quantities/orbital/orbit_type:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{orbit type}}}} and is determined by the parent {\hyperref[\detokenize{quantities/orbital/eccentricity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{eccentricity}}}} \(e_p\)
+and the child {\hyperref[\detokenize{quantities/orbital/eccentricity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{eccentricity}}}} \(e_c\).
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+For a prograde orbit, it is given by \(0.4895 (1 - 1.0305 e_p - 0.2738 e_c)\).
+
+\item {} 
+\sphinxAtStartPar
+For a retrograde orbit, it is given by \(0.9309 (1 - 1.0764 e_p - 0.9812 e_c)\).
+
+\end{enumerate}
+
 
 \subsection{Orbital Stability}
-\label{\detokenize{quantities/orbital/orbital_stability:orbital-stability}}\label{\detokenize{quantities/orbital/orbital_stability::doc}}
+\label{\detokenize{quantities/orbital/orbital_stability:orbital-stability}}\label{\detokenize{quantities/orbital/orbital_stability::doc}}\phantomsection\label{\detokenize{quantities/orbital/orbital_stability:id1}}
+\sphinxAtStartPar
+Orbital stability demonstrates if the orbit of the child object around the parent object
+does not exceed any limits. More specifically, for a stable orbit we must have:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+{\hyperref[\detokenize{quantities/orbital/periapsis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{Periapsis}}}} \textgreater{} {\hyperref[\detokenize{quantities/children_orbit_limits/roche_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{roche limit}}}}.
+
+\item {} 
+\sphinxAtStartPar
+{\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{Semi\sphinxhyphen{}major axis}}}} \textgreater{} {\hyperref[\detokenize{quantities/children_orbit_limits/p_type_critical_orbit:p-type-critical-orbit}]{\sphinxcrossref{\DUrole{std,std-ref}{p\sphinxhyphen{}type critical orbit}}}}.
+
+\item {} 
+\sphinxAtStartPar
+{\hyperref[\detokenize{quantities/orbital/apoapsis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{Apoapsis}}}} \textless{} {\hyperref[\detokenize{quantities/orbital/semi_major_axis_maximum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{semi\sphinxhyphen{}major axis maximum limit}}}}.
+
+\item {} 
+\sphinxAtStartPar
+Optional: {\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{Semi\sphinxhyphen{}major axis}}}} \textgreater{} {\hyperref[\detokenize{quantities/children_orbit_limits/inner_orbit_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{parent inner orbit limit}}}}.
+
+\item {} 
+\sphinxAtStartPar
+For rock worlds: {\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{Semi\sphinxhyphen{}major axis}}}} \textgreater{} {\hyperref[\detokenize{quantities/children_orbit_limits/outer_rock_formation_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{parent outer rock formation limit}}}}.
+
+\end{enumerate}
+
 
 \subsection{Inclination}
-\label{\detokenize{quantities/orbital/inclination:inclination}}\label{\detokenize{quantities/orbital/inclination::doc}}
+\label{\detokenize{quantities/orbital/inclination:inclination}}\label{\detokenize{quantities/orbital/inclination::doc}}\phantomsection\label{\detokenize{quantities/orbital/inclination:id1}}
+\sphinxAtStartPar
+Orbital inclination is the tilt of a child object’s orbit around a celestial body.
+It varies between 0 and 180. Between 0 and 90, the orbit is prograde.
+Between 90 and 180, the orbit is retrograde.
+
+\sphinxAtStartPar
+However, as of now, it is cosmetic and does not determine any other characteristics,
+including the {\hyperref[\detokenize{quantities/orbital/orbit_type:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{orbit type}}}}.
+
 
 \subsection{Argument of Periapsis}
-\label{\detokenize{quantities/orbital/argument_of_periapsis:argument-of-periapsis}}\label{\detokenize{quantities/orbital/argument_of_periapsis::doc}}
+\label{\detokenize{quantities/orbital/argument_of_periapsis:argument-of-periapsis}}\label{\detokenize{quantities/orbital/argument_of_periapsis::doc}}\phantomsection\label{\detokenize{quantities/orbital/argument_of_periapsis:id1}}
+\sphinxAtStartPar
+Check out \sphinxurl{https://en.wikipedia.org/wiki/Argument\_of\_periapsis}.
+
+\sphinxAtStartPar
+The argument of periapsis, as of now, it is cosmetic and does not determine any other characteristics.
+
 
 \subsection{Longitude of the Ascending Node}
-\label{\detokenize{quantities/orbital/longitude_of_the_ascending_node:longitude-of-the-ascending-node}}\label{\detokenize{quantities/orbital/longitude_of_the_ascending_node::doc}}
+\label{\detokenize{quantities/orbital/longitude_of_the_ascending_node:longitude-of-the-ascending-node}}\label{\detokenize{quantities/orbital/longitude_of_the_ascending_node::doc}}\phantomsection\label{\detokenize{quantities/orbital/longitude_of_the_ascending_node:id1}}
+\sphinxAtStartPar
+Check out \sphinxurl{https://en.wikipedia.org/wiki/Longitude\_of\_the\_ascending\_node}.
+
+\sphinxAtStartPar
+The longitude of the ascending node, as of now, it is cosmetic and does
+not determine any other characteristics.
+
+
+\subsection{Semi\sphinxhyphen{}Major Axis Minimum Limit}
+\label{\detokenize{quantities/orbital/semi_major_axis_minimum_limit:semi-major-axis-minimum-limit}}\label{\detokenize{quantities/orbital/semi_major_axis_minimum_limit::doc}}\phantomsection\label{\detokenize{quantities/orbital/semi_major_axis_minimum_limit:id1}}
+\sphinxAtStartPar
+The semi\sphinxhyphen{}major axis minimum limit is the {\hyperref[\detokenize{quantities/children_orbit_limits/roche_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{roche limit}}}} of the parent for the specific child
+{\hyperref[\detokenize{quantities/material/density:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{density}}}}, or the {\hyperref[\detokenize{quantities/children_orbit_limits/p_type_critical_orbit:p-type-critical-orbit}]{\sphinxcrossref{\DUrole{std,std-ref}{p\sphinxhyphen{}type critical limit}}}} in binary systems.
+
+
+\subsection{Semi\sphinxhyphen{}Major Axis Maximum Limit}
+\label{\detokenize{quantities/orbital/semi_major_axis_maximum_limit:semi-major-axis-maximum-limit}}\label{\detokenize{quantities/orbital/semi_major_axis_maximum_limit::doc}}\phantomsection\label{\detokenize{quantities/orbital/semi_major_axis_maximum_limit:id1}}
+\sphinxAtStartPar
+The semi\sphinxhyphen{}major axis maximum limit is the {\hyperref[\detokenize{quantities/children_orbit_limits/hill_sphere:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{hill\_sphere}}}} multiplied by the
+{\hyperref[\detokenize{quantities/orbital/orbit_type_factor:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{orbit type factor}}}}.
+
 
 \section{Children Orbit Limits}
-\label{\detokenize{quantities/children_orbit_limits/children_orbit_limits:children-orbit-limits}}\label{\detokenize{quantities/children_orbit_limits/children_orbit_limits::doc}}
+\label{\detokenize{quantities/children_orbit_limits/children_orbit_limits:children-orbit-limits}}\label{\detokenize{quantities/children_orbit_limits/children_orbit_limits::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/children_orbit_limits:id1}}
 
 \subsection{Tidal Locking Radius}
 \label{\detokenize{quantities/children_orbit_limits/tidal_locking_radius:tidal-locking-radius}}\label{\detokenize{quantities/children_orbit_limits/tidal_locking_radius::doc}}
+
+\subsection{Roche Limit}
+\label{\detokenize{quantities/children_orbit_limits/roche_limit:roche-limit}}\label{\detokenize{quantities/children_orbit_limits/roche_limit::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/roche_limit:id1}}
 
 \subsection{Dense Roche Limit}
 \label{\detokenize{quantities/children_orbit_limits/dense_roche_limit:dense-roche-limit}}\label{\detokenize{quantities/children_orbit_limits/dense_roche_limit::doc}}
 
 \subsection{P\sphinxhyphen{}type binary Critical Orbit}
-\label{\detokenize{quantities/children_orbit_limits/p_type_critical_orbit:p-type-binary-critical-orbit}}\label{\detokenize{quantities/children_orbit_limits/p_type_critical_orbit::doc}}
+\label{\detokenize{quantities/children_orbit_limits/p_type_critical_orbit:p-type-binary-critical-orbit}}\label{\detokenize{quantities/children_orbit_limits/p_type_critical_orbit::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/p_type_critical_orbit:p-type-critical-orbit}}
 
 \subsection{Inner Orbit Limit}
-\label{\detokenize{quantities/children_orbit_limits/inner_orbit_limit:inner-orbit-limit}}\label{\detokenize{quantities/children_orbit_limits/inner_orbit_limit::doc}}
+\label{\detokenize{quantities/children_orbit_limits/inner_orbit_limit:inner-orbit-limit}}\label{\detokenize{quantities/children_orbit_limits/inner_orbit_limit::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/inner_orbit_limit:id1}}
 
 \subsection{Hill Sphere}
-\label{\detokenize{quantities/children_orbit_limits/hill_sphere:hill-sphere}}\label{\detokenize{quantities/children_orbit_limits/hill_sphere::doc}}
+\label{\detokenize{quantities/children_orbit_limits/hill_sphere:hill-sphere}}\label{\detokenize{quantities/children_orbit_limits/hill_sphere::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/hill_sphere:id1}}
 \sphinxAtStartPar
 hill sphere or roche lobe
 
@@ -341,7 +553,7 @@ hill sphere or roche lobe
 \label{\detokenize{quantities/children_orbit_limits/inner_rock_formation_limit:inner-rock-formation-limit}}\label{\detokenize{quantities/children_orbit_limits/inner_rock_formation_limit::doc}}
 
 \subsection{Outer Rock Formation Limit}
-\label{\detokenize{quantities/children_orbit_limits/outer_rock_formation_limit:outer-rock-formation-limit}}\label{\detokenize{quantities/children_orbit_limits/outer_rock_formation_limit::doc}}
+\label{\detokenize{quantities/children_orbit_limits/outer_rock_formation_limit:outer-rock-formation-limit}}\label{\detokenize{quantities/children_orbit_limits/outer_rock_formation_limit::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/outer_rock_formation_limit:id1}}
 
 \subsection{Inner Water Frost Limit}
 \label{\detokenize{quantities/children_orbit_limits/inner_water_frost_limit:inner-water-frost-limit}}\label{\detokenize{quantities/children_orbit_limits/inner_water_frost_limit::doc}}

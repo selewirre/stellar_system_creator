@@ -15,6 +15,7 @@
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -53,6 +54,7 @@
 <li class="toctree-l3"><a class="reference internal" href="p_type_critical_orbit.html">P-type binary Critical Orbit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="inner_orbit_limit.html">Inner Orbit Limit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="hill_sphere.html">Hill Sphere</a></li>
+<li class="toctree-l3"><a class="reference internal" href="roche_lobe.html">Roche Lobe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="s_type_critical_orbit.html">S-type binary Critical Orbit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="outer_orbit_limit.html">Outer Orbit Limit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="inner_rock_formation_limit.html">Inner Rock Formation Limit</a></li>
@@ -96,7 +98,18 @@
              
   <section id="outer-rock-formation-limit">
 <h1>Outer Rock Formation Limit<a class="headerlink" href="#outer-rock-formation-limit" title="Permalink to this headline"></a></h1>
-<span class="target" id="id1"></span></section>
+<p id="id1">We use <a class="reference internal" href="../insolation_models/selsis/selsis.html#selsis-insolation-model"><span class="std std-ref">Selsis insolation model</span></a> since it allows for easy, Solar system comparisons.
+Rock line is the distance at which iron and rock can form clusters, planetesimals and eventually planets.
+Since the rock line is determined by when rock and iron are more or less solid, I decided to use
+the melting point of a slow rotating (<a class="reference internal" href="tidal_locking_radius.html#id1"><span class="std std-ref">tidally locked</span></a>) rock ball
+(<a class="reference internal" href="../surface/emission/heat_distribution.html#id1"><span class="std std-ref">heating distribution</span></a> <span class="math notranslate nohighlight">\(\beta\)</span> 0.5, <a class="reference internal" href="../surface/emission/albedo.html#id1"><span class="std std-ref">albedo</span></a> <span class="math notranslate nohighlight">\(A\)</span> 0.85)
+&#64; <span class="math notranslate nohighlight">\(T = 600\)</span> K to find the equivalent solar system distance
+and multiply by 5/3.1 (similar to the <a class="reference internal" href="outer_water_frost_limit.html#id1"><span class="std std-ref">early solar system water frost line</span></a>)
+(lowest temperature from <a class="reference external" href="http://hyperphysics.phy-astr.gsu.edu/hbase/Geophys/meltrock.html">http://hyperphysics.phy-astr.gsu.edu/hbase/Geophys/meltrock.html</a>)
+for the optimistic outer rock line limit, giving a value of <span class="math notranslate nohighlight">\(\approx 0.281\)</span> A.U for our sun.</p>
+<p>Distance estimation: <span class="math notranslate nohighlight">\(\frac{5}{3.1}\left(\frac{T}{T_{\rm eff}}\right) ^ 2 \sqrt{\frac{1-A}{\beta}}\)</span>,
+with <span class="math notranslate nohighlight">\(T_{\rm eff} = 278.5\)</span> K (<a class="reference external" href="https://arxiv.org/pdf/1702.07314.pdf">https://arxiv.org/pdf/1702.07314.pdf</a> eq. 6 with <span class="math notranslate nohighlight">\(L = 1\)</span>).</p>
+</section>
 
 
            </div>

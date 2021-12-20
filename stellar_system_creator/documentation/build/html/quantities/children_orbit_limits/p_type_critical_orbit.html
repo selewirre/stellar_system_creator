@@ -15,6 +15,7 @@
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -53,6 +54,7 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">P-type binary Critical Orbit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="inner_orbit_limit.html">Inner Orbit Limit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="hill_sphere.html">Hill Sphere</a></li>
+<li class="toctree-l3"><a class="reference internal" href="roche_lobe.html">Roche Lobe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="s_type_critical_orbit.html">S-type binary Critical Orbit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="outer_orbit_limit.html">Outer Orbit Limit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="inner_rock_formation_limit.html">Inner Rock Formation Limit</a></li>
@@ -96,7 +98,14 @@
              
   <section id="p-type-binary-critical-orbit">
 <h1>P-type binary Critical Orbit<a class="headerlink" href="#p-type-binary-critical-orbit" title="Permalink to this headline"></a></h1>
-<span class="target" id="p-type-critical-orbit"></span></section>
+<p id="p-type-critical-orbit">In close binary systems (p-type binaries) of two stars with <a class="reference internal" href="../material/mass.html#id1"><span class="std std-ref">masses</span></a>
+<span class="math notranslate nohighlight">\(m_1\)</span> and <span class="math notranslate nohighlight">\(m_2\)</span> with <span class="math notranslate nohighlight">\(m_1 &gt; m_2\)</span>, <a class="reference internal" href="../orbital/semi_major_axis.html#id1"><span class="std std-ref">mean distance</span></a> <span class="math notranslate nohighlight">\(d\)</span>
+and <a class="reference internal" href="../orbital/eccentricity.html#id1"><span class="std std-ref">eccentricity</span></a> <span class="math notranslate nohighlight">\(e\)</span>, the critical orbit limit
+is the <em>minimum</em> distance at which an orbit stays stable.</p>
+<p>It is estimated by: <span class="math notranslate nohighlight">\(d(1.6 + 5.1 e - 2.22 e^2 + 4.12 \mu - 5.09 \mu^2 + 4.61 e^2  \mu^2 - 4.27 e \mu)\)</span>,
+where <span class="math notranslate nohighlight">\(\mu = \frac{m_2}{m_1 + m_2}\)</span>.</p>
+<p>More info on: <a class="reference external" href="https://arxiv.org/pdf/2108.07815.pdf">https://arxiv.org/pdf/2108.07815.pdf</a> (eq. 3).</p>
+</section>
 
 
            </div>
