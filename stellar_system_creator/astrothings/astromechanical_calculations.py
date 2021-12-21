@@ -558,18 +558,21 @@ def calculate_tidal_locking_radius(parent_mass: Q_, age: Q_) -> Q_:
     return locking_radius.to('au')
 
 
-def calculate_tide_height(companion_mass: Q_, target_mass: Q_, target_radius: Q_, distance: Q_) -> Q_:
+def calculate_tide_height(companion_mass: Q_, target_mass: Q_, target_radius: Q_, distance: Q_,
+                          eccentricity: float) -> Q_:
     """
     When a celestial object rotates around another, they both exert forces on each other. When there is liquid mass
-    on top of solid, the liquid rise and fall is give from equation 20 of reference.
+    on top of solid, the liquid rise and fall is give from equation 20 of reference (modified to add eccentricity).
 
     More info on: https://www.cambridge.org/resources/0521846560/7708_Tidal%20distortion.pdf
     """
-    tide_height = 3 * target_radius ** 4 / distance ** 3 * companion_mass / target_mass
+    periapsis = distance * (1 - eccentricity)
+    base_height = target_radius ** 4 / periapsis ** 3 * companion_mass / target_mass / 2
+    tide_height = 3 * base_height
     return tide_height.to('meters')
 
 
-def     calculate_angular_diameter(target_radius: Q_, distance: Q_) -> Q_:
+def calculate_angular_diameter(target_radius: Q_, distance: Q_) -> Q_:
     """
     Angular diameter is the size of a celestial body in the sky. The angular diameter of the sun and the moon are
     similar on earth, and approximatelly ~ 0.5 degrees

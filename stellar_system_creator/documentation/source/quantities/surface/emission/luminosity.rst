@@ -9,7 +9,8 @@ It is determined by the :ref:`mass <mass>` of the object, and the
 of radiation.
 
 For star of :ref:`mass <mass>` :math:`M` in the main sequence, the luminosity
-is given by a mass-relation relationship as in https://en.wikipedia.org/wiki/Mass-luminosity_relation.
+is given by various mass-luminosity relationships as in https://en.wikipedia.org/wiki/Mass-luminosity_relation.
+Use values :math:`\pm 8` % around the suggested value.
 
 For a planet of :ref:`surface temperature <temperature>` :math:`T`,
 :ref:`temperature-based incident flux <incident_flux>` :math:`S_T`,

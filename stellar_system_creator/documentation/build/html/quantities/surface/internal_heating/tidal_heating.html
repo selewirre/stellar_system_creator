@@ -15,6 +15,7 @@
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -42,6 +43,8 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../../quantities.html">Quantities</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../material/material.html">Material</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../geometric/geometric.html">Geometric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../rotational/rotational.html">Rotational</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../life/life.html">Life</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../surface.html">Surface</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../emission/emission.html">Emission</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../gravity/gravity.html">Gravity</a></li>
@@ -53,8 +56,13 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../induced_tide.html">Induced Tide</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../angular_diameter.html">Angular Diameter</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../orbital/orbital.html">Orbital</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../children_orbit_limits/children_orbit_limits.html">Children Orbit Limits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../insolation_models/insolation_models.html">Insolation Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../habitability/habitability.html">Habitability</a></li>
 </ul>
 </li>
 </ul>
@@ -88,6 +96,18 @@
              
   <section id="tidal-heating">
 <h1>Tidal Heating<a class="headerlink" href="#tidal-heating" title="Permalink to this headline"></a></h1>
+<p id="id1">When an child object of <a class="reference internal" href="../../geometric/radius.html#id1"><span class="std std-ref">radius</span></a> <span class="math notranslate nohighlight">\(r\)</span> rotates around a parent object
+of <a class="reference internal" href="../../material/mass.html#id1"><span class="std std-ref">mass</span></a> <span class="math notranslate nohighlight">\(M\)</span> in an non-circular (eccentric) orbit, at a
+<a class="reference internal" href="../../orbital/semi_major_axis.html#id1"><span class="std std-ref">mean distance</span></a> <span class="math notranslate nohighlight">\(a\)</span> and <a class="reference internal" href="../../orbital/eccentricity.html#id1"><span class="std std-ref">eccentricity</span></a> <span class="math notranslate nohighlight">\(e\)</span>,
+the shape of the child object can periodically change due to the variation of gravitational pull
+it feels from the parent object (it wobbles). This motion results in internal heating.</p>
+<p>Tidal heating is proportional to: <span class="math notranslate nohighlight">\(Q_{\rm tidal} \propto M^{2.5} r^5 e^2 a^{-7.5}\)</span></p>
+<p>More information on:</p>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="https://academic.oup.com/mnras/article/391/1/237/1121115">https://academic.oup.com/mnras/article/391/1/237/1121115</a></p></li>
+<li><p><a class="reference external" href="https://www.liebertpub.com/doi/10.1089/ast.2015.1325">https://www.liebertpub.com/doi/10.1089/ast.2015.1325</a> Eq.2</p></li>
+<li><p><a class="reference external" href="https://iopscience.iop.org/article/10.1088/0004-637X/789/1/30/pdf">https://iopscience.iop.org/article/10.1088/0004-637X/789/1/30/pdf</a> table 2, pg. 22</p></li>
+</ol>
 </section>
 
 

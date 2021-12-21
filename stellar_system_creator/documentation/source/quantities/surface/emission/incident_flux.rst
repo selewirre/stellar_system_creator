@@ -14,7 +14,7 @@ For a child orbiting at :ref:`mean distance <semi_major_axis>` :math:`a`
 and :ref:`eccentricity <eccentricity>` :math:`e`,
 there are two types of effective distance we care about.
 The first is the one that is related to the average incoming flux and is given by:
-:math:`r_F = a (1 − e^2)^{1/4}`.
+:math:`r_F = a \left(1 - e^2\right)^{1/4}`.
 
 The second is the one that is related to the average surface temperature and is given by:
 :math:`r_T \approx a (1 + \frac{1}{8} e^2 + \frac{21}{512} e^4)`.

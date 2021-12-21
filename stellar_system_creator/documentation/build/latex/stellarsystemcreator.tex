@@ -60,7 +60,7 @@
 
 
 \title{Stellar System Creator}
-\date{Dec 19, 2021}
+\date{Dec 20, 2021}
 \release{0.0.5.1}
 \author{Selewirre Iskvary}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -109,7 +109,7 @@ Suggested (approximate) masses:
 \sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
 \item {} 
 \sphinxAtStartPar
-For mon\sphinxhyphen{}like satellites, less than 0.05 earth masses (Me)
+For moon\sphinxhyphen{}like satellites, less than 0.05 earth masses (Me)
 
 \item {} 
 \sphinxAtStartPar
@@ -271,7 +271,7 @@ parent age.
 \subsection{Lifetime}
 \label{\detokenize{quantities/life/lifetime:lifetime}}\label{\detokenize{quantities/life/lifetime::doc}}\phantomsection\label{\detokenize{quantities/life/lifetime:id1}}
 \sphinxAtStartPar
-The lifetime of stars is determined by its mass and its luminosity (\(T=\frac{M}{L}\)).
+The lifetime of stars is determined by its mass and its luminosity (\(T=\frac{M}{L} \cdot 10\) billion years).
 
 \sphinxAtStartPar
 The lifetime of each other body is determined by the lifetime of the parent
@@ -287,28 +287,166 @@ no means binding.
 \label{\detokenize{quantities/surface/emission/emission:emission}}\label{\detokenize{quantities/surface/emission/emission::doc}}
 
 \subsubsection{Albedo}
-\label{\detokenize{quantities/surface/emission/albedo:albedo}}\label{\detokenize{quantities/surface/emission/albedo::doc}}
+\label{\detokenize{quantities/surface/emission/albedo:albedo}}\label{\detokenize{quantities/surface/emission/albedo::doc}}\phantomsection\label{\detokenize{quantities/surface/emission/albedo:id1}}
+\sphinxAtStartPar
+(Bond) albedo \(A\) is the measure of reflection of incident radiation of an object.
+A value of \(A = 0\) means the object absorbs all incident radiation.
+A value of \(A = 1\) means the object reflects all incident radiation.
+
+\sphinxAtStartPar
+Albedo values for planets in our solar system:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+Mercury, Mars \textasciitilde{}0.14.
+
+\item {} 
+\sphinxAtStartPar
+Earth, Uranus, Neptune \textasciitilde{} 0.3.
+
+\item {} 
+\sphinxAtStartPar
+Jupiter, Saturn \textasciitilde{} 0.5.
+
+\item {} 
+\sphinxAtStartPar
+Venus \textasciitilde{} 0.75.
+
+\end{enumerate}
+
+\sphinxAtStartPar
+More information and example values on: \sphinxurl{https://en.wikipedia.org/wiki/Albedo}.
+
 
 \subsubsection{Emissivity}
-\label{\detokenize{quantities/surface/emission/emissivity:emissivity}}\label{\detokenize{quantities/surface/emission/emissivity::doc}}
+\label{\detokenize{quantities/surface/emission/emissivity:emissivity}}\label{\detokenize{quantities/surface/emission/emissivity::doc}}\phantomsection\label{\detokenize{quantities/surface/emission/emissivity:id1}}
+\sphinxAtStartPar
+Emissivity \(\epsilon\) is the measure of how much of the overall radiation on the surface of an object
+is emitted outside. Most planets have an emissivity close to 1 (the maximum value).
+Emissivity of 0 (minimum value) means that no radiation is emitted.
+
 
 \subsubsection{Heat Distribution}
-\label{\detokenize{quantities/surface/emission/heat_distribution:heat-distribution}}\label{\detokenize{quantities/surface/emission/heat_distribution::doc}}
+\label{\detokenize{quantities/surface/emission/heat_distribution:heat-distribution}}\label{\detokenize{quantities/surface/emission/heat_distribution::doc}}\phantomsection\label{\detokenize{quantities/surface/emission/heat_distribution:id1}}
+\sphinxAtStartPar
+Heat distribution \(\beta\) is the measure of how well a planet distributes heat,
+and can take values from 0 to 1. It highly depends on the rotation speed of the planet.
+
+\sphinxAtStartPar
+The faster the rotation, the closer the number is to 1 (usually 1 for all non\sphinxhyphen{}tidally locked planets).
+The heat distribution is 0.5 for a planet that is {\hyperref[\detokenize{quantities/children_orbit_limits/tidal_locking_radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{tidally locked}}}} to its parent.
+
 
 \subsubsection{Normalized Greenhouse}
-\label{\detokenize{quantities/surface/emission/normalized_greenhouse:normalized-greenhouse}}\label{\detokenize{quantities/surface/emission/normalized_greenhouse::doc}}
+\label{\detokenize{quantities/surface/emission/normalized_greenhouse:normalized-greenhouse}}\label{\detokenize{quantities/surface/emission/normalized_greenhouse::doc}}\phantomsection\label{\detokenize{quantities/surface/emission/normalized_greenhouse:id1}}
+\sphinxAtStartPar
+The normalized greenhouse effect \(g\) is a measure of the greenhouse effect in the atmosphere of a planet.
+It takes values between 0 and 1. The closer to 1, the higher the temperature of the planet will be.
+When you get close to 1 (e.g. 0.99), adding a new 9 at the end (e.g. 0.999) will dramatically increase the effect.
+
+\sphinxAtStartPar
+The normalized greenhouse effect on earth is approximately 0.34.
+
 
 \subsubsection{Incident Flux}
-\label{\detokenize{quantities/surface/emission/incident_flux:incident-flux}}\label{\detokenize{quantities/surface/emission/incident_flux::doc}}
+\label{\detokenize{quantities/surface/emission/incident_flux:incident-flux}}\label{\detokenize{quantities/surface/emission/incident_flux::doc}}\phantomsection\label{\detokenize{quantities/surface/emission/incident_flux:id1}}
+\sphinxAtStartPar
+Incident flux is the incoming radiation flux from all major sources.
+The total incident flux is added from the parent, the parent of the parent
+etc.
+
+\sphinxAtStartPar
+The incident flux \(S\) from a single source of {\hyperref[\detokenize{quantities/surface/emission/luminosity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{luminosity}}}} \(L\)
+at effective distance :math:’r\_\{rm eff\}’ is given by the equation: \(\frac{L}{r_{\rm eff}^2}\).
+
+\sphinxAtStartPar
+For a child orbiting at {\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mean distance}}}} \(a\)
+and {\hyperref[\detokenize{quantities/orbital/eccentricity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{eccentricity}}}} \(e\),
+there are two types of effective distance we care about.
+The first is the one that is related to the average incoming flux and is given by:
+\(r_F = a \left(1 - e^2\right)^{1/4}\).
+
+\sphinxAtStartPar
+The second is the one that is related to the average surface temperature and is given by:
+\(r_T \approx a (1 + \frac{1}{8} e^2 + \frac{21}{512} e^4)\).
+
+\sphinxAtStartPar
+For more information: \sphinxurl{https://arxiv.org/pdf/1702.07314.pdf} (eq. 3, 17, 19).
+
 
 \subsubsection{Temperature}
-\label{\detokenize{quantities/surface/emission/temperature:temperature}}\label{\detokenize{quantities/surface/emission/temperature::doc}}
+\label{\detokenize{quantities/surface/emission/temperature:temperature}}\label{\detokenize{quantities/surface/emission/temperature::doc}}\phantomsection\label{\detokenize{quantities/surface/emission/temperature:id1}}
+\sphinxAtStartPar
+The surface temperature of an object can be defined differently for objects
+that produce significant radiation (stars) and ones that are mostly heated
+by another stellar body (planets, satellites).
+
+\sphinxAtStartPar
+For a star of {\hyperref[\detokenize{quantities/surface/emission/luminosity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{luminosity}}}} \(L\) in solar luminosities
+and {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{radius}}}} \(R\) in solar radii, the surface temperature
+is given by the ideal body equation: \(\frac{L}{R^2} \cdot 5778\) K.
+
+\sphinxAtStartPar
+For a planet of {\hyperref[\detokenize{quantities/surface/emission/albedo:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{bond albedo}}}} \(A\), {\hyperref[\detokenize{quantities/surface/emission/emissivity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{emissivity}}}} \(\epsilon\),
+{\hyperref[\detokenize{quantities/surface/emission/heat_distribution:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{heat distribution}}}} \(\beta\),
+{\hyperref[\detokenize{quantities/surface/emission/normalized_greenhouse:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{normalized greenhouse}}}} \(g\) and
+{\hyperref[\detokenize{quantities/surface/emission/incident_flux:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{incident flux}}}} \(S\),
+the surface temperature is given by the equation:
+\(\left(\frac{(1 - A) S}{\beta \epsilon (1 - g)}\right)^{1/4} \cdot 278.5\) K.
+
+\sphinxAtStartPar
+For more information of the planetary surface temperature:
+\sphinxurl{https://arxiv.org/pdf/1702.07314.pdf} (eq. 6 and 16)
+
 
 \subsubsection{Luminosity}
 \label{\detokenize{quantities/surface/emission/luminosity:luminosity}}\label{\detokenize{quantities/surface/emission/luminosity::doc}}\phantomsection\label{\detokenize{quantities/surface/emission/luminosity:id1}}
+\sphinxAtStartPar
+Luminosity is the measure of the emitted radiation from an object.
+It is determined by the {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} of the object, and the
+{\hyperref[\detokenize{quantities/surface/emission/incident_flux:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{incident flux}}}} if it is relatively higher than the emitted flux
+of radiation.
+
+\sphinxAtStartPar
+For star of {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} \(M\) in the main sequence, the luminosity
+is given by various mass\sphinxhyphen{}luminosity relationships as in \sphinxurl{https://en.wikipedia.org/wiki/Mass-luminosity\_relation}.
+Use values \(\pm 8\) \% around the suggested value.
+
+\sphinxAtStartPar
+For a planet of {\hyperref[\detokenize{quantities/surface/emission/temperature:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{surface temperature}}}} \(T\),
+{\hyperref[\detokenize{quantities/surface/emission/incident_flux:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{temperature\sphinxhyphen{}based incident flux}}}} \(S_T\),
+{\hyperref[\detokenize{quantities/surface/emission/albedo:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{albedo}}}} \(A\) and {\hyperref[\detokenize{quantities/geometric/surface_area:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{surface area}}}} \(A_S\),
+the luminosity is determined by:
+\(\sigma A_S T ^ 4 + A S_T A_S / 4\),
+where \(\sigma\) is the Stefan\sphinxhyphen{}Boltzmann constant.
+
+\sphinxAtStartPar
+For more information on planetary luminosity:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+\sphinxurl{https://www.acs.org/content/acs/en/climatescience/atmosphericwarming/singlelayermodel.html}
+
+\item {} 
+\sphinxAtStartPar
+\sphinxurl{https://en.wikipedia.org/wiki/Planetary\_equilibrium\_temperature}
+
+\end{enumerate}
+
 
 \subsubsection{Peak Wavelength}
-\label{\detokenize{quantities/surface/emission/peak_wavelength:peak-wavelength}}\label{\detokenize{quantities/surface/emission/peak_wavelength::doc}}
+\label{\detokenize{quantities/surface/emission/peak_wavelength:peak-wavelength}}\label{\detokenize{quantities/surface/emission/peak_wavelength::doc}}\phantomsection\label{\detokenize{quantities/surface/emission/peak_wavelength:id1}}
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/surface/emission/temperature:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{surface temperature}}}} \(T\) of an object,
+if it is an (close to) ideal black body object can be associated with
+a profile of emitted wavelengths, with a single maximum.
+For our sun, the maximum of the emission spectrum is around 500 nm (green).
+
+\sphinxAtStartPar
+In general, the peak wavelength it is given by: \(\lambda = \frac{2.898 \cdot 10 ^ 6 \,{\rm nm\, K}}{T}\).
+
 
 \subsection{Gravity}
 \label{\detokenize{quantities/surface/gravity/gravity:gravity}}\label{\detokenize{quantities/surface/gravity/gravity::doc}}
@@ -349,6 +487,13 @@ no means binding.
 Eccentricity \(e\) determines how elliptic the orbit of a child around a parent body is.
 \(e = 0\) means that the orbit is circular, and \(e = 1\) means
 that the orbit resembles a line (not a stable orbit).
+
+\sphinxAtStartPar
+The closer to \(e = 0\), the more stable the orbit in single star systems.
+
+\sphinxAtStartPar
+For objects orbiting binary systems (P\sphinxhyphen{} or S\sphinxhyphen{}type), the preferred eccentricity
+is not zero.
 
 
 \subsection{Semi\sphinxhyphen{}Major Axis}
@@ -392,7 +537,8 @@ object (denoted as +1 and \sphinxhyphen{}1 respectively) that is orbiting a pare
 \label{\detokenize{quantities/orbital/contact:contact}}\label{\detokenize{quantities/orbital/contact::doc}}\phantomsection\label{\detokenize{quantities/orbital/contact:id1}}
 \sphinxAtStartPar
 In this context, contact between two binary stars happens if the radius of at least
-one of the two stars resides outside the roche lobe while the stars are in {\hyperref[\detokenize{quantities/orbital/periapsis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{periapsis}}}}.
+one of the two stars resides outside the {\hyperref[\detokenize{quantities/children_orbit_limits/roche_lobe:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{Roche lobe}}}} while the stars
+are in {\hyperref[\detokenize{quantities/orbital/periapsis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{periapsis}}}}.
 
 
 \subsection{Roche Lobe}
@@ -523,46 +669,234 @@ The semi\sphinxhyphen{}major axis maximum limit is the {\hyperref[\detokenize{qu
 \label{\detokenize{quantities/children_orbit_limits/children_orbit_limits:children-orbit-limits}}\label{\detokenize{quantities/children_orbit_limits/children_orbit_limits::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/children_orbit_limits:id1}}
 
 \subsection{Tidal Locking Radius}
-\label{\detokenize{quantities/children_orbit_limits/tidal_locking_radius:tidal-locking-radius}}\label{\detokenize{quantities/children_orbit_limits/tidal_locking_radius::doc}}
+\label{\detokenize{quantities/children_orbit_limits/tidal_locking_radius:tidal-locking-radius}}\label{\detokenize{quantities/children_orbit_limits/tidal_locking_radius::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/tidal_locking_radius:id1}}
+\sphinxAtStartPar
+The tidal locking radius is the furthest distance a child would be tidally locked
+to its parent. Tidal locking means that an orbiting object around a parent turns
+around itself at the same amount of time it turns around its parent.
+One side of the planet is always faces the parent, while the other side
+does not.
+
+\sphinxAtStartPar
+The tidal locking radius is larger the more {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{massive}}}} the parent is,
+and the more {\hyperref[\detokenize{quantities/life/age:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{old}}}} it is. Many parameters of the child object
+determine the tidal locking radius, but they are hard to estimate,
+so treat this this number as a suggestion rather than a hard limit.
+
+\sphinxAtStartPar
+More info on:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+\sphinxurl{https://en.wikipedia.org/wiki/Tidal\_locking\#Timescale},
+
+\item {} 
+\sphinxAtStartPar
+\sphinxurl{https://physics.stackexchange.com/questions/12541/tidal-lock-radius-in-habitable-zones}
+
+\item {} 
+\sphinxAtStartPar
+\sphinxurl{https://www.sciencedirect.com/science/article/abs/pii/S0019103583710109} (eq. 10 in CGS units)
+
+\end{enumerate}
+
 
 \subsection{Roche Limit}
 \label{\detokenize{quantities/children_orbit_limits/roche_limit:roche-limit}}\label{\detokenize{quantities/children_orbit_limits/roche_limit::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/roche_limit:id1}}
+\sphinxAtStartPar
+Roche limit is the minimum distance \(d_{Roche}\) a child object of {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} \(m\),
+{\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{radius}}}} \(r\) and {\hyperref[\detokenize{quantities/material/density:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{density}}}} \(\rho_m\) can orbit a parent object of
+{\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} \(M\), {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{radius}}}} \(R\) and {\hyperref[\detokenize{quantities/material/density:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{density}}}} \(\rho_M\)
+before the child object breaks apart into pieces. An additional condition is that
+the child object must only be held together by its own gravity.
+
+\sphinxAtStartPar
+It is given the equation: \(d_{Roche} = 2.44 r \left(\frac{M}{m}\right)^{1/3}\) or
+\(d_{Roche} = 2.44 R \left(\frac{\rho_M}{\rho_m}\right)^{1/3}\).
+
 
 \subsection{Dense Roche Limit}
-\label{\detokenize{quantities/children_orbit_limits/dense_roche_limit:dense-roche-limit}}\label{\detokenize{quantities/children_orbit_limits/dense_roche_limit::doc}}
+\label{\detokenize{quantities/children_orbit_limits/dense_roche_limit:dense-roche-limit}}\label{\detokenize{quantities/children_orbit_limits/dense_roche_limit::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/dense_roche_limit:id1}}
+\sphinxAtStartPar
+Dense Roche limit is the {\hyperref[\detokenize{quantities/children_orbit_limits/roche_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{Roche limit}}}} of a child of unknown {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{radius}}}}
+and a parent object of {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{radius}}}} \(R\) {\hyperref[\detokenize{quantities/material/density:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{density}}}} 10 times bigger than the child {\hyperref[\detokenize{quantities/material/density:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{density}}}}.
+
+\sphinxAtStartPar
+It is approximately: \(5.2568 R\).
+
 
 \subsection{P\sphinxhyphen{}type binary Critical Orbit}
 \label{\detokenize{quantities/children_orbit_limits/p_type_critical_orbit:p-type-binary-critical-orbit}}\label{\detokenize{quantities/children_orbit_limits/p_type_critical_orbit::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/p_type_critical_orbit:p-type-critical-orbit}}
+\sphinxAtStartPar
+In close binary systems (p\sphinxhyphen{}type binaries) of two stars with {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{masses}}}}
+\(m_1\) and \(m_2\) with \(m_1 > m_2\), {\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mean distance}}}} \(d\)
+and {\hyperref[\detokenize{quantities/orbital/eccentricity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{eccentricity}}}} \(e\), the critical orbit limit
+is the \sphinxstyleemphasis{minimum} distance at which an orbit stays stable.
+
+\sphinxAtStartPar
+It is estimated by: \(d(1.6 + 5.1 e - 2.22 e^2 + 4.12 \mu - 5.09 \mu^2 + 4.61 e^2  \mu^2 - 4.27 e \mu)\),
+where \(\mu = \frac{m_2}{m_1 + m_2}\).
+
+\sphinxAtStartPar
+More info on: \sphinxurl{https://arxiv.org/pdf/2108.07815.pdf} (eq. 3).
+
 
 \subsection{Inner Orbit Limit}
 \label{\detokenize{quantities/children_orbit_limits/inner_orbit_limit:inner-orbit-limit}}\label{\detokenize{quantities/children_orbit_limits/inner_orbit_limit::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/inner_orbit_limit:id1}}
+\sphinxAtStartPar
+The inner orbit limit of a parent for its children is the highest of
+{\hyperref[\detokenize{quantities/children_orbit_limits/dense_roche_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{dense Roche limit}}}} and {\hyperref[\detokenize{quantities/children_orbit_limits/p_type_critical_orbit:p-type-critical-orbit}]{\sphinxcrossref{\DUrole{std,std-ref}{P\sphinxhyphen{}type critical orbit}}}}.
+It is provided to assist the user determine the worst possible inner orbit limit.
+
 
 \subsection{Hill Sphere}
 \label{\detokenize{quantities/children_orbit_limits/hill_sphere:hill-sphere}}\label{\detokenize{quantities/children_orbit_limits/hill_sphere::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/hill_sphere:id1}}
 \sphinxAtStartPar
-hill sphere or roche lobe
+Hill sphere is the maximum distance (\(r_H\)) an object (child) can affect even smaller body (grandchild),
+because of the presence of a bigger body around (parent).
+For example the moon is within the hill sphere of earth, and the hill sphere of earth is determined
+by earth’s {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} \(m\) {\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{semi\sphinxhyphen{}major axis}}}} \(a\),
+and {\hyperref[\detokenize{quantities/orbital/eccentricity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{eccentricity}}}} \(e\), and the sun’s {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} \(M\).
+
+\sphinxAtStartPar
+It is given by the equation: \(r_H = a (1 - e) \left(\frac{m}{3 M}\right)^{1/3}\).
+
+\sphinxAtStartPar
+If we looking at a single object that is part of a binary system, a more accurate determination
+of the Hill sphere is given by the {\hyperref[\detokenize{quantities/children_orbit_limits/roche_lobe:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{Roche lobe}}}}.
+
+
+\subsection{Roche Lobe}
+\label{\detokenize{quantities/children_orbit_limits/roche_lobe:roche-lobe}}\label{\detokenize{quantities/children_orbit_limits/roche_lobe::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/roche_lobe:id1}}
+\sphinxAtStartPar
+Roche lobe (or sphere) (not to be confused with {\hyperref[\detokenize{quantities/children_orbit_limits/roche_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{Roche limit}}}}) is the region
+around a star in a binary system within which orbiting material is gravitationally bound to that star.
+
+\sphinxAtStartPar
+For an object of {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} \(m\) in a binary system, and a companion object of
+{\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} \(m_c\), with a binary  {\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mean distance}}}} \(d\)
+and {\hyperref[\detokenize{quantities/orbital/eccentricity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{eccentricity}}}} \(e\), the roche lobe is approximated by:
+\(d (1 - e) \frac{0.49 \mu^{2/3}}{0.6\mu^{2/3} + \ln{\left(1 + \mu^{1/3}\right)}}\), where
+\(\mu = \frac{m}{m_c}\).
 
 
 \subsection{S\sphinxhyphen{}type binary Critical Orbit}
-\label{\detokenize{quantities/children_orbit_limits/s_type_critical_orbit:s-type-binary-critical-orbit}}\label{\detokenize{quantities/children_orbit_limits/s_type_critical_orbit::doc}}
+\label{\detokenize{quantities/children_orbit_limits/s_type_critical_orbit:s-type-binary-critical-orbit}}\label{\detokenize{quantities/children_orbit_limits/s_type_critical_orbit::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/s_type_critical_orbit:s-type-critical-orbit}}
+\sphinxAtStartPar
+In wide binary systems (S\sphinxhyphen{}type binaries) of two objects with {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{masses}}}}
+\(m_1\) and \(m_2\) with \(m_1 > m_2\), {\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mean distance}}}} \(d\)
+and {\hyperref[\detokenize{quantities/orbital/eccentricity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{eccentricity}}}} \(e\), the critical orbit limit is the \sphinxstyleemphasis{maximum}
+distance at which an orbit stays stable around a single object.
+This distance is different for each object and changes due to their mass difference.
+
+\sphinxAtStartPar
+For the primary star of {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} \(m_1\), \(\mu\) is determined
+by the companions to the binary’s mass ratio \(\mu = \frac{m_2}{m_1 + m_2}\).
+
+\sphinxAtStartPar
+For the secondary star of {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} \(m_2\), \(\mu\) is determined
+by the companions to the binary’s mass ratio \(\mu = \frac{m_1}{m_1 + m_2}\).
+
+\sphinxAtStartPar
+The critical distance is estimated by: \(d (0.464 - 0.38 \mu - 0.631 e + 0.586 \mu e + 0.15 e^2 - 0.198 \mu e^2)\).
+
+\sphinxAtStartPar
+More info on: \sphinxurl{https://arxiv.org/pdf/2108.07815.pdf} (eq. 1).
+
 
 \subsection{Outer Orbit Limit}
-\label{\detokenize{quantities/children_orbit_limits/outer_orbit_limit:outer-orbit-limit}}\label{\detokenize{quantities/children_orbit_limits/outer_orbit_limit::doc}}
+\label{\detokenize{quantities/children_orbit_limits/outer_orbit_limit:outer-orbit-limit}}\label{\detokenize{quantities/children_orbit_limits/outer_orbit_limit::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/outer_orbit_limit:id1}}
+\sphinxAtStartPar
+The outer orbit limit of a parent for its children is the lowest of
+{\hyperref[\detokenize{quantities/children_orbit_limits/hill_sphere:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{Hill Sphere}}}} and {\hyperref[\detokenize{quantities/children_orbit_limits/s_type_critical_orbit:s-type-critical-orbit}]{\sphinxcrossref{\DUrole{std,std-ref}{S\sphinxhyphen{}type critical orbit}}}}.
+It is provided to assist the user determine the worst possible outer orbit limit.
+
 
 \subsection{Inner Rock Formation Limit}
-\label{\detokenize{quantities/children_orbit_limits/inner_rock_formation_limit:inner-rock-formation-limit}}\label{\detokenize{quantities/children_orbit_limits/inner_rock_formation_limit::doc}}
+\label{\detokenize{quantities/children_orbit_limits/inner_rock_formation_limit:inner-rock-formation-limit}}\label{\detokenize{quantities/children_orbit_limits/inner_rock_formation_limit::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/inner_rock_formation_limit:id1}}
+\sphinxAtStartPar
+We use {\hyperref[\detokenize{quantities/insolation_models/selsis/selsis:selsis-insolation-model}]{\sphinxcrossref{\DUrole{std,std-ref}{Selsis insolation model}}}} since it allows for easy, Solar system comparisons.
+Rock line is the distance at which iron and rock can form clusters, planetesimals and eventually planets.
+Since the rock line is determined by when rock and iron are more or less solid, I decided to use
+the boiling point of a fast rotating iron ball
+({\hyperref[\detokenize{quantities/surface/emission/heat_distribution:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{heating distribution}}}} \(\beta\) 1, {\hyperref[\detokenize{quantities/surface/emission/albedo:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{albedo}}}} \(A\) 0.15)
+@ \(T = 2870\) K.
+for the optimistic inner rock line limit, giving a value of \(\approx 0.087\) A.U for our sun.
+
+\sphinxAtStartPar
+Distance estimation: \(\left(\frac{T}{T_{\rm eff}}\right) ^ 2 \sqrt{\frac{1-A}{\beta}}\),
+with \(T_{\rm eff} = 278.5\) K (\sphinxurl{https://arxiv.org/pdf/1702.07314.pdf} eq. 6 with \(L = 1\)).
+
 
 \subsection{Outer Rock Formation Limit}
 \label{\detokenize{quantities/children_orbit_limits/outer_rock_formation_limit:outer-rock-formation-limit}}\label{\detokenize{quantities/children_orbit_limits/outer_rock_formation_limit::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/outer_rock_formation_limit:id1}}
+\sphinxAtStartPar
+We use {\hyperref[\detokenize{quantities/insolation_models/selsis/selsis:selsis-insolation-model}]{\sphinxcrossref{\DUrole{std,std-ref}{Selsis insolation model}}}} since it allows for easy, Solar system comparisons.
+Rock line is the distance at which iron and rock can form clusters, planetesimals and eventually planets.
+Since the rock line is determined by when rock and iron are more or less solid, I decided to use
+the melting point of a slow rotating ({\hyperref[\detokenize{quantities/children_orbit_limits/tidal_locking_radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{tidally locked}}}}) rock ball
+({\hyperref[\detokenize{quantities/surface/emission/heat_distribution:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{heating distribution}}}} \(\beta\) 0.5, {\hyperref[\detokenize{quantities/surface/emission/albedo:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{albedo}}}} \(A\) 0.85)
+@ \(T = 600\) K to find the equivalent solar system distance
+and multiply by 5/3.1 (similar to the {\hyperref[\detokenize{quantities/children_orbit_limits/outer_water_frost_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{early solar system water frost line}}}})
+(lowest temperature from \sphinxurl{http://hyperphysics.phy-astr.gsu.edu/hbase/Geophys/meltrock.html})
+for the optimistic outer rock line limit, giving a value of \(\approx 0.281\) A.U for our sun.
+
+\sphinxAtStartPar
+Distance estimation: \(\frac{5}{3.1}\left(\frac{T}{T_{\rm eff}}\right) ^ 2 \sqrt{\frac{1-A}{\beta}}\),
+with \(T_{\rm eff} = 278.5\) K (\sphinxurl{https://arxiv.org/pdf/1702.07314.pdf} eq. 6 with \(L = 1\)).
+
 
 \subsection{Inner Water Frost Limit}
-\label{\detokenize{quantities/children_orbit_limits/inner_water_frost_limit:inner-water-frost-limit}}\label{\detokenize{quantities/children_orbit_limits/inner_water_frost_limit::doc}}
+\label{\detokenize{quantities/children_orbit_limits/inner_water_frost_limit:inner-water-frost-limit}}\label{\detokenize{quantities/children_orbit_limits/inner_water_frost_limit::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/inner_water_frost_limit:id1}}
+\sphinxAtStartPar
+We use {\hyperref[\detokenize{quantities/insolation_models/selsis/selsis:selsis-insolation-model}]{\sphinxcrossref{\DUrole{std,std-ref}{Selsis insolation model}}}} since it allows for easy, Solar system comparisons.
+As shown on the wikipedia page \sphinxurl{https://en.wikipedia.org/wiki/Frost\_line\_(astrophysics}), there are different
+frost lines for different compounds. Water is important and seems to determine the line between gas planets and
+rocky planets.
+
+\sphinxAtStartPar
+It must be noted that gas giants can migrate to inner orbits after their creation,
+so it is not impossible to find one where venus or mercury would have been. It would however
+probably destabilize any other planets in its path.
+
+\sphinxAtStartPar
+The inner limit is taken from wiki’s suggestion for big sized bodies at \textasciitilde{}1.94 AU (\textasciitilde{}200 K).
+
 
 \subsection{Sol\sphinxhyphen{}Equivalent Water Frost Limit}
-\label{\detokenize{quantities/children_orbit_limits/sol_equivalent_water_frost_limit:sol-equivalent-water-frost-limit}}\label{\detokenize{quantities/children_orbit_limits/sol_equivalent_water_frost_limit::doc}}
+\label{\detokenize{quantities/children_orbit_limits/sol_equivalent_water_frost_limit:sol-equivalent-water-frost-limit}}\label{\detokenize{quantities/children_orbit_limits/sol_equivalent_water_frost_limit::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/sol_equivalent_water_frost_limit:sol-equivalent-water-frost-line}}
+\sphinxAtStartPar
+We use {\hyperref[\detokenize{quantities/insolation_models/selsis/selsis:selsis-insolation-model}]{\sphinxcrossref{\DUrole{std,std-ref}{Selsis insolation model}}}} since it allows for easy, Solar system comparisons.
+As shown on the wikipedia page \sphinxurl{https://en.wikipedia.org/wiki/Frost\_line\_(astrophysics}), there are different
+frost lines for different compounds. Water is important and seems to determine the line between gas planets and
+rocky planets.
+
+\sphinxAtStartPar
+It must be noted that gas giants can migrate to inner orbits after their creation,
+so it is not impossible to find one where venus or mercury would have been. It would however
+probably destabilize any other planets in its path.
+
+\sphinxAtStartPar
+The Sol equivalent limit is from the average of the newest finds \textasciitilde{} 3.1 AU (\textasciitilde{} 158.2 K).
+
 
 \subsection{Outer Water Frost Limit}
-\label{\detokenize{quantities/children_orbit_limits/outer_water_frost_limit:outer-water-frost-limit}}\label{\detokenize{quantities/children_orbit_limits/outer_water_frost_limit::doc}}
+\label{\detokenize{quantities/children_orbit_limits/outer_water_frost_limit:outer-water-frost-limit}}\label{\detokenize{quantities/children_orbit_limits/outer_water_frost_limit::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/outer_water_frost_limit:id1}}
+\sphinxAtStartPar
+We use {\hyperref[\detokenize{quantities/insolation_models/selsis/selsis:selsis-insolation-model}]{\sphinxcrossref{\DUrole{std,std-ref}{Selsis insolation model}}}} since it allows for easy, Solar system comparisons.
+As shown on the wikipedia page \sphinxurl{https://en.wikipedia.org/wiki/Frost\_line\_(astrophysics}), there are different
+frost lines for different compounds. Water is important and seems to determine the line between gas planets and
+rocky planets.
+
+\sphinxAtStartPar
+It must be noted that gas giants can migrate to inner orbits after their creation,
+so it is not impossible to find one where venus or mercury would have been. It would however
+probably destabilize any other planets in its path.
+
+\sphinxAtStartPar
+The outer limit is taken from wiki’s mention on the early\sphinxhyphen{}days frost line at 5 AU (\textasciitilde{}124.5 K).
+
 
 \section{Insolation Models}
 \label{\detokenize{quantities/insolation_models/insolation_models:insolation-models}}\label{\detokenize{quantities/insolation_models/insolation_models::doc}}
@@ -571,7 +905,7 @@ hill sphere or roche lobe
 \label{\detokenize{quantities/insolation_models/kopparapu/kopparapu:kopparapu}}\label{\detokenize{quantities/insolation_models/kopparapu/kopparapu::doc}}
 
 \subsection{Selsis}
-\label{\detokenize{quantities/insolation_models/selsis/selsis:selsis}}\label{\detokenize{quantities/insolation_models/selsis/selsis::doc}}
+\label{\detokenize{quantities/insolation_models/selsis/selsis:selsis}}\label{\detokenize{quantities/insolation_models/selsis/selsis::doc}}\phantomsection\label{\detokenize{quantities/insolation_models/selsis/selsis:selsis-insolation-model}}
 
 \section{Habitability}
 \label{\detokenize{quantities/habitability/habitability:habitability}}\label{\detokenize{quantities/habitability/habitability::doc}}

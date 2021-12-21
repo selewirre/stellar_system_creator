@@ -1,5 +1,6 @@
 
 # Main code:
+0. Add suggested eccentricity.
 1. Ring, resonances from moons etc. To find ring minima, use atmospheric extend. Ring maxima is the roche limit.
 2. Add planetary binaries.
 3. Semi-major axis minimum limit should take into account the gas giant radius expansion with the roche limit.

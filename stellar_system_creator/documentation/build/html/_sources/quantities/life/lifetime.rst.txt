@@ -3,7 +3,7 @@ Lifetime
 
 .. _lifetime:
 
-The lifetime of stars is determined by its mass and its luminosity (:math:`T=\frac{M}{L}`).
+The lifetime of stars is determined by its mass and its luminosity (:math:`T=\frac{M}{L} \cdot 10` billion years).
 
 The lifetime of each other body is determined by the lifetime of the parent
 minus a hundred million years, which is roughly the amount of time it takes

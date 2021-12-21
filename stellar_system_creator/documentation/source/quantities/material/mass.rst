@@ -10,7 +10,7 @@ like :ref:`radius <radius>`, :ref:`luminosity <luminosity>`, :ref:`spin period <
 
 Suggested (approximate) masses:
 
-1. For mon-like satellites, less than 0.05 earth masses (Me)
+1. For moon-like satellites, less than 0.05 earth masses (Me)
 2. For rocky planets: up to around 5 earth masses
 3. For ice-giants: between 5 and 100 earth masses
 4. For gas-giants: between 100 earth masses and 10 jupiter masses (Mj)

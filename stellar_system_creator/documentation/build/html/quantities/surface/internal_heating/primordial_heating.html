@@ -15,6 +15,7 @@
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -42,6 +43,8 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../../quantities.html">Quantities</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../material/material.html">Material</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../geometric/geometric.html">Geometric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../rotational/rotational.html">Rotational</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../life/life.html">Life</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../surface.html">Surface</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../emission/emission.html">Emission</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../gravity/gravity.html">Gravity</a></li>
@@ -53,8 +56,13 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../induced_tide.html">Induced Tide</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../angular_diameter.html">Angular Diameter</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../orbital/orbital.html">Orbital</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../children_orbit_limits/children_orbit_limits.html">Children Orbit Limits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../insolation_models/insolation_models.html">Insolation Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../habitability/habitability.html">Habitability</a></li>
 </ul>
 </li>
 </ul>
@@ -88,6 +96,16 @@
              
   <section id="primordial-heating">
 <h1>Primordial Heating<a class="headerlink" href="#primordial-heating" title="Permalink to this headline"></a></h1>
+<p id="id1">Primordial heating <span class="math notranslate nohighlight">\(Q_{\rm prim}\)</span> of a planet is heating that originates from the initial formation heating.
+It is stored in the planet as an internal heating source that slowly (or quickly)
+escapes, depending on the planet materials.</p>
+<p>For a planet of <a class="reference internal" href="../../material/mass.html#id1"><span class="std std-ref">mass</span></a> <span class="math notranslate nohighlight">\(M\)</span>, <a class="reference internal" href="../../geometric/surface_area.html#id1"><span class="std std-ref">surface area</span></a> <span class="math notranslate nohighlight">\(S\)</span>,
+<a class="reference internal" href="../../life/age.html#id1"><span class="std std-ref">age</span></a> <span class="math notranslate nohighlight">\(T\)</span>, and initial heating <span class="math notranslate nohighlight">\(H_o\)</span>, the primordial heating is given by:
+<span class="math notranslate nohighlight">\(Q_{\rm prim} = H_o {\rm e}^{- \lambda T} M / S\)</span>, where <span class="math notranslate nohighlight">\(\lambda\)</span> is a decay constant.</p>
+<p>For this package we use a constant <span class="math notranslate nohighlight">\(H_o = 1.2 \cdot 10^{-11}\)</span> Watts/kg and
+<span class="math notranslate nohighlight">\(\lambda = \frac{0.3391}{\rm billion\,years}\)</span>.</p>
+<p>More information on:
+<a class="reference external" href="https://www.sciencedirect.com/science/article/abs/pii/S003206331300161X">https://www.sciencedirect.com/science/article/abs/pii/S003206331300161X</a> Eq. 2.1 <span class="math notranslate nohighlight">\(\cdot M / S\)</span></p>
 </section>
 
 

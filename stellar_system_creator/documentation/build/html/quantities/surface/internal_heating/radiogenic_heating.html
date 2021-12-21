@@ -15,6 +15,7 @@
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -42,6 +43,8 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../../quantities.html">Quantities</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../material/material.html">Material</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../geometric/geometric.html">Geometric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../rotational/rotational.html">Rotational</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../life/life.html">Life</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../surface.html">Surface</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../emission/emission.html">Emission</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../gravity/gravity.html">Gravity</a></li>
@@ -53,8 +56,13 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../induced_tide.html">Induced Tide</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../angular_diameter.html">Angular Diameter</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../orbital/orbital.html">Orbital</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../children_orbit_limits/children_orbit_limits.html">Children Orbit Limits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../insolation_models/insolation_models.html">Insolation Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../habitability/habitability.html">Habitability</a></li>
 </ul>
 </li>
 </ul>
@@ -88,6 +96,22 @@
              
   <section id="radiogenic-heating">
 <h1>Radiogenic Heating<a class="headerlink" href="#radiogenic-heating" title="Permalink to this headline"></a></h1>
+<p id="id1">Radiogenic heating <span class="math notranslate nohighlight">\(Q_{\rm rad}\)</span> is the heating produced by slowly radiative isotopes in a planets mantle.
+Since we only care for the mantle, we take into account the planetary composition
+(we assume that only the rocky part of the planet is contributing to radiogenic heating).
+This model assumes the same percentages of radioactive isotopes as earth, although these may vary
+from planet to planet and stellar system to stellar system, depending on the age of the galaxy
+and local isotope abundances.</p>
+<p>For a radiogenic isotope of number <span class="math notranslate nohighlight">\(k\)</span> with heating production <span class="math notranslate nohighlight">\(H_k\)</span>, initial abundance <span class="math notranslate nohighlight">\(n_k (0)\)</span>,
+lifetime <span class="math notranslate nohighlight">\(\tau_k\)</span>, the heating heating produced at a certain time (<a class="reference internal" href="../../life/age.html#id1"><span class="std std-ref">age</span></a>) <span class="math notranslate nohighlight">\(t\)</span>
+is given by: <span class="math notranslate nohighlight">\(H_k(t) = H_k n_k (0) {\rm e}^{- t / \tau}\)</span>.</p>
+<p>For a planet of <a class="reference internal" href="../../material/mass.html#id1"><span class="std std-ref">mass</span></a> <span class="math notranslate nohighlight">\(M\)</span>, <a class="reference internal" href="../../geometric/surface_area.html#id1"><span class="std std-ref">surface area</span></a> <span class="math notranslate nohighlight">\(S\)</span>,
+<a class="reference internal" href="../../life/age.html#id1"><span class="std std-ref">age</span></a> <span class="math notranslate nohighlight">\(T\)</span>, and rocky mantle percentage <span class="math notranslate nohighlight">\(p_{\rm rocky}\)</span> (see <a class="reference internal" href="../../material/chemical_composition.html#id1"><span class="std std-ref">chemical composition</span></a>
+and <a class="reference internal" href="../../material/composition_type.html#id1"><span class="std std-ref">composition type</span></a>), the total heating is given by:
+<span class="math notranslate nohighlight">\(Q_{\rm rad} = \sum_k \left(H_k(T)\right) p_{\rm rocky} M / S\)</span>.</p>
+<p>More information on:
+<a class="reference external" href="https://www.sciencedirect.com/science/article/abs/pii/S0019103514004473?via%3Dihub#b0415%20">https://www.sciencedirect.com/science/article/abs/pii/S0019103514004473?via%3Dihub#b0415%20</a>.
+See table 1 for heat production and half-times, and table 2 for relative abundance.</p>
 </section>
 
 
