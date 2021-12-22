@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 setuptools.setup(
     name="stellar_system_creator",
-    version="0.0.5.0",
+    version="0.0.5.2",
     author="Selewirre Iskvary",
     author_email="selewirre@gmail.com",
     description="A tool for creating custom, scientifically plausible stellar systems.",
@@ -16,8 +16,10 @@ setuptools.setup(
     package_data={'stellar_system_creator': ['astrothings/data/*.csv',
                                              'documentation/*.pdf',
                                              'examples/output_files/*',
-                                             'visualization/default_images/*.png']},
-    install_requires=['matplotlib',
+                                             'visualization/default_images/*.png',
+                                             'gui/*.ico']},
+    install_requires=['astropy',
+                      'matplotlib',
                       'numpy',
                       'pandas',
                       'pint',
