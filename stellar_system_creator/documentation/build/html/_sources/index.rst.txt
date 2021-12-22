@@ -10,6 +10,8 @@ Welcome to Stellar System Creator's documentation!
 
 .. toctree::
    introduction
+   celestial_bodies/celestial_bodies
+   celestial_systems/celestial_systems
    quantities/quantities
 
 .. :maxdepth: 2
@@ -17,9 +19,8 @@ Welcome to Stellar System Creator's documentation!
 
 
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. Indices and tables
+   ==================
+   * :ref:`genindex`
+   * :ref:`modindex`
+   * :ref:`search`

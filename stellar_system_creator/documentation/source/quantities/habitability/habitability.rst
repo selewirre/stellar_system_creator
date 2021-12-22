@@ -4,7 +4,8 @@ Habitability
 .. _habitability:
 
 Habitability is a label given to stars or planets that satisfy certain criteria.
-These criteria are different for (binary) stars, planets and satellites and trojan satellites.
+These criteria are different for (:ref:`binary <binary_system>`) :ref:`stars <star>`,
+:ref:`planets <planet>` and :ref:`satellites <satellite>` and :ref:`trojan satellites <trojan_satellite>`.
 
 .. toctree::
     habitable_zones/habitable_zones

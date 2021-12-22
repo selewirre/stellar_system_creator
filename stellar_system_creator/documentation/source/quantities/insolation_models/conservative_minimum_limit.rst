@@ -1,5 +1,5 @@
 Conservative Minimum Limit
-=====================
+==========================
 
 .. _conservative_minimum_limit:
 

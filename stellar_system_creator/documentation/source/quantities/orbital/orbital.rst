@@ -1,6 +1,7 @@
 Orbital
 =======
 
+.. _orbital:
 
 .. toctree::
     eccentricity

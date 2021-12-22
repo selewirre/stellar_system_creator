@@ -751,12 +751,15 @@ class Planet(StellarBody):
         if self.parent is not None:
             from .binary_system import StellarBinary
             if not isinstance(self.parent, StellarBinary):
-                to_self = calculate_tide_height(self.parent.mass, self.mass, self.radius, self.semi_major_axis)
-                to_parent = calculate_tide_height(self.mass, self.parent.mass, self.parent.radius, self.semi_major_axis)
+                to_self = calculate_tide_height(self.parent.mass, self.mass, self.radius,
+                                                self.semi_major_axis, self.orbital_eccentricity)
+                to_parent = calculate_tide_height(self.mass, self.parent.mass, self.parent.radius,
+                                                  self.semi_major_axis, self.orbital_eccentricity)
             else:
-                to_self = calculate_tide_height(self.parent.mass, self.mass, self.radius, self.semi_major_axis)
+                to_self = calculate_tide_height(self.parent.mass, self.mass, self.radius,
+                                                self.semi_major_axis, self.orbital_eccentricity)
                 to_parent = {parent_body.name: calculate_tide_height(
-                    self.mass, parent_body.mass, parent_body.radius, self.semi_major_axis)
+                    self.mass, parent_body.mass, parent_body.radius, self.semi_major_axis, self.orbital_eccentricity)
                              for parent_body in [self.parent.primary_body, self.parent.secondary_body]}
         else:
             to_self = to_parent = np.nan * ureg.meter
@@ -1249,8 +1252,10 @@ class Satellite(Planet):
 
     def calculate_max_satellite_mass(self):
         if self.parent is not None:
-            return calculate_max_satellite_mass(self.parent.mass, self.parent.radius, self.parent.outer_orbit_limit,
-                                                self.orbit_type_factor, self.farthest_parent.lifetime)
+            # return calculate_max_satellite_mass(self.parent.mass, self.parent.radius, self.parent.outer_orbit_limit,
+            #                                     self.orbit_type_factor, self.farthest_parent.lifetime)
+            return calculate_max_satellite_mass(self.parent.mass, self.parent.radius,
+                                                self.semi_major_axis, self.age, self.lifetime)
         else:
             return np.nan * self.mass.u
 

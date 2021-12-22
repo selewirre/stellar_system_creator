@@ -60,7 +60,7 @@
 
 
 \title{Stellar System Creator}
-\date{Dec 20, 2021}
+\date{Dec 21, 2021}
 \release{0.0.5.1}
 \author{Selewirre Iskvary}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -84,6 +84,175 @@ The Solar System Creator is a python package that aims to ease the creation of r
 stellar systems in sci\sphinxhyphen{}fi settings. With minimal input, the user is able to create stars, planets,
 moons, asteroid regions and other celestial bodies, with accurate physical characteristics, declare their habitability,
 extract physical characteristics and visualize them.
+
+
+\chapter{Celestial Bodies}
+\label{\detokenize{celestial_bodies/celestial_bodies:celestial-bodies}}\label{\detokenize{celestial_bodies/celestial_bodies::doc}}\phantomsection\label{\detokenize{celestial_bodies/celestial_bodies:id1}}
+\sphinxAtStartPar
+Celestial bodies are different types of objects that constitute a stellar system.
+They can be very massive, or very light. They can be puffy or very dense.
+They can be bright or dim.
+
+
+\section{Star}
+\label{\detokenize{celestial_bodies/star:star}}\label{\detokenize{celestial_bodies/star::doc}}\phantomsection\label{\detokenize{celestial_bodies/star:id1}}
+\sphinxAtStartPar
+A star is a celestial object that is massive enough to sustain nuclear fission in it’s core.
+In this package we will only work with main sequence stars.
+Their {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{masses}}}} vary between \(0.08 \, {\rm M_s}\) and \(150 \, {\rm M_s}\).
+
+\sphinxAtStartPar
+The more massive the star, the bigger it’s {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{size}}}}, the more {\hyperref[\detokenize{quantities/surface/emission/luminosity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{luminous}}}} it is,
+and the smallest its {\hyperref[\detokenize{quantities/life/lifetime:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{lifetime}}}} will be.
+Ideal for {\hyperref[\detokenize{quantities/habitability/habitability:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{life}}}} stars, are stars with {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} between \(0.6 \, {\rm M_s}\)
+and \(1.4 \, {\rm M_s}\).
+
+\sphinxAtStartPar
+Stars can form {\hyperref[\detokenize{celestial_systems/binary_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stellar binaries}}}} and host {\hyperref[\detokenize{celestial_bodies/planet:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{planets}}}}
+and {\hyperref[\detokenize{celestial_bodies/asteroid_belt:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{asteroid belts}}}}, either together or separately from their companion star (or both).
+
+
+\section{Planet}
+\label{\detokenize{celestial_bodies/planet:planet}}\label{\detokenize{celestial_bodies/planet::doc}}\phantomsection\label{\detokenize{celestial_bodies/planet:id1}}
+\sphinxAtStartPar
+A planet is a celestial object that is {\hyperref[\detokenize{quantities/orbital/orbital:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{orbiting}}}}
+around a {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{star}}}} or a {\hyperref[\detokenize{celestial_systems/binary_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{binary stellar system}}}}
+and is massive enough to be rounded due to its own gravity, but not massive
+enough to sustain nuclear fission in it’s core.
+
+\sphinxAtStartPar
+In this package we will work with planets of a few distinct, but representative
+{\hyperref[\detokenize{quantities/material/composition_type:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{composition types}}}}, that fall under four categories:
+iron worlds, rocky worlds, water worlds, and ice/gas giants. Rocky and water
+worlds are ideal for life, either on the land,
+in the surface/underground ocean, or both.
+
+\sphinxAtStartPar
+Planets can host {\hyperref[\detokenize{celestial_bodies/satellite:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{satellites}}}}, {\hyperref[\detokenize{celestial_bodies/trojan:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{trojans}}}},
+and {\hyperref[\detokenize{celestial_bodies/trojan_satellite:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{trojan satellites}}}}, and orbit around {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stars}}}}
+or {\hyperref[\detokenize{celestial_systems/binary_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stellar binaries}}}}.
+
+
+\section{Asteroid Belt}
+\label{\detokenize{celestial_bodies/asteroid_belt:asteroid-belt}}\label{\detokenize{celestial_bodies/asteroid_belt::doc}}\phantomsection\label{\detokenize{celestial_bodies/asteroid_belt:id1}}
+\sphinxAtStartPar
+An asteroid belt (or circumstellar disc) is is a torus,
+pancake or ring\sphinxhyphen{}shaped accumulation of matter composed of
+gas, dust, planetesimals, asteroids, or collision fragments in {\hyperref[\detokenize{quantities/orbital/orbital:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{orbit}}}} around a {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{star}}}}.
+
+
+\section{Satellite}
+\label{\detokenize{celestial_bodies/satellite:satellite}}\label{\detokenize{celestial_bodies/satellite::doc}}\phantomsection\label{\detokenize{celestial_bodies/satellite:id1}}
+\sphinxAtStartPar
+A satellite is a celestial object that is {\hyperref[\detokenize{quantities/orbital/orbital:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{orbiting}}}}
+around a {\hyperref[\detokenize{celestial_bodies/planet:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{planet}}}}. It’s {\hyperref[\detokenize{quantities/material/composition_type:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{composition}}}}
+varies between a rocky world and water world.
+There is no a minimum {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} requirement.
+
+\sphinxAtStartPar
+The more {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{massive}}}} the parent {\hyperref[\detokenize{celestial_bodies/planet:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{planet}}}},
+and the bigger the {\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{distance}}}} between child\sphinxhyphen{}parent,
+the more massive a satellite can be.
+If a satellite is massive enough, it can resemble a planet and can
+potentially sustain {\hyperref[\detokenize{quantities/habitability/habitability:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{life}}}}.
+
+
+\section{Trojan}
+\label{\detokenize{celestial_bodies/trojan:trojan}}\label{\detokenize{celestial_bodies/trojan::doc}}\phantomsection\label{\detokenize{celestial_bodies/trojan:id1}}
+\sphinxAtStartPar
+Trojans are multiple small celestial objects that are {\hyperref[\detokenize{quantities/orbital/orbital:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{orbiting}}}} around a {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{star}}}}
+while locked in the L4 or L5 {\hyperref[\detokenize{quantities/orbital/lagrange_position:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{Lagrange point}}}} of a {\hyperref[\detokenize{celestial_bodies/planet:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{planet}}}}.
+Their {\hyperref[\detokenize{quantities/material/composition_type:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{composition}}}}
+varies between a rocky world and water world.
+There is no a minimum {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} requirement.
+
+\sphinxAtStartPar
+The more {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{massive}}}} the parent {\hyperref[\detokenize{celestial_bodies/planet:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{planet}}}},
+the higher the total {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{massive}}}} trojan can be.
+
+
+\section{Trojan Satellite}
+\label{\detokenize{celestial_bodies/trojan_satellite:trojan-satellite}}\label{\detokenize{celestial_bodies/trojan_satellite::doc}}\phantomsection\label{\detokenize{celestial_bodies/trojan_satellite:id1}}
+\sphinxAtStartPar
+A trojan satellite is a celestial object that is {\hyperref[\detokenize{quantities/orbital/orbital:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{orbiting}}}} around a {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{star}}}}
+while locked in the L4 or L5 {\hyperref[\detokenize{quantities/orbital/lagrange_position:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{Lagrange point}}}} of a {\hyperref[\detokenize{celestial_bodies/planet:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{planet}}}}.
+Its {\hyperref[\detokenize{quantities/material/composition_type:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{composition}}}}
+varies between a rocky world and water world.
+There is no a minimum {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} requirement.
+
+\sphinxAtStartPar
+The more {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{massive}}}} the parent {\hyperref[\detokenize{celestial_bodies/planet:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{planet}}}},
+the more massive a trojan satellite can be.
+If a trojan satellite is massive enough, it can resemble a planet and can
+potentially sustain {\hyperref[\detokenize{quantities/habitability/habitability:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{life}}}}.
+
+
+\section{Ring}
+\label{\detokenize{celestial_bodies/ring:ring}}\label{\detokenize{celestial_bodies/ring::doc}}\phantomsection\label{\detokenize{celestial_bodies/ring:id1}}
+\sphinxAtStartPar
+An ring is is a torus,
+pancake or ring\sphinxhyphen{}shaped accumulation of matter composed of
+gas, dust, asteroids, or collision fragments in {\hyperref[\detokenize{quantities/orbital/orbital:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{orbit}}}} around a {\hyperref[\detokenize{celestial_bodies/planet:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{planet}}}}.
+
+\sphinxAtStartPar
+It is not yet implemented in this package. Soon though!
+
+
+\chapter{Celestial Systems}
+\label{\detokenize{celestial_systems/celestial_systems:celestial-systems}}\label{\detokenize{celestial_systems/celestial_systems::doc}}\phantomsection\label{\detokenize{celestial_systems/celestial_systems:id1}}
+\sphinxAtStartPar
+Celestial systems are systems that include one or more celestial bodies,
+and can be part of other celestial systems.
+
+
+\section{Binary System}
+\label{\detokenize{celestial_systems/binary_system:binary-system}}\label{\detokenize{celestial_systems/binary_system::doc}}\phantomsection\label{\detokenize{celestial_systems/binary_system:id1}}
+\sphinxAtStartPar
+A binary system is a system of two {\hyperref[\detokenize{celestial_bodies/celestial_bodies:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{celestial objects}}}} that orbit around a common center.
+
+\sphinxAtStartPar
+In this package, we only implement stellar binary systems.
+Planetary binary systems are coming soon though!
+
+\sphinxAtStartPar
+There are two main types of binary systems:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+P\sphinxhyphen{}type or close binaries. Their distance is small enough so that other bodies can orbit around both of them
+
+\item {} 
+\sphinxAtStartPar
+S\sphinxhyphen{}type or wide binaries. Their distance is big enough so that other bodies can orbit each object individually.
+
+\end{enumerate}
+
+\sphinxAtStartPar
+In some cases a P\sphinxhyphen{}type system can also be an S\sphinxhyphen{}type system, meaning that objects orbit
+a) around both hosts, b) around one host.
+
+\sphinxAtStartPar
+Binary systems can also also be part of other binary systems. It is wise
+to not put too many binaries within binaries, since the orbits become highly unstable.
+
+
+\section{Stellar System}
+\label{\detokenize{celestial_systems/stellar_system:stellar-system}}\label{\detokenize{celestial_systems/stellar_system::doc}}\phantomsection\label{\detokenize{celestial_systems/stellar_system:id1}}
+\sphinxAtStartPar
+A stellar system consists of a parent/host {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{star}}}} or
+a {\hyperref[\detokenize{celestial_systems/binary_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stellar binary}}}} and a small number of
+{\hyperref[\detokenize{celestial_systems/planetary_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{planetary systems}}}} and {\hyperref[\detokenize{celestial_bodies/asteroid_belt:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{asteroid belts}}}} as children.
+
+
+\section{Planetary System}
+\label{\detokenize{celestial_systems/planetary_system:planetary-system}}\label{\detokenize{celestial_systems/planetary_system::doc}}\phantomsection\label{\detokenize{celestial_systems/planetary_system:id1}}
+\sphinxAtStartPar
+A planetary system consists of a parent/host {\hyperref[\detokenize{celestial_bodies/planet:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{planet}}}} or
+a {\hyperref[\detokenize{celestial_systems/binary_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{planetary binary}}}} and a number of
+{\hyperref[\detokenize{celestial_bodies/satellite:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{satellites}}}} and {\hyperref[\detokenize{celestial_bodies/ring:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{rings}}}} as children.
+They can also host  {\hyperref[\detokenize{celestial_bodies/trojan:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{trojans}}}} and {\hyperref[\detokenize{celestial_bodies/trojan_satellite:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{trojan satellites}}}}
+on their {\hyperref[\detokenize{quantities/orbital/lagrange_position:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{Lagrange positions}}}} L4 and L5.
 
 
 \chapter{Quantities}
@@ -152,11 +321,36 @@ The composition type of planets, planetoids, asteroids etc. is
 what the approximate composition of a celestial object will be.
 There are two types of iron worlds, two types of rocky worlds,
 four types of water worlds, one type of ice\sphinxhyphen{} and one of gas\sphinxhyphen{}giants.
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+Iron worlds (e.g. Mercury) are {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{small}}}}, very {\hyperref[\detokenize{quantities/material/density:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{dense}}}} and can sustain limited to no {\hyperref[\detokenize{quantities/surface/internal_heating/tectonic_activity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{tectonic activity}}}}, which is essential to {\hyperref[\detokenize{quantities/habitability/habitability:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{life}}}}.
+
+\item {} 
+\sphinxAtStartPar
+Rocky worlds (e.g. Venus, Earth, Mars) are on average a bit {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{bigger}}}}, {\hyperref[\detokenize{quantities/material/density:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{dense}}}} and can sustain substantial {\hyperref[\detokenize{quantities/surface/internal_heating/tectonic_activity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{tectonic activity}}}}.
+
+\item {} 
+\sphinxAtStartPar
+Water worlds (e.g. \sphinxhref{https://en.wikipedia.org/wiki/Gliese\_1214\_b}{Gliese 1214b}) are of similar {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{size}}}} or a bit bigger compared to rocky worlds, {\hyperref[\detokenize{quantities/material/density:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{less dense}}}}, and depending on the amount of rock in their mantle, they may sustain {\hyperref[\detokenize{quantities/surface/internal_heating/tectonic_activity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{tectonic activity}}}}.
+
+\item {} 
+\sphinxAtStartPar
+Ice giants (e.g. Neptune, Uranus) are {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{bigger}}}}, {\hyperref[\detokenize{quantities/material/density:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{puffy}}}} and can not sustain any {\hyperref[\detokenize{quantities/surface/internal_heating/tectonic_activity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{tectonic activity}}}}.
+
+\item {} 
+\sphinxAtStartPar
+Gas giants (e.g. Saturn, Jupiter) are the {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{biggest}}}} of planets, very {\hyperref[\detokenize{quantities/material/density:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{puffy}}}} and can not sustain any {\hyperref[\detokenize{quantities/surface/internal_heating/tectonic_activity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{tectonic activity}}}}.
+
+\end{enumerate}
 
 \sphinxAtStartPar
-Even though the composition is not accurate by itself, I find
-that the {\hyperref[\detokenize{quantities/material/density:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{density}}}} and {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{radius}}}} of asteroids and moons that are not rocky,
-can be generally approximated by the four different water worlds.
+I find that the {\hyperref[\detokenize{quantities/material/density:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{density}}}} and {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{radius}}}}
+of asteroids and moons that are not rocky,
+can be generally approximated by the four different water worlds,
+even though the {\hyperref[\detokenize{quantities/material/chemical_composition:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{chemical composition}}}}
+is not accurate by itself.
 Same for small gassy worlds (like Pluto).
 
 
@@ -453,33 +647,201 @@ In general, the peak wavelength it is given by: \(\lambda = \frac{2.898 \cdot 10
 
 \subsubsection{Surface Gravity}
 \label{\detokenize{quantities/surface/gravity/surface_gravity:surface-gravity}}\label{\detokenize{quantities/surface/gravity/surface_gravity::doc}}
+\sphinxAtStartPar
+Surface gravity \(g\) is the gravitational acceleration experienced at
+the surface of an object.
+
+\sphinxAtStartPar
+Earth’s surface gravity is approximately 9.81 \({\rm m/s^2}\).
+
 
 \subsubsection{Escape Velocity}
 \label{\detokenize{quantities/surface/gravity/escape_velocity:escape-velocity}}\label{\detokenize{quantities/surface/gravity/escape_velocity::doc}}
+\sphinxAtStartPar
+Escape velocity \(v_{\rm esc}\) is the initial speed a small object needs to escape the gravitational
+pull of the celestial object it is bound to.
+
+\sphinxAtStartPar
+Earth’s escape velocity is approximately 11.19 km/s.
+
 
 \subsection{Internal Heating}
-\label{\detokenize{quantities/surface/internal_heating/internal_heating:internal-heating}}\label{\detokenize{quantities/surface/internal_heating/internal_heating::doc}}
+\label{\detokenize{quantities/surface/internal_heating/internal_heating:internal-heating}}\label{\detokenize{quantities/surface/internal_heating/internal_heating::doc}}\phantomsection\label{\detokenize{quantities/surface/internal_heating/internal_heating:id1}}
+\sphinxAtStartPar
+Internal heating are a variety of processes with which an object generates heat.
+
 
 \subsubsection{Tectonic Activity}
-\label{\detokenize{quantities/surface/internal_heating/tectonic_activity:tectonic-activity}}\label{\detokenize{quantities/surface/internal_heating/tectonic_activity::doc}}
+\label{\detokenize{quantities/surface/internal_heating/tectonic_activity:tectonic-activity}}\label{\detokenize{quantities/surface/internal_heating/tectonic_activity::doc}}\phantomsection\label{\detokenize{quantities/surface/internal_heating/tectonic_activity:id1}}
+\sphinxAtStartPar
+The tectonic activity label is determined by amount of total internal heating \(Q_{\rm tot}\).
+Since each internal heating process is not estimated very accurately, take the
+label as a suggestion, rather than an absolute truth, and optimize however you see fit.
+Plate tectonics are only present on sold planets, so any planets with substantial gaseous
+components will not have any plate tectonics.
+
+\sphinxAtStartPar
+The labels we use are:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+‘Not applicable’, if the composition is Icegiant or Gasgiant.
+
+\item {} 
+\sphinxAtStartPar
+‘Unknown’, if \(Q_{\rm tot} = {\rm nan}\).
+
+\item {} 
+\sphinxAtStartPar
+‘Stagnant’, if \(Q_{\rm tot} < 0.01 \, {\rm W/m^2}\).
+
+\item {} 
+\sphinxAtStartPar
+‘Low’, if \(Q_{\rm tot} < 0.04 \, {\rm W/m^2}\).
+
+\item {} 
+\sphinxAtStartPar
+‘Medium Low’, if \(Q_{\rm tot} < 0.07 \, {\rm W/m^2}\).
+
+\item {} 
+\sphinxAtStartPar
+‘Medium’, if \(Q_{\rm tot} < 0.15 \, {\rm W/m^2}\).
+
+\item {} 
+\sphinxAtStartPar
+‘Medium High’, if \(Q_{\rm tot} < 0.2 \, {\rm W/m^2}\).
+
+\item {} 
+\sphinxAtStartPar
+‘High’, if \(Q_{\rm tot} < 0.35 \, {\rm W/m^2}\).
+
+\item {} 
+\sphinxAtStartPar
+‘Extreme’, if \(Q_{\rm tot} \ge 0.35 \, {\rm W/m^2}\).
+
+\end{enumerate}
+
 
 \subsubsection{Primordial Heating}
-\label{\detokenize{quantities/surface/internal_heating/primordial_heating:primordial-heating}}\label{\detokenize{quantities/surface/internal_heating/primordial_heating::doc}}
+\label{\detokenize{quantities/surface/internal_heating/primordial_heating:primordial-heating}}\label{\detokenize{quantities/surface/internal_heating/primordial_heating::doc}}\phantomsection\label{\detokenize{quantities/surface/internal_heating/primordial_heating:id1}}
+\sphinxAtStartPar
+Primordial heating \(Q_{\rm prim}\) of a planet is heating that originates from the initial formation heating.
+It is stored in the planet as an internal heating source that slowly (or quickly)
+escapes, depending on the planet materials.
+
+\sphinxAtStartPar
+For a planet of {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} \(M\), {\hyperref[\detokenize{quantities/geometric/surface_area:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{surface area}}}} \(S\),
+{\hyperref[\detokenize{quantities/life/age:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{age}}}} \(T\), and initial heating \(H_o\), the primordial heating is given by:
+\(Q_{\rm prim} = H_o {\rm e}^{- \lambda T} M / S\), where \(\lambda\) is a decay constant.
+
+\sphinxAtStartPar
+For this package we use a constant \(H_o = 1.2 \cdot 10^{-11}\) Watts/kg and
+\(\lambda = \frac{0.3391}{\rm billion\,years}\).
+
+\sphinxAtStartPar
+More information on:
+\sphinxurl{https://www.sciencedirect.com/science/article/abs/pii/S003206331300161X} Eq. 2.1 \(\cdot M / S\)
+
 
 \subsubsection{Radiogenic Heating}
-\label{\detokenize{quantities/surface/internal_heating/radiogenic_heating:radiogenic-heating}}\label{\detokenize{quantities/surface/internal_heating/radiogenic_heating::doc}}
+\label{\detokenize{quantities/surface/internal_heating/radiogenic_heating:radiogenic-heating}}\label{\detokenize{quantities/surface/internal_heating/radiogenic_heating::doc}}\phantomsection\label{\detokenize{quantities/surface/internal_heating/radiogenic_heating:id1}}
+\sphinxAtStartPar
+Radiogenic heating \(Q_{\rm rad}\) is the heating produced by slowly radiative isotopes in a planets mantle.
+Since we only care for the mantle, we take into account the planetary composition
+(we assume that only the rocky part of the planet is contributing to radiogenic heating).
+This model assumes the same percentages of radioactive isotopes as earth, although these may vary
+from planet to planet and stellar system to stellar system, depending on the age of the galaxy
+and local isotope abundances.
+
+\sphinxAtStartPar
+For a radiogenic isotope of number \(k\) with heating production \(H_k\), initial abundance \(n_k (0)\),
+lifetime \(\tau_k\), the heating heating produced at a certain time ({\hyperref[\detokenize{quantities/life/age:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{age}}}}) \(t\)
+is given by: \(H_k(t) = H_k n_k (0) {\rm e}^{- t / \tau}\).
+
+\sphinxAtStartPar
+For a planet of {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} \(M\), {\hyperref[\detokenize{quantities/geometric/surface_area:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{surface area}}}} \(S\),
+{\hyperref[\detokenize{quantities/life/age:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{age}}}} \(T\), and rocky mantle percentage \(p_{\rm rocky}\) (see {\hyperref[\detokenize{quantities/material/chemical_composition:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{chemical composition}}}}
+and {\hyperref[\detokenize{quantities/material/composition_type:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{composition type}}}}), the total heating is given by:
+\(Q_{\rm rad} = \sum_k \left(H_k(T)\right) p_{\rm rocky} M / S\).
+
+\sphinxAtStartPar
+More information on:
+\sphinxurl{https://www.sciencedirect.com/science/article/abs/pii/S0019103514004473?via\%3Dihub\#b0415\%20}.
+See table 1 for heat production and half\sphinxhyphen{}times, and table 2 for relative abundance.
+
 
 \subsubsection{Tidal Heating}
-\label{\detokenize{quantities/surface/internal_heating/tidal_heating:tidal-heating}}\label{\detokenize{quantities/surface/internal_heating/tidal_heating::doc}}
+\label{\detokenize{quantities/surface/internal_heating/tidal_heating:tidal-heating}}\label{\detokenize{quantities/surface/internal_heating/tidal_heating::doc}}\phantomsection\label{\detokenize{quantities/surface/internal_heating/tidal_heating:id1}}
+\sphinxAtStartPar
+When an child object of {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{radius}}}} \(r\) rotates around a parent object
+of {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} \(M\) in an non\sphinxhyphen{}circular (eccentric) orbit, at a
+{\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mean distance}}}} \(a\) and {\hyperref[\detokenize{quantities/orbital/eccentricity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{eccentricity}}}} \(e\),
+the shape of the child object can periodically change due to the variation of gravitational pull
+it feels from the parent object (it wobbles). This motion results in internal heating.
+
+\sphinxAtStartPar
+Tidal heating is proportional to: \(Q_{\rm tidal} \propto M^{2.5} r^5 e^2 a^{-7.5}\)
+
+\sphinxAtStartPar
+More information on:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+\sphinxurl{https://academic.oup.com/mnras/article/391/1/237/1121115}
+
+\item {} 
+\sphinxAtStartPar
+\sphinxurl{https://www.liebertpub.com/doi/10.1089/ast.2015.1325} Eq.2
+
+\item {} 
+\sphinxAtStartPar
+\sphinxurl{https://iopscience.iop.org/article/10.1088/0004-637X/789/1/30/pdf} table 2, pg. 22
+
+\end{enumerate}
+
 
 \subsection{Induced Tide}
 \label{\detokenize{quantities/surface/induced_tide:induced-tide}}\label{\detokenize{quantities/surface/induced_tide::doc}}
+\sphinxAtStartPar
+Induced tides \(h_{\rm tides}\) are the height differences that occur due to tidal forces
+on a planet’s massive ocean’s water level. The values provided are very
+crued and are only meant as a suggestion to the user. Tide height depends
+on many local parameters, as explained in \sphinxhref{https://youtu.be/wsuejZRqus4}{artifexian’s video}.
+
+\sphinxAtStartPar
+For an object of {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} \(m\) and {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{radius}}}} \(r\)
+that interacts with a companion object of {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} \(m_c\)
+from a {\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mean distance}}}} \(a\)
+with orbital {\hyperref[\detokenize{quantities/orbital/eccentricity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{eccentricity}}}} \(e\),
+will experience a maximum tide height of:
+\(h_{\rm tides} = 3 \frac{m_c}{m} \left(\frac{r}{a (1 - e)}\right)^3 \frac{r}{2}\).
+
+\sphinxAtStartPar
+More information on the model used can be found on
+\sphinxurl{https://www.cambridge.org/resources/0521846560/7708\_Tidal\%20distortion.pdf} (Eq. 20)
+where mean distance is replaced by the periapsis (which yields the maximum observed tides).
+A mistake must be noted: the example below eq. 20 needs \(m_1\) to be the earth mass
+and \(m_2\) the moon mass.
+
 
 \subsection{Angular Diameter}
-\label{\detokenize{quantities/surface/angular_diameter:angular-diameter}}\label{\detokenize{quantities/surface/angular_diameter::doc}}
+\label{\detokenize{quantities/surface/angular_diameter:angular-diameter}}\label{\detokenize{quantities/surface/angular_diameter::doc}}\phantomsection\label{\detokenize{quantities/surface/angular_diameter:id1}}
+\sphinxAtStartPar
+Angular diameter \(\delta\) is the size of a celestial body in the sky. The angular diameter of the sun and the moon are
+similar on earth, and approximately \textasciitilde{} 0.5 degrees
+
+\sphinxAtStartPar
+The angular diameter of a body with {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{radius}}}} \(r\) at a distance \(D\)
+is given by: \(\delta = 2 \arcsin(r/D)\)
+
+\sphinxAtStartPar
+More information on: \sphinxurl{https://en.wikipedia.org/wiki/Angular\_diameter}
+
 
 \section{Orbital}
-\label{\detokenize{quantities/orbital/orbital:orbital}}\label{\detokenize{quantities/orbital/orbital::doc}}
+\label{\detokenize{quantities/orbital/orbital:orbital}}\label{\detokenize{quantities/orbital/orbital::doc}}\phantomsection\label{\detokenize{quantities/orbital/orbital:id1}}
 
 \subsection{Eccentricity}
 \label{\detokenize{quantities/orbital/eccentricity:eccentricity}}\label{\detokenize{quantities/orbital/eccentricity::doc}}\phantomsection\label{\detokenize{quantities/orbital/eccentricity:id1}}
@@ -500,6 +862,15 @@ is not zero.
 \label{\detokenize{quantities/orbital/semi_major_axis:semi-major-axis}}\label{\detokenize{quantities/orbital/semi_major_axis::doc}}\phantomsection\label{\detokenize{quantities/orbital/semi_major_axis:id1}}
 \sphinxAtStartPar
 Semi\sphinxhyphen{}major axis \(a\) is the mean distance between a child and a parent body.
+
+\sphinxAtStartPar
+When placing two objects in the same {\hyperref[\detokenize{celestial_systems/celestial_systems:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{celestial system}}}}
+with semi\sphinxhyphen{}major axes \(a_1\) and \(a_2\),
+try to space them out in such a way that \(a_2 = (1.4 \, {\rm to} \, 2) \cdot a1\).
+Maintain this distance ratio for all new objects.
+Also, make sure to stay within the {\hyperref[\detokenize{quantities/orbital/semi_major_axis_minimum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{minimum}}}}
+and {\hyperref[\detokenize{quantities/orbital/semi_major_axis_maximum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{maximum}}}} limits since
+the program will not stop the user from exceeding the limits.
 
 
 \subsection{Semi\sphinxhyphen{}Minor Axis}
@@ -528,16 +899,39 @@ It is determined by the {\hyperref[\detokenize{quantities/orbital/semi_major_axi
 \subsection{Lagrange Position}
 \label{\detokenize{quantities/orbital/lagrange_position:lagrange-position}}\label{\detokenize{quantities/orbital/lagrange_position::doc}}\phantomsection\label{\detokenize{quantities/orbital/lagrange_position:id1}}
 \sphinxAtStartPar
-Lagrange positions (L\#) are (semi\sphinxhyphen{})stable positions between two orbiting objects.
-Trojans are objects in the L4 and L5 positions, in front and behind the child
-object (denoted as +1 and \sphinxhyphen{}1 respectively) that is orbiting a parent object.
+Lagrange positions/points (L\#) are the equilibrium points between
+two {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{masses}}}} (grandparent \(m_1\) and parent \(m_2\)) that can
+potentially host an object of small mass \(m_3\). There are
+5 such points, three (L1, L2, L3) of which are unstable and two that are semi\sphinxhyphen{}stable (L4, L5).
+Points L4 and L5 can host from multiple asteroid\sphinxhyphen{}type bodies to a small planet, depending on \(m_2\).
+
+\sphinxAtStartPar
+The rule of thumb is that the total {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} of objects in these points
+must be smaller than \(0.0018878 \cdot m_2\) or smaller than the Gascheu’s limit.
+It must be noted that, since the three bodies are never just by themselves,
+there are other orbital instabilities introduced that
+further degrade the stability of the Lagrange points.
+
+\sphinxAtStartPar
+More information about the limits on:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+\sphinxurl{https://hal.archives-ouvertes.fr/hal-00552502/document} (For a discussion on Gascheu’s limit)
+
+\item {} 
+\sphinxAtStartPar
+\sphinxurl{https://www.aanda.org/articles/aa/abs/2007/07/aa6582-06/aa6582-06.html} (For simple \(0.0018878 \cdot m_2\) limit)
+
+\end{enumerate}
 
 
 \subsection{Contact}
 \label{\detokenize{quantities/orbital/contact:contact}}\label{\detokenize{quantities/orbital/contact::doc}}\phantomsection\label{\detokenize{quantities/orbital/contact:id1}}
 \sphinxAtStartPar
 In this context, contact between two binary stars happens if the radius of at least
-one of the two stars resides outside the {\hyperref[\detokenize{quantities/children_orbit_limits/roche_lobe:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{Roche lobe}}}} while the stars
+one of the two stars resides outside the {\hyperref[\detokenize{quantities/orbital/roche_lobe:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{Roche lobe}}}} while the stars
 are in {\hyperref[\detokenize{quantities/orbital/periapsis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{periapsis}}}}.
 
 
@@ -764,7 +1158,7 @@ It is given by the equation: \(r_H = a (1 - e) \left(\frac{m}{3 M}\right)^{1/3}\
 
 \sphinxAtStartPar
 If we looking at a single object that is part of a binary system, a more accurate determination
-of the Hill sphere is given by the {\hyperref[\detokenize{quantities/children_orbit_limits/roche_lobe:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{Roche lobe}}}}.
+of the Hill sphere is given by the {\hyperref[\detokenize{quantities/orbital/roche_lobe:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{Roche lobe}}}}.
 
 
 \subsection{Roche Lobe}
@@ -865,7 +1259,7 @@ The inner limit is taken from wiki’s suggestion for big sized bodies at \texta
 
 
 \subsection{Sol\sphinxhyphen{}Equivalent Water Frost Limit}
-\label{\detokenize{quantities/children_orbit_limits/sol_equivalent_water_frost_limit:sol-equivalent-water-frost-limit}}\label{\detokenize{quantities/children_orbit_limits/sol_equivalent_water_frost_limit::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/sol_equivalent_water_frost_limit:sol-equivalent-water-frost-line}}
+\label{\detokenize{quantities/children_orbit_limits/sol_equivalent_water_frost_limit:sol-equivalent-water-frost-limit}}\label{\detokenize{quantities/children_orbit_limits/sol_equivalent_water_frost_limit::doc}}\phantomsection\label{\detokenize{quantities/children_orbit_limits/sol_equivalent_water_frost_limit:id1}}
 \sphinxAtStartPar
 We use {\hyperref[\detokenize{quantities/insolation_models/selsis/selsis:selsis-insolation-model}]{\sphinxcrossref{\DUrole{std,std-ref}{Selsis insolation model}}}} since it allows for easy, Solar system comparisons.
 As shown on the wikipedia page \sphinxurl{https://en.wikipedia.org/wiki/Frost\_line\_(astrophysics}), there are different
@@ -899,32 +1293,471 @@ The outer limit is taken from wiki’s mention on the early\sphinxhyphen{}days f
 
 
 \section{Insolation Models}
-\label{\detokenize{quantities/insolation_models/insolation_models:insolation-models}}\label{\detokenize{quantities/insolation_models/insolation_models::doc}}
+\label{\detokenize{quantities/insolation_models/insolation_models:insolation-models}}\label{\detokenize{quantities/insolation_models/insolation_models::doc}}\phantomsection\label{\detokenize{quantities/insolation_models/insolation_models:id1}}
+\sphinxAtStartPar
+Insolation or effective stellar flux is the effective flux that
+reaches a specific {\hyperref[\detokenize{quantities/orbital/orbital:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{orbital}}}} distance, called threshold (or limit).
+Insolation changes with the {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{star’s}}}} {\hyperref[\detokenize{quantities/surface/emission/temperature:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{temperature}}}},
+as well as the climate of the target {\hyperref[\detokenize{quantities/habitability/habitability:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{habitable}}}} world.
+We use insolation for a specific climate to normalize the
+{\hyperref[\detokenize{quantities/surface/emission/luminosity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{luminosity}}}} of a {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{star’s}}}},
+and then try and estimate the threshold at which distance from
+the {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{star’s}}}} these environmental situations occur.
+By using extreme environmental conditions that could potentially support life,
+we can determine minima and maxima for {\hyperref[\detokenize{quantities/habitability/habitable_zones/habitable_zones:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{zones of habitability}}}}
+around single\sphinxhyphen{} or multi\sphinxhyphen{}star {\hyperref[\detokenize{celestial_systems/celestial_systems:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{systems}}}}.
+
+\sphinxAtStartPar
+There are different types of insolation models. In this package,
+we are using one that was designed by {\hyperref[\detokenize{quantities/insolation_models/kopparapu/kopparapu:kopparapu-insolation-model}]{\sphinxcrossref{\DUrole{std,std-ref}{Kopparapu}}}}, and
+one that was designed by {\hyperref[\detokenize{quantities/insolation_models/selsis/selsis:selsis-insolation-model}]{\sphinxcrossref{\DUrole{std,std-ref}{Selsis}}}}.
+
+\sphinxAtStartPar
+These models have multiple different thresholds, from which
+we only use a handful that are representative of the {\hyperref[\detokenize{quantities/habitability/habitable_zones/habitable_zones:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{habitability limits}}}}.
+These are designated as \sphinxstyleemphasis{earth equivalent}, \sphinxstyleemphasis{conservative} or \sphinxstyleemphasis{relaxed} and \sphinxstyleemphasis{minimum} (inner) or \sphinxstyleemphasis{maximum} (outer).
+
 
 \subsection{Kopparapu}
-\label{\detokenize{quantities/insolation_models/kopparapu/kopparapu:kopparapu}}\label{\detokenize{quantities/insolation_models/kopparapu/kopparapu::doc}}
+\label{\detokenize{quantities/insolation_models/kopparapu/kopparapu:kopparapu}}\label{\detokenize{quantities/insolation_models/kopparapu/kopparapu::doc}}\phantomsection\label{\detokenize{quantities/insolation_models/kopparapu/kopparapu:kopparapu-insolation-model}}
+\sphinxAtStartPar
+Kopparapu’s insolation model is an elegant model that describes seven
+disparate thresholds of interest.
+It’s main asset is the distinction of thresholds between different planetary
+masses for the runaway greenhouse effect.
+
+\sphinxAtStartPar
+The provided thresholds are:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+Recent Venus: \sphinxstyleemphasis{inner}, {\hyperref[\detokenize{quantities/insolation_models/relaxed_minimum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{relaxed minimum limit}}}}.
+
+\item {} 
+\sphinxAtStartPar
+Runaway Greenhouse Effect, Subterran: \sphinxstyleemphasis{inner}.
+
+\item {} 
+\sphinxAtStartPar
+Runaway Greenhouse Effect, Terran: \sphinxstyleemphasis{inner}, {\hyperref[\detokenize{quantities/insolation_models/conservative_minimum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{conservative minimum limit}}}}.
+
+\item {} 
+\sphinxAtStartPar
+Runaway Greenhouse Effect, Superterran: \sphinxstyleemphasis{inner}.
+
+\item {} 
+\sphinxAtStartPar
+Moist Greenhouse Effect: \sphinxstyleemphasis{inner}, {\hyperref[\detokenize{quantities/insolation_models/earth_equivalent_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{earth equivalent limit}}}}.
+
+\item {} 
+\sphinxAtStartPar
+Maximum Greenhouse Effect: \sphinxstyleemphasis{outer}, {\hyperref[\detokenize{quantities/insolation_models/conservative_maximum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{conservative maximum limit}}}}.
+
+\item {} 
+\sphinxAtStartPar
+Early Mars: \sphinxstyleemphasis{outer}, {\hyperref[\detokenize{quantities/insolation_models/relaxed_maximum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{relaxed maximum limit}}}}.
+
+\end{enumerate}
+
+\sphinxAtStartPar
+Sources: Kopparapu. et al. 2013 {[}1{]}, 2014 {[}2{]}, Wang and Cuntz 2019 {[}3{]}
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+\sphinxurl{https://iopscience.iop.org/article/10.1088/0004-637X/765/2/131}
+
+\item {} 
+\sphinxAtStartPar
+\sphinxurl{https://iopscience.iop.org/article/10.1088/2041-8205/787/2/L29}
+
+\item {} 
+\sphinxAtStartPar
+\sphinxurl{https://iopscience.iop.org/article/10.3847/1538-4357/ab0377} (overview of this and other models)
+
+\end{enumerate}
+
 
 \subsection{Selsis}
 \label{\detokenize{quantities/insolation_models/selsis/selsis:selsis}}\label{\detokenize{quantities/insolation_models/selsis/selsis::doc}}\phantomsection\label{\detokenize{quantities/insolation_models/selsis/selsis:selsis-insolation-model}}
+\sphinxAtStartPar
+Selsis’ insolation model is a simple model that describes a multitude of
+disparate thresholds of interest.
+It’s main assets are the distinction cloudy and non\sphinxhyphen{}cloudy greenhouse effect\sphinxhyphen{}based thresholds,
+the provision of very relaxed thresholds, and the ability to make once own thresholds. This last part
+is important in determining the {\hyperref[\detokenize{quantities/children_orbit_limits/inner_rock_formation_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{inner rock formation limit}}}},
+the {\hyperref[\detokenize{quantities/children_orbit_limits/outer_rock_formation_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{outer rock formation limit}}}},
+the {\hyperref[\detokenize{quantities/children_orbit_limits/inner_water_frost_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{inner water frost limit}}}},
+the {\hyperref[\detokenize{quantities/children_orbit_limits/sol_equivalent_water_frost_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{sol\sphinxhyphen{}equivalent water frost limit}}}},
+and the {\hyperref[\detokenize{quantities/children_orbit_limits/outer_water_frost_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{outer water frost limit}}}}.
+
+\sphinxAtStartPar
+The provided thresholds are:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} \begin{description}
+\item[{Planet\sphinxhyphen{}based}] \leavevmode\begin{enumerate}
+\sphinxsetlistlabels{\alph}{enumii}{enumiii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+Recent Venus: \sphinxstyleemphasis{inner}.
+
+\item {} 
+\sphinxAtStartPar
+Earth Equivalent’: \sphinxstyleemphasis{inner}, {\hyperref[\detokenize{quantities/insolation_models/earth_equivalent_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{earth equivalent limit}}}}.
+
+\item {} 
+\sphinxAtStartPar
+Early Mars: \sphinxstyleemphasis{outer}.
+
+\end{enumerate}
+
+\end{description}
+
+\item {} \begin{description}
+\item[{0\% Clouds}] \leavevmode\begin{enumerate}
+\sphinxsetlistlabels{\alph}{enumii}{enumiii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+Runaway Greenhouse Effect, 0\% Clouds: \sphinxstyleemphasis{inner}, {\hyperref[\detokenize{quantities/insolation_models/conservative_minimum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{conservative minimum limit}}}}.
+
+\item {} 
+\sphinxAtStartPar
+Start of water loss, 0\% Clouds: \sphinxstyleemphasis{inner}.
+
+\item {} 
+\sphinxAtStartPar
+First C02 Condensation, 0\% Clouds: \sphinxstyleemphasis{outer}.
+
+\item {} 
+\sphinxAtStartPar
+Maximum Greenhouse Effect, 0\% Clouds: \sphinxstyleemphasis{outer}, {\hyperref[\detokenize{quantities/insolation_models/conservative_maximum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{conservative maximum limit}}}}.
+
+\end{enumerate}
+
+\end{description}
+
+\item {} \begin{description}
+\item[{50\% Clouds}] \leavevmode\begin{enumerate}
+\sphinxsetlistlabels{\alph}{enumii}{enumiii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+Runaway Greenhouse Effect, 50\% Clouds: \sphinxstyleemphasis{inner}.
+
+\item {} 
+\sphinxAtStartPar
+Start of water loss, 50\% Clouds: \sphinxstyleemphasis{inner}.
+
+\item {} 
+\sphinxAtStartPar
+Maximum Greenhouse Effect, 50\% Clouds: \sphinxstyleemphasis{outer}.
+
+\end{enumerate}
+
+\end{description}
+
+\item {} \begin{description}
+\item[{100\% Clouds}] \leavevmode\begin{enumerate}
+\sphinxsetlistlabels{\alph}{enumii}{enumiii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+Runaway Greenhouse Effect, 100\% Clouds: \sphinxstyleemphasis{inner}, {\hyperref[\detokenize{quantities/insolation_models/relaxed_minimum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{relaxed minimum limit}}}}.
+
+\item {} 
+\sphinxAtStartPar
+Start of water loss, 100\% Clouds: \sphinxstyleemphasis{inner}.
+
+\item {} 
+\sphinxAtStartPar
+Maximum Greenhouse Effect, 100\% Clouds: \sphinxstyleemphasis{outer}, {\hyperref[\detokenize{quantities/insolation_models/relaxed_maximum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{relaxed maximum limit}}}}.
+
+\end{enumerate}
+
+\end{description}
+
+\end{enumerate}
+
+\sphinxAtStartPar
+Sources: Selsis. et al. 2007 {[}1{]}, Wang and Cuntz 2019 {[}2{]}
+1. \sphinxurl{https://www.aanda.org/articles/aa/pdf/2007/48}
+2. \sphinxurl{https://iopscience.iop.org/article/10.3847/1538-4357/ab0377} (overview of this and others models)
+
+
+\subsection{Relaxed Minimum Limit}
+\label{\detokenize{quantities/insolation_models/relaxed_minimum_limit:relaxed-minimum-limit}}\label{\detokenize{quantities/insolation_models/relaxed_minimum_limit::doc}}\phantomsection\label{\detokenize{quantities/insolation_models/relaxed_minimum_limit:id1}}
+\sphinxAtStartPar
+Relaxed minimum limit is the smallest inner limit of an {\hyperref[\detokenize{quantities/insolation_models/insolation_models:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{insolation model}}}}.
+
+
+\subsection{Relaxed Maximum Limit}
+\label{\detokenize{quantities/insolation_models/relaxed_maximum_limit:relaxed-maximum-limit}}\label{\detokenize{quantities/insolation_models/relaxed_maximum_limit::doc}}\phantomsection\label{\detokenize{quantities/insolation_models/relaxed_maximum_limit:id1}}
+\sphinxAtStartPar
+Relaxed maximum limit is the furthest outer limit of an {\hyperref[\detokenize{quantities/insolation_models/insolation_models:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{insolation model}}}}.
+
+
+\subsection{Conservative Minimum Limit}
+\label{\detokenize{quantities/insolation_models/conservative_minimum_limit:conservative-minimum-limit}}\label{\detokenize{quantities/insolation_models/conservative_minimum_limit::doc}}\phantomsection\label{\detokenize{quantities/insolation_models/conservative_minimum_limit:id1}}
+\sphinxAtStartPar
+Conservative minimum limit is the furthest inner limit of an {\hyperref[\detokenize{quantities/insolation_models/insolation_models:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{insolation model}}}}.
+
+
+\subsection{Conservative Maximum Limit}
+\label{\detokenize{quantities/insolation_models/conservative_maximum_limit:conservative-maximum-limit}}\label{\detokenize{quantities/insolation_models/conservative_maximum_limit::doc}}\phantomsection\label{\detokenize{quantities/insolation_models/conservative_maximum_limit:id1}}
+\sphinxAtStartPar
+Conservative maximum limit is the smallest outer limit of an {\hyperref[\detokenize{quantities/insolation_models/insolation_models:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{insolation model}}}}.
+
+
+\subsection{Earth\sphinxhyphen{}Equivalent Limit}
+\label{\detokenize{quantities/insolation_models/earth_equivalent_limit:earth-equivalent-limit}}\label{\detokenize{quantities/insolation_models/earth_equivalent_limit::doc}}\phantomsection\label{\detokenize{quantities/insolation_models/earth_equivalent_limit:id1}}
+\sphinxAtStartPar
+Earth\sphinxhyphen{}equivalent limit is the limit that closely matches the distance of the earth
+from the sun of an {\hyperref[\detokenize{quantities/insolation_models/insolation_models:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{insolation model}}}}.
+
 
 \section{Habitability}
-\label{\detokenize{quantities/habitability/habitability:habitability}}\label{\detokenize{quantities/habitability/habitability::doc}}
+\label{\detokenize{quantities/habitability/habitability:habitability}}\label{\detokenize{quantities/habitability/habitability::doc}}\phantomsection\label{\detokenize{quantities/habitability/habitability:id1}}
+\sphinxAtStartPar
+Habitability is a label given to stars or planets that satisfy certain criteria.
+These criteria are different for ({\hyperref[\detokenize{celestial_systems/binary_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{binary}}}}) {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stars}}}},
+{\hyperref[\detokenize{celestial_bodies/planet:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{planets}}}} and {\hyperref[\detokenize{celestial_bodies/satellite:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{satellites}}}} and {\hyperref[\detokenize{celestial_bodies/trojan_satellite:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{trojan satellites}}}}.
 
-\chapter{Indices and tables}
-\label{\detokenize{index:indices-and-tables}}\begin{itemize}
+
+\subsection{Habitable Zones}
+\label{\detokenize{quantities/habitability/habitable_zones/habitable_zones:habitable-zones}}\label{\detokenize{quantities/habitability/habitable_zones/habitable_zones::doc}}\phantomsection\label{\detokenize{quantities/habitability/habitable_zones/habitable_zones:id1}}
+\sphinxAtStartPar
+Habitable zone (HZ) is defined as an area between two orbital distances from a parent star or binary system
+that life can exist. The extremes of the zone are probably not as hospitable to complex organisms
+like ourselves, but you never know…
+
+\sphinxAtStartPar
+Depending on the system type, the habitable zone is estimated in different ways.
+They always depend on the {\hyperref[\detokenize{quantities/surface/emission/luminosity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{luminosity}}}} and {\hyperref[\detokenize{quantities/surface/emission/temperature:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{temperature}}}} of the star(s),
+and often on the orbital {\hyperref[\detokenize{quantities/orbital/eccentricity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{eccentricity}}}} of the potential habitable world.
+The single star habitable zone or {\hyperref[\detokenize{quantities/habitability/habitable_zones/single_star_habitable_zone:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{SSHZ}}}} is the simplest type of
+HZ. For binary stars, there are three different types,
+the radiative habitable zone or {\hyperref[\detokenize{quantities/habitability/habitable_zones/radiative_habitable_zone:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{RHZ}}}},
+the permanent habitable zone or {\hyperref[\detokenize{quantities/habitability/habitable_zones/permanent_habitable_zone:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{PHZ}}}},
+the average habitable zone or {\hyperref[\detokenize{quantities/habitability/habitable_zones/average_habitable_zone:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{AHZ}}}}.
+
+
+\subsubsection{Single Star Habitable Zone}
+\label{\detokenize{quantities/habitability/habitable_zones/single_star_habitable_zone:single-star-habitable-zone}}\label{\detokenize{quantities/habitability/habitable_zones/single_star_habitable_zone::doc}}\phantomsection\label{\detokenize{quantities/habitability/habitable_zones/single_star_habitable_zone:id1}}
+
+\subsubsection{Radiative Habitable Zone}
+\label{\detokenize{quantities/habitability/habitable_zones/radiative_habitable_zone:radiative-habitable-zone}}\label{\detokenize{quantities/habitability/habitable_zones/radiative_habitable_zone::doc}}\phantomsection\label{\detokenize{quantities/habitability/habitable_zones/radiative_habitable_zone:id1}}
+
+\subsubsection{Permanent Habitable Zone}
+\label{\detokenize{quantities/habitability/habitable_zones/permanent_habitable_zone:permanent-habitable-zone}}\label{\detokenize{quantities/habitability/habitable_zones/permanent_habitable_zone::doc}}\phantomsection\label{\detokenize{quantities/habitability/habitable_zones/permanent_habitable_zone:id1}}
+
+\subsubsection{Average Habitable Zone}
+\label{\detokenize{quantities/habitability/habitable_zones/average_habitable_zone:average-habitable-zone}}\label{\detokenize{quantities/habitability/habitable_zones/average_habitable_zone::doc}}\phantomsection\label{\detokenize{quantities/habitability/habitable_zones/average_habitable_zone:id1}}
+
+\subsection{Single Star Habitability}
+\label{\detokenize{quantities/habitability/single_star_habitability:single-star-habitability}}\label{\detokenize{quantities/habitability/single_star_habitability::doc}}\phantomsection\label{\detokenize{quantities/habitability/single_star_habitability:id1}}
+\sphinxAtStartPar
+For a single {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{star}}}}, the habitability is determined by the following conditions:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
 \item {} 
 \sphinxAtStartPar
-\DUrole{xref,std,std-ref}{genindex}
+There must be a viable {\hyperref[\detokenize{quantities/habitability/habitable_zones/single_star_habitable_zone:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{SSHZ}}}} given by the {\hyperref[\detokenize{quantities/insolation_models/relaxed_minimum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{relaxed minimum limit}}}} and the {\hyperref[\detokenize{quantities/insolation_models/relaxed_maximum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{relaxed maximum limit}}}}.
 
 \item {} 
 \sphinxAtStartPar
-\DUrole{xref,std,std-ref}{modindex}
+The {\hyperref[\detokenize{quantities/insolation_models/relaxed_maximum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{relaxed maximum limit}}}} must not be smaller than the {\hyperref[\detokenize{quantities/children_orbit_limits/inner_orbit_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{inner orbit limit}}}}.
 
 \item {} 
 \sphinxAtStartPar
-\DUrole{xref,std,std-ref}{search}
+The {\hyperref[\detokenize{quantities/insolation_models/relaxed_minimum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{relaxed minimum limit}}}} must not be larger than the {\hyperref[\detokenize{quantities/children_orbit_limits/outer_orbit_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{outer orbit limit}}}}.
 
-\end{itemize}
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/life/lifetime:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{lifetime}}}} or {\hyperref[\detokenize{quantities/life/age:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{age}}}}  must be bigger than 1 billion years. This minimum age limit is when life is expected to start developing (see \sphinxhref{https://link.springer.com/article/10.1007/BF00160399}{here}).
+
+\end{enumerate}
+
+\sphinxAtStartPar
+These are the most relaxed criteria, so keep in mind that habitability varies
+from object to object and the type of life that can survive on them.
+
+
+\subsection{Binary S\sphinxhyphen{}type Habitability}
+\label{\detokenize{quantities/habitability/binary_s_type_habitability:binary-s-type-habitability}}\label{\detokenize{quantities/habitability/binary_s_type_habitability::doc}}\phantomsection\label{\detokenize{quantities/habitability/binary_s_type_habitability:id1}}
+\sphinxAtStartPar
+For a {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{star}}}} in an S\sphinxhyphen{}type {\hyperref[\detokenize{celestial_systems/binary_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{binary system}}}},
+the habitability conditions are the same as the {\hyperref[\detokenize{quantities/habitability/single_star_habitability:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{single star habitability conditions}}}}
+but the {\hyperref[\detokenize{quantities/habitability/habitable_zones/single_star_habitable_zone:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{SSHZ}}}} is replaced with {\hyperref[\detokenize{quantities/habitability/habitable_zones/average_habitable_zone:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{AHZ}}}}.
+For convenience, the conditions are listed here:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+There must be a viable {\hyperref[\detokenize{quantities/habitability/habitable_zones/average_habitable_zone:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{AHZ}}}} given by the {\hyperref[\detokenize{quantities/insolation_models/relaxed_minimum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{relaxed minimum limit}}}} and the {\hyperref[\detokenize{quantities/insolation_models/relaxed_maximum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{relaxed maximum limit}}}}.
+
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/insolation_models/relaxed_maximum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{relaxed maximum limit}}}} must not be smaller than the {\hyperref[\detokenize{quantities/children_orbit_limits/inner_orbit_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{inner orbit limit}}}}.
+
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/insolation_models/relaxed_minimum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{relaxed minimum limit}}}} must not be larger than the {\hyperref[\detokenize{quantities/children_orbit_limits/outer_orbit_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{outer orbit limit}}}}.
+
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/life/lifetime:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{lifetime}}}} or {\hyperref[\detokenize{quantities/life/age:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{age}}}}  must be bigger than 1 billion years. This minimum age limit is when life is expected to start developing (see \sphinxhref{https://link.springer.com/article/10.1007/BF00160399}{here}).
+
+\end{enumerate}
+
+\sphinxAtStartPar
+These are the most relaxed criteria, so keep in mind that habitability varies
+from object to object and the type of life that can survive on them.
+
+
+\subsection{Binary P\sphinxhyphen{}type Habitability}
+\label{\detokenize{quantities/habitability/binary_p_type_habitability:binary-p-type-habitability}}\label{\detokenize{quantities/habitability/binary_p_type_habitability::doc}}\phantomsection\label{\detokenize{quantities/habitability/binary_p_type_habitability:id1}}
+\sphinxAtStartPar
+For a P\sphinxhyphen{}type {\hyperref[\detokenize{celestial_systems/binary_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stellar binary}}}}, the habitability is determined by the following conditions:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+There must be a viable {\hyperref[\detokenize{quantities/habitability/habitable_zones/average_habitable_zone:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{P\sphinxhyphen{}Type AHZ}}}} given by the {\hyperref[\detokenize{quantities/insolation_models/relaxed_minimum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{relaxed minimum limit}}}} and the {\hyperref[\detokenize{quantities/insolation_models/relaxed_maximum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{relaxed maximum limit}}}}.
+
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/insolation_models/relaxed_maximum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{relaxed maximum limit}}}} must not be smaller than the {\hyperref[\detokenize{quantities/children_orbit_limits/inner_orbit_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{inner orbit limit}}}}.
+
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/insolation_models/relaxed_minimum_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{relaxed minimum limit}}}} must not be larger than the {\hyperref[\detokenize{quantities/children_orbit_limits/outer_orbit_limit:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{outer orbit limit}}}}.
+
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/life/lifetime:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{lifetime}}}} or {\hyperref[\detokenize{quantities/life/age:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{age}}}} of the primary {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{star}}}} must be bigger than 1 billion years. This minimum age limit is when life is expected to start developing (see \sphinxhref{https://link.springer.com/article/10.1007/BF00160399}{here}).
+
+\end{enumerate}
+
+\sphinxAtStartPar
+These are the most relaxed criteria, so keep in mind that habitability varies
+from object to object and the type of life that can survive on them.
+
+
+\subsection{Planet Habitability}
+\label{\detokenize{quantities/habitability/planet_habitability:planet-habitability}}\label{\detokenize{quantities/habitability/planet_habitability::doc}}\phantomsection\label{\detokenize{quantities/habitability/planet_habitability:id1}}
+\sphinxAtStartPar
+For a {\hyperref[\detokenize{celestial_bodies/planet:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{planet}}}}, the habitability is determined by the following conditions:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} must be less than \(5 \, {\rm M_e}\).
+
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} must be more than \(0.0268 \, {\rm M_e}\) for water worlds and more than \(0.1 \, {\rm M_e}\) for other {\hyperref[\detokenize{quantities/material/composition_type:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{composition types}}}}.
+
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{radius}}}} must be between \(0.5 \, {\rm R_e}\) and \(1.5 \, {\rm R_e}\).
+
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{celestial_bodies/planet:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{planet’s}}}} parent must have a viable relaxed {\hyperref[\detokenize{quantities/habitability/habitable_zones/habitable_zones:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{HZ}}}}.
+
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{semi\sphinxhyphen{}major axis}}}} must be within the relaxed {\hyperref[\detokenize{quantities/habitability/habitable_zones/habitable_zones:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{HZ}}}} of the parent.
+
+\item {} 
+\sphinxAtStartPar
+The orbit must be {\hyperref[\detokenize{quantities/orbital/orbital_stability:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stable}}}}.
+
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/surface/internal_heating/tectonic_activity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{tectonic activity}}}} must be labeled as “Medium Low”, “Medium” or “Medium High”.
+
+\end{enumerate}
+
+
+\subsection{Satellite Habitability}
+\label{\detokenize{quantities/habitability/satellite_habitability:satellite-habitability}}\label{\detokenize{quantities/habitability/satellite_habitability::doc}}\phantomsection\label{\detokenize{quantities/habitability/satellite_habitability:id1}}
+\sphinxAtStartPar
+For a {\hyperref[\detokenize{celestial_bodies/satellite:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{satellite}}}}, the habitability conditions are the same as the
+{\hyperref[\detokenize{quantities/habitability/planet_habitability:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{planetary habitability conditions}}}}
+but the the reference to the {\hyperref[\detokenize{quantities/habitability/habitable_zones/habitable_zones:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{HZ}}}} of the parent, must be changed to the grandparent.
+For convenience, the conditions are listed here:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} must be less than \(5 \, {\rm M_e}\).
+
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} must be more than \(0.0268 \, {\rm M_e}\) for water worlds and more than \(0.1 \, {\rm M_e}\) for other {\hyperref[\detokenize{quantities/material/composition_type:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{composition types}}}}.
+
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{radius}}}} must be between \(0.5 \, {\rm R_e}\) and \(1.5 \, {\rm R_e}\).
+
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{celestial_bodies/satellite:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{satellite’s}}}} grandparent must have a viable relaxed {\hyperref[\detokenize{quantities/habitability/habitable_zones/habitable_zones:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{HZ}}}}.
+
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{semi\sphinxhyphen{}major axis}}}} of the {\hyperref[\detokenize{celestial_bodies/satellite:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{satellite’s}}}} parent must be within the relaxed {\hyperref[\detokenize{quantities/habitability/habitable_zones/habitable_zones:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{HZ}}}} of the {\hyperref[\detokenize{celestial_bodies/satellite:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{satellite’s}}}} grandparent.
+
+\item {} 
+\sphinxAtStartPar
+The orbit must be {\hyperref[\detokenize{quantities/orbital/orbital_stability:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stable}}}}.
+
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/surface/internal_heating/tectonic_activity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{tectonic activity}}}} must be labeled as “Medium Low”, “Medium” or “Medium High”.
+
+\end{enumerate}
+
+
+\subsection{Trojan Satellite Habitability}
+\label{\detokenize{quantities/habitability/trojan_satellite_habitability:trojan-satellite-habitability}}\label{\detokenize{quantities/habitability/trojan_satellite_habitability::doc}}\phantomsection\label{\detokenize{quantities/habitability/trojan_satellite_habitability:id1}}
+\sphinxAtStartPar
+For a {\hyperref[\detokenize{celestial_bodies/trojan_satellite:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{trojan satellite}}}}, the habitability conditions are the same as the
+{\hyperref[\detokenize{quantities/habitability/planet_habitability:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{planetary habitability conditions}}}}
+but the the reference to the {\hyperref[\detokenize{quantities/habitability/habitable_zones/habitable_zones:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{HZ}}}} of the parent, must be changed to the grandparent.
+For convenience, the conditions are listed here:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} must be less than \(5 \, {\rm M_e}\).
+
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} must be more than \(0.0268 \, {\rm M_e}\) for water worlds and more than \(0.1 \, {\rm M_e}\) for other {\hyperref[\detokenize{quantities/material/composition_type:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{composition types}}}}.
+
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{radius}}}} must be between \(0.5 \, {\rm R_e}\) and \(1.5 \, {\rm R_e}\).
+
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{celestial_bodies/trojan_satellite:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{trojan satellite’s}}}} grandparent must have a viable relaxed {\hyperref[\detokenize{quantities/habitability/habitable_zones/habitable_zones:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{HZ}}}}.
+
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{semi\sphinxhyphen{}major axis}}}} must be within the relaxed {\hyperref[\detokenize{quantities/habitability/habitable_zones/habitable_zones:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{HZ}}}} of the grandparent.
+
+\item {} 
+\sphinxAtStartPar
+The orbit of the parent must be {\hyperref[\detokenize{quantities/orbital/orbital_stability:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stable}}}}.
+
+\item {} 
+\sphinxAtStartPar
+The {\hyperref[\detokenize{quantities/surface/internal_heating/tectonic_activity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{tectonic activity}}}} must be labeled as “Medium Low”, “Medium” or “Medium High”.
+
+\end{enumerate}
 
 
 

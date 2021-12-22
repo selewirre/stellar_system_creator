@@ -1,5 +1,5 @@
 Earth-Equivalent Limit
-=====================
+======================
 
 .. _earth_equivalent_limit:
 

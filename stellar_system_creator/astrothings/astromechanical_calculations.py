@@ -612,17 +612,33 @@ def calculate_satellite_retrograde_orbit_limit_factor(parent_eccentricity: float
     return 0.9309 * (1 - 1.0764 * parent_eccentricity - 0.9812 * child_eccentricity)
 
 
-def calculate_max_satellite_mass(parent_mass: Q_, parent_radius: Q_, hill_sphere: Q_, orbit_type_limit_factor: float,
+# def calculate_max_satellite_mass(parent_mass: Q_, parent_radius: Q_, hill_sphere: Q_, orbit_type_limit_factor: float,
+#                                  satellite_lifetime: Q_) -> Q_:
+#     """
+#     Satellites around planets have a limited mass dependent on their parent.
+#
+#     More info on: https://www.aanda.org/articles/aa/pdf/2010/13/aa14955-10.pdf Eq. 5
+#     """
+#     prefactor = 1000 / 0.51 / 39 / np.sqrt(gravitational_constant) * orbit_type_limit_factor ** 6.5
+#
+#     upper_mass_limit = prefactor * hill_sphere.to('m') ** 6.5 \
+#         / satellite_lifetime.to('second') / parent_radius.to('m') ** 5 * np.sqrt(parent_mass.to('kg'))
+#
+#     return upper_mass_limit.to(parent_mass.units)
+
+
+def calculate_max_satellite_mass(parent_mass: Q_, parent_radius: Q_, satellite_semi_major_axis: Q_, satellite_age: Q_,
                                  satellite_lifetime: Q_) -> Q_:
     """
     Satellites around planets have a limited mass dependent on their parent.
 
     More info on: https://www.aanda.org/articles/aa/pdf/2010/13/aa14955-10.pdf Eq. 5
     """
-    prefactor = 1000 / 0.51 / 39 / np.sqrt(gravitational_constant) * orbit_type_limit_factor ** 6.5
+    prefactor = 20000 / 0.51 / 39 / np.sqrt(gravitational_constant)
+    remaining_lifetime = satellite_lifetime - satellite_age
 
-    upper_mass_limit = prefactor * hill_sphere.to('m') ** 6.5 \
-        / satellite_lifetime.to('second') / parent_radius.to('m') ** 5 * np.sqrt(parent_mass.to('kg'))
+    upper_mass_limit = prefactor * satellite_semi_major_axis.to('m') ** 6.5 \
+        / remaining_lifetime.to('second') / parent_radius.to('m') ** 5 * np.sqrt(parent_mass.to('kg'))
 
     return upper_mass_limit.to(parent_mass.units)
 

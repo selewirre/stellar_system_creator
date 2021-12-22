@@ -1,7 +1,7 @@
 Sol-Equivalent Water Frost Limit
 ================================
 
-.. _sol_equivalent_water_frost_line:
+.. _sol_equivalent_water_frost_limit:
 
 We use :ref:`Selsis insolation model <selsis_insolation_model>` since it allows for easy, Solar system comparisons.
 As shown on the wikipedia page https://en.wikipedia.org/wiki/Frost_line_(astrophysics), there are different
