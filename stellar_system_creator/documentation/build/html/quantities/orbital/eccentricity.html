@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Eccentricity &mdash; Stellar System Creator 0.0.5.1 documentation</title>
+  <title>Eccentricity &mdash; Stellar System Creator 0.0.5.2 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -107,9 +107,18 @@
 <p id="id1">Eccentricity <span class="math notranslate nohighlight">\(e\)</span> determines how elliptic the orbit of a child around a parent body is.
 <span class="math notranslate nohighlight">\(e = 0\)</span> means that the orbit is circular, and <span class="math notranslate nohighlight">\(e = 1\)</span> means
 that the orbit resembles a line (not a stable orbit).</p>
-<p>The closer to <span class="math notranslate nohighlight">\(e = 0\)</span>, the more stable the orbit in single star systems.</p>
-<p>For objects orbiting binary systems (P- or S-type), the preferred eccentricity
-is not zero.</p>
+<p>The suggested eccentricity is <span class="math notranslate nohighlight">\(e = 0\)</span> for single <a class="reference internal" href="../../celestial_bodies/star.html#id1"><span class="std std-ref">star</span></a> systems.
+For <a class="reference internal" href="../../celestial_systems/binary_system.html#id1"><span class="std std-ref">binary systems</span></a>, the suggested eccentricity depends on the
+eccentricity of the binary <span class="math notranslate nohighlight">\(e_c\)</span>,
+the <a class="reference internal" href="semi_major_axis.html#id1"><span class="std std-ref">semi-major axis</span></a> <span class="math notranslate nohighlight">\(a_c\)</span> of the child, the
+<a class="reference internal" href="semi_major_axis.html#id1"><span class="std std-ref">mean distance</span></a> <span class="math notranslate nohighlight">\(a_b\)</span> between the two binary system objects,
+and the secondary to total <a class="reference internal" href="../material/mass.html#id1"><span class="std std-ref">mass</span></a> ratio <span class="math notranslate nohighlight">\(\mu\)</span> of the binary. Small
+variations of the eccentricity (e.g. <span class="math notranslate nohighlight">\(\pm 0.05\)</span>) are suggested for a more realistic
+<a class="reference internal" href="orbital.html#id1"><span class="std std-ref">orbit</span></a>.</p>
+<p>For S-type <a class="reference internal" href="../../celestial_systems/binary_system.html#id1"><span class="std std-ref">binary systems</span></a>, the suggested eccentricity is given by:
+<span class="math notranslate nohighlight">\(e_S = \frac{5}{4} \frac{a_c}{a_b} \frac{e_b}{1-e_b^2}\)</span>.</p>
+<p>For P-type <a class="reference internal" href="../../celestial_systems/binary_system.html#id1"><span class="std std-ref">binary systems</span></a>, the suggested eccentricity is given by:
+<span class="math notranslate nohighlight">\(e_P = \frac{5}{4} \frac{a_b}{a_c} (1-2\mu) \frac{4 e_b + 3e_b^3}{4 + 6e_b^2}\)</span>.</p>
 </section>
 
 

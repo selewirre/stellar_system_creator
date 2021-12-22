@@ -237,8 +237,10 @@ def exit_application(parent):
 
 
 def open_documentation():
+    # filename = pkg_resources.resource_filename('stellar_system_creator',
+    #                                            'documentation/build/latex/stellarsystemcreator.pdf')
     filename = pkg_resources.resource_filename('stellar_system_creator',
-                                               'documentation/stellar_system_creator_documentation.pdf')
+                                               'documentation/build/html/index.html')
     import subprocess, os, platform
     if platform.system() == 'Darwin':  # macOS
         subprocess.call(('open', filename))

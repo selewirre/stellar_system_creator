@@ -159,7 +159,7 @@ class LineEdit(QLineEdit):
         super().__init__(*args, **kwargs)
         self.sse = sse
         self.value_name = value_name
-        self.setText(str(self.sse.__dict__[self.value_name]))
+        self.setText(get_value_string_no_unit(self.sse.__dict__[self.value_name]))
         self.editingFinished.connect(self.change_text_action)
         self.setFixedSize(300, self.sizeHint().height())
         # self.inputRejected.connect(self.keep_old_text_action)
@@ -181,7 +181,10 @@ class LineEdit(QLineEdit):
 
     def keep_old_text_action(self) -> None:
         if self.hasFocus():
-            self.setText(self.sse.__dict__[self.value_name])
+            self.setText(get_value_string_no_unit(self.get_value()))
+
+    def get_value(self):
+        return self.sse.__dict__[self.value_name]
 
 
 class Label(QLabel):
@@ -206,10 +209,7 @@ class Label(QLabel):
         else:
             text_value = self.sse.__dict__[self.value_name]
 
-        if isinstance(text_value, dict):
-            text = '\n'.join([f'{key}:\t{text_value[key]}' for key in text_value])
-        else:
-            text = str(text_value)
+        text = get_value_string_no_unit(text_value)
 
         self.setText(text)
 
@@ -476,6 +476,15 @@ def get_value_string(value: Q_):
         return '\n'.join([f'{key}:\t{value[key].m:.3g}' for key in value])
     else:
         return f'{value.m:.3g}'
+
+
+def get_value_string_no_unit(value):
+    if isinstance(value, dict):
+        return '\n'.join([f'{key}:\t{value[key]}' for key in value])
+    elif isinstance(value, (int, float)):
+        return f'{value:.3g}'
+    else:
+        return str(value)
 
 
 def get_unit_bidict(value: Q_):

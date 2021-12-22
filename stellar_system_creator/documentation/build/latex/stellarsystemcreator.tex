@@ -60,8 +60,8 @@
 
 
 \title{Stellar System Creator}
-\date{Dec 21, 2021}
-\release{0.0.5.1}
+\date{Dec 22, 2021}
+\release{0.0.5.2}
 \author{Selewirre Iskvary}
 \newcommand{\sphinxlogo}{\vbox{}}
 \renewcommand{\releasename}{Release}
@@ -842,6 +842,9 @@ More information on: \sphinxurl{https://en.wikipedia.org/wiki/Angular\_diameter}
 
 \section{Orbital}
 \label{\detokenize{quantities/orbital/orbital:orbital}}\label{\detokenize{quantities/orbital/orbital::doc}}\phantomsection\label{\detokenize{quantities/orbital/orbital:id1}}
+\sphinxAtStartPar
+An orbit is a curved trajectory of an object. This trajectory can either be circular, or elliptical.
+
 
 \subsection{Eccentricity}
 \label{\detokenize{quantities/orbital/eccentricity:eccentricity}}\label{\detokenize{quantities/orbital/eccentricity::doc}}\phantomsection\label{\detokenize{quantities/orbital/eccentricity:id1}}
@@ -851,11 +854,22 @@ Eccentricity \(e\) determines how elliptic the orbit of a child around a parent 
 that the orbit resembles a line (not a stable orbit).
 
 \sphinxAtStartPar
-The closer to \(e = 0\), the more stable the orbit in single star systems.
+The suggested eccentricity is \(e = 0\) for single {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{star}}}} systems.
+For {\hyperref[\detokenize{celestial_systems/binary_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{binary systems}}}}, the suggested eccentricity depends on the
+eccentricity of the binary \(e_c\),
+the {\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{semi\sphinxhyphen{}major axis}}}} \(a_c\) of the child, the
+{\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mean distance}}}} \(a_b\) between the two binary system objects,
+and the secondary to total {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} ratio \(\mu\) of the binary. Small
+variations of the eccentricity (e.g. \(\pm 0.05\)) are suggested for a more realistic
+{\hyperref[\detokenize{quantities/orbital/orbital:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{orbit}}}}.
 
 \sphinxAtStartPar
-For objects orbiting binary systems (P\sphinxhyphen{} or S\sphinxhyphen{}type), the preferred eccentricity
-is not zero.
+For S\sphinxhyphen{}type {\hyperref[\detokenize{celestial_systems/binary_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{binary systems}}}}, the suggested eccentricity is given by:
+\(e_S = \frac{5}{4} \frac{a_c}{a_b} \frac{e_b}{1-e_b^2}\).
+
+\sphinxAtStartPar
+For P\sphinxhyphen{}type {\hyperref[\detokenize{celestial_systems/binary_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{binary systems}}}}, the suggested eccentricity is given by:
+\(e_P = \frac{5}{4} \frac{a_b}{a_c} (1-2\mu) \frac{4 e_b + 3e_b^3}{4 + 6e_b^2}\).
 
 
 \subsection{Semi\sphinxhyphen{}Major Axis}
@@ -1298,11 +1312,11 @@ The outer limit is taken from wiki’s mention on the early\sphinxhyphen{}days f
 Insolation or effective stellar flux is the effective flux that
 reaches a specific {\hyperref[\detokenize{quantities/orbital/orbital:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{orbital}}}} distance, called threshold (or limit).
 Insolation changes with the {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{star’s}}}} {\hyperref[\detokenize{quantities/surface/emission/temperature:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{temperature}}}},
-as well as the climate of the target {\hyperref[\detokenize{quantities/habitability/habitability:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{habitable}}}} world.
+as well as the environmental conditions of the target {\hyperref[\detokenize{quantities/habitability/habitability:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{habitable}}}} world.
 We use insolation for a specific climate to normalize the
 {\hyperref[\detokenize{quantities/surface/emission/luminosity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{luminosity}}}} of a {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{star’s}}}},
-and then try and estimate the threshold at which distance from
-the {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{star’s}}}} these environmental situations occur.
+and try to estimate the threshold at which distance from
+the {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{star’s}}}} the aforementioned environmental conditions occur.
 By using extreme environmental conditions that could potentially support life,
 we can determine minima and maxima for {\hyperref[\detokenize{quantities/habitability/habitable_zones/habitable_zones:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{zones of habitability}}}}
 around single\sphinxhyphen{} or multi\sphinxhyphen{}star {\hyperref[\detokenize{celestial_systems/celestial_systems:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{systems}}}}.
@@ -1543,15 +1557,89 @@ the average habitable zone or {\hyperref[\detokenize{quantities/habitability/hab
 
 \subsubsection{Single Star Habitable Zone}
 \label{\detokenize{quantities/habitability/habitable_zones/single_star_habitable_zone:single-star-habitable-zone}}\label{\detokenize{quantities/habitability/habitable_zones/single_star_habitable_zone::doc}}\phantomsection\label{\detokenize{quantities/habitability/habitable_zones/single_star_habitable_zone:id1}}
+\sphinxAtStartPar
+The Single Star Habitable Zone (SSHZ) is the simplest type of habitable zone.
+
+\sphinxAtStartPar
+For a single {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{star}}}} of {\hyperref[\detokenize{quantities/surface/emission/luminosity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{luminosity}}}} \(L\) and
+{\hyperref[\detokenize{quantities/surface/emission/temperature:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{temperature}}}} \(T\), the habitable thresholds \(r_x\) (where
+\(x = {\rm inner, \, outer}\)) with insolation
+\(S_x(T)\) are estimated by:
+\(r_x = \sqrt{\frac{L}{S_x(T)}}\).
+
 
 \subsubsection{Radiative Habitable Zone}
 \label{\detokenize{quantities/habitability/habitable_zones/radiative_habitable_zone:radiative-habitable-zone}}\label{\detokenize{quantities/habitability/habitable_zones/radiative_habitable_zone::doc}}\phantomsection\label{\detokenize{quantities/habitability/habitable_zones/radiative_habitable_zone:id1}}
+\sphinxAtStartPar
+The Radiative Habitable Zone (SSHZ) is the simplest type of habitable zone in a {\hyperref[\detokenize{celestial_systems/binary_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{binary system}}}}.
+It does \sphinxstyleemphasis{not} take into account the forced and periodically changing {\hyperref[\detokenize{quantities/orbital/eccentricity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{eccentricity}}}}
+of the {\hyperref[\detokenize{celestial_bodies/planet:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{planets}}}} due to the asymmetry
+the two {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stars}}}} of different {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} introduce to the {\hyperref[\detokenize{celestial_systems/stellar_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stellar system}}}}.
+
+\sphinxAtStartPar
+Let us assume a {\hyperref[\detokenize{celestial_systems/binary_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{binary system}}}} with {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stars}}}} \(s = A,\, B\)
+of {\hyperref[\detokenize{quantities/surface/emission/luminosity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{luminosities}}}} \(L_s\) and
+{\hyperref[\detokenize{quantities/surface/emission/temperature:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{temperatures}}}} \(T_s\).
+They are separated by a mean {\hyperref[\detokenize{quantities/orbital/semi_major_axis:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{distance}}}} \(D\)
+and orbit around a common center with {\hyperref[\detokenize{quantities/orbital/eccentricity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{eccentricity}}}} \(e\).
+We aim to calculate the \sphinxstyleemphasis{radiative} habitable thresholds with insolation
+\(S_{s,x}(T_s)\) (where \(x = {\rm I, \, O}\)).
+For convenience, we define the
+normalized luminosity: \(\tilde L_{s,x} = \frac{L_s}{S_{s,x}(T_s)}\), the
+{\hyperref[\detokenize{quantities/habitability/habitable_zones/single_star_habitable_zone:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{SSHZ}}}} \(r_{s, x} = \sqrt{\tilde L_{s,x}}\),
+the double\sphinxhyphen{}star equivalent \(r_{\rm AB, x} = \sqrt{\tilde L_{A,x} + \tilde L_{B,x}}\),
+and the half mean distance \(b = D/2\).
+
+\sphinxAtStartPar
+The S\sphinxhyphen{}type RHZ for {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stars}}}} \(A\), namely \(r_{A, x}^{\rm S-type}\), thresholds are estimated by:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+Inner: \(r_{\rm A, I}^{\rm S-type} = r_{\rm A, I} \left(1 + \frac{\tilde L_{B,\rm I}}{\left(D - r_{\rm A, I}\right)^2} \right)\).
+
+\item {} 
+\sphinxAtStartPar
+Outer: \(r_{\rm A, O}^{\rm S-type} = r_{\rm A, O} \left(1 + \frac{\tilde L_{B,\rm O}}{\left(D + r_{\rm A, O}\right)^2} \right)\).
+
+\end{enumerate}
+
+\sphinxAtStartPar
+The P\sphinxhyphen{}type RHZ, namely \(r_{\rm AB, x}^{\rm P-type}\), thresholds are estimated by:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+Inner: \(r_{\rm AB, I}^{\rm P-type} = \sqrt{ \tilde L_{A,\rm I} \frac{r_{\rm AB, I} + b}{r_{\rm AB, I} - b} + \tilde L_{B,\rm I} \frac{r_{\rm AB, I} - b}{r_{\rm AB, I} + b} - b^2}\)
+
+\item {} 
+\sphinxAtStartPar
+Outer: \(r_{\rm AB, O}^{\rm P-type} = \sqrt{ \tilde L_{A,\rm O} \frac{r_{\rm AB, O} - b}{r_{\rm AB, O} + b} + \tilde L_{B,\rm O} \frac{r_{\rm AB, O} + b}{r_{\rm AB, O} - b} - b^2}\)
+
+\end{enumerate}
+
 
 \subsubsection{Permanent Habitable Zone}
 \label{\detokenize{quantities/habitability/habitable_zones/permanent_habitable_zone:permanent-habitable-zone}}\label{\detokenize{quantities/habitability/habitable_zones/permanent_habitable_zone::doc}}\phantomsection\label{\detokenize{quantities/habitability/habitable_zones/permanent_habitable_zone:id1}}
+\sphinxAtStartPar
+The Permanent Habitable Zone (PHZ) is a complex type of habitable zone in a {\hyperref[\detokenize{celestial_systems/binary_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{binary system}}}}.
+It takes into account the forced and periodically changing {\hyperref[\detokenize{quantities/orbital/eccentricity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{eccentricity}}}}
+of the {\hyperref[\detokenize{celestial_bodies/planet:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{planets}}}} due to the asymmetry
+the two {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stars}}}} of different {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} introduce to the {\hyperref[\detokenize{celestial_systems/stellar_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stellar system}}}}.
+It assumes that the climate of the potential habitable world is fast at immediately adjusting to the periodically changing
+{\hyperref[\detokenize{quantities/orbital/eccentricity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{eccentricity}}}}.
+
 
 \subsubsection{Average Habitable Zone}
 \label{\detokenize{quantities/habitability/habitable_zones/average_habitable_zone:average-habitable-zone}}\label{\detokenize{quantities/habitability/habitable_zones/average_habitable_zone::doc}}\phantomsection\label{\detokenize{quantities/habitability/habitable_zones/average_habitable_zone:id1}}
+\sphinxAtStartPar
+The Average Habitable Zone (AHZ) is a complex type of habitable zone in a {\hyperref[\detokenize{celestial_systems/binary_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{binary system}}}}.
+It takes into account the forced and periodically changing {\hyperref[\detokenize{quantities/orbital/eccentricity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{eccentricity}}}}
+of the {\hyperref[\detokenize{celestial_bodies/planet:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{planets}}}} due to the asymmetry
+the two {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stars}}}} of different {\hyperref[\detokenize{quantities/material/mass:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{mass}}}} introduce to the {\hyperref[\detokenize{celestial_systems/stellar_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stellar system}}}}.
+It assumes that the climate of the potential habitable world is slow at adjusting to the periodically changing
+{\hyperref[\detokenize{quantities/orbital/eccentricity:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{eccentricity}}}}.
+
 
 \subsection{Single Star Habitability}
 \label{\detokenize{quantities/habitability/single_star_habitability:single-star-habitability}}\label{\detokenize{quantities/habitability/single_star_habitability::doc}}\phantomsection\label{\detokenize{quantities/habitability/single_star_habitability:id1}}

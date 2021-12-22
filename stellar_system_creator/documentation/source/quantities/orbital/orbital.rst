@@ -3,6 +3,8 @@ Orbital
 
 .. _orbital:
 
+An orbit is a curved trajectory of an object. This trajectory can either be circular, or elliptical.
+
 .. toctree::
     eccentricity
     semi_major_axis

@@ -584,7 +584,7 @@ class MainSequenceStar(Star):
 class Planet(StellarBody):
 
     def __init__(self, name, mass: Q_, radius: Q_ = np.nan * ureg.R_e, parent=None,
-                 semi_major_axis: Q_ = np.nan * ureg.au, orbital_eccentricity: float = 0, orbit_type='prograde',
+                 semi_major_axis: Q_ = np.nan * ureg.au, orbital_eccentricity: float = np.nan, orbit_type='prograde',
                  composition='Rockworld70', spin_period: Q_ = np.nan * ureg.days, inclination: Q_ = 0 * ureg.deg,
                  longitude_of_ascending_node: Q_ = 0 * ureg.deg, argument_of_periapsis: Q_ = np.nan * ureg.deg,
                  axial_tilt: Q_ = 0 * ureg.deg, albedo: float = 0, normalized_greenhouse: float = 0,
@@ -608,10 +608,20 @@ class Planet(StellarBody):
         super().__init__(name, mass, radius, luminosity, spin_period, age, parent, image_filename)
 
     def __post_init__(self):
+        self._get_suggested_orbital_eccentricity()
         self.incident_flux = self.calculate_incident_flux()
         self.temperature = self.calculate_temperature()
 
         super().__post_init__()
+
+    def _get_suggested_orbital_eccentricity(self) -> None:
+        if 'suggested_orbital_eccentricity' in self.__dict__:
+            previous_suggested_orbital_eccentricity = self.suggested_orbital_eccentricity
+        else:
+            previous_suggested_orbital_eccentricity = -999
+        self.suggested_orbital_eccentricity = self.calculate_suggested_orbital_eccentricity()
+        if np.isnan(self.orbital_eccentricity) or previous_suggested_orbital_eccentricity == self.orbital_eccentricity:
+            self.orbital_eccentricity = self.suggested_orbital_eccentricity
 
     def _get_age(self) -> None:
         if 'suggested_age' in self.__dict__:
@@ -624,6 +634,22 @@ class Planet(StellarBody):
             self.suggested_age = np.nan * ureg.T_s
         if np.isnan(self.age.m) or previous_suggested_age == self.age:
             self.age = self.suggested_age
+
+    def calculate_suggested_orbital_eccentricity(self) -> float:
+        from stellar_system_creator.stellar_system_elements.binary_system import BinarySystem
+        if self.parent is None:
+            return 0
+        elif isinstance(self.parent, BinarySystem):
+            secondary_star_mass_ratio = self.parent.secondary_body.mass/self.parent.mass
+            return calculate_forced_eccentricity_in_close_binary(self.semi_major_axis, self.parent.mean_distance,
+                                                                 self.parent.eccentricity, secondary_star_mass_ratio)
+        elif isinstance(self.parent, StellarBody) and self.parent.parent is None:
+            return 0
+        elif isinstance(self.parent, StellarBody) and isinstance(self.parent.parent, BinarySystem):
+            return calculate_forced_eccentricity_in_wide_binary(self.semi_major_axis, self.parent.parent.mean_distance,
+                                                                self.parent.parent.eccentricity)
+        else:
+            return np.nan
 
     def calculate_suggested_radius(self) -> Q_:
         return calculate_planet_radius(self.mass, self.composition, self.incident_flux)
@@ -681,11 +707,6 @@ class Planet(StellarBody):
                 if self.parent.parent.primary_body == self:
                     companion_body = self.parent.parent.primary_body
                 else:
-                    print(self.name)
-                    print(self.parent.part_of_binary)
-                    print(self.parent.name)
-                    print(self.parent.parent.name)
-                    print('=======')
                     companion_body = self.parent.parent.secondary_body
                 incident_flux = incident_flux + calculate_companion_incident_flux_in_wide_binary(
                     companion_body.luminosity, self.semi_major_axis, self.parent.mean_distance,
@@ -1119,6 +1140,9 @@ class Trojan(Planet):
     def _set_radius_distribution(self):
         self.radius_distribution: Q_ = (self.mass_distribution / (4 * np.pi / 3 * self.density)).to_reduced_units() \
                                        ** (1 / 3)
+
+    def calculate_suggested_orbital_eccentricity(self) -> float:
+        return self.parent.suggested_orbital_eccentricity
 
     def calculate_suggested_luminosity(self) -> Q_:
         return 0 * ureg.L_s

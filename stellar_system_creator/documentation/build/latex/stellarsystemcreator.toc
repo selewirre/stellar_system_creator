@@ -56,51 +56,51 @@
 \contentsline {subsection}{\numberline {4.6.3}Semi\sphinxhyphen {}Minor Axis}{14}{subsection.4.6.3}%
 \contentsline {subsection}{\numberline {4.6.4}Apoapsis}{14}{subsection.4.6.4}%
 \contentsline {subsection}{\numberline {4.6.5}Periapsis}{14}{subsection.4.6.5}%
-\contentsline {subsection}{\numberline {4.6.6}Lagrange Position}{14}{subsection.4.6.6}%
+\contentsline {subsection}{\numberline {4.6.6}Lagrange Position}{15}{subsection.4.6.6}%
 \contentsline {subsection}{\numberline {4.6.7}Contact}{15}{subsection.4.6.7}%
 \contentsline {subsection}{\numberline {4.6.8}Roche Lobe}{15}{subsection.4.6.8}%
 \contentsline {subsection}{\numberline {4.6.9}Orbital Period}{15}{subsection.4.6.9}%
 \contentsline {subsection}{\numberline {4.6.10}Orbital Velocity}{15}{subsection.4.6.10}%
 \contentsline {subsection}{\numberline {4.6.11}Orbit Type}{15}{subsection.4.6.11}%
-\contentsline {subsection}{\numberline {4.6.12}Orbit Type Factor}{15}{subsection.4.6.12}%
-\contentsline {subsection}{\numberline {4.6.13}Orbital Stability}{15}{subsection.4.6.13}%
+\contentsline {subsection}{\numberline {4.6.12}Orbit Type Factor}{16}{subsection.4.6.12}%
+\contentsline {subsection}{\numberline {4.6.13}Orbital Stability}{16}{subsection.4.6.13}%
 \contentsline {subsection}{\numberline {4.6.14}Inclination}{16}{subsection.4.6.14}%
 \contentsline {subsection}{\numberline {4.6.15}Argument of Periapsis}{16}{subsection.4.6.15}%
 \contentsline {subsection}{\numberline {4.6.16}Longitude of the Ascending Node}{16}{subsection.4.6.16}%
 \contentsline {subsection}{\numberline {4.6.17}Semi\sphinxhyphen {}Major Axis Minimum Limit}{16}{subsection.4.6.17}%
-\contentsline {subsection}{\numberline {4.6.18}Semi\sphinxhyphen {}Major Axis Maximum Limit}{16}{subsection.4.6.18}%
-\contentsline {section}{\numberline {4.7}Children Orbit Limits}{16}{section.4.7}%
-\contentsline {subsection}{\numberline {4.7.1}Tidal Locking Radius}{16}{subsection.4.7.1}%
+\contentsline {subsection}{\numberline {4.6.18}Semi\sphinxhyphen {}Major Axis Maximum Limit}{17}{subsection.4.6.18}%
+\contentsline {section}{\numberline {4.7}Children Orbit Limits}{17}{section.4.7}%
+\contentsline {subsection}{\numberline {4.7.1}Tidal Locking Radius}{17}{subsection.4.7.1}%
 \contentsline {subsection}{\numberline {4.7.2}Roche Limit}{17}{subsection.4.7.2}%
 \contentsline {subsection}{\numberline {4.7.3}Dense Roche Limit}{17}{subsection.4.7.3}%
 \contentsline {subsection}{\numberline {4.7.4}P\sphinxhyphen {}type binary Critical Orbit}{17}{subsection.4.7.4}%
-\contentsline {subsection}{\numberline {4.7.5}Inner Orbit Limit}{17}{subsection.4.7.5}%
-\contentsline {subsection}{\numberline {4.7.6}Hill Sphere}{17}{subsection.4.7.6}%
-\contentsline {subsection}{\numberline {4.7.7}Roche Lobe}{17}{subsection.4.7.7}%
+\contentsline {subsection}{\numberline {4.7.5}Inner Orbit Limit}{18}{subsection.4.7.5}%
+\contentsline {subsection}{\numberline {4.7.6}Hill Sphere}{18}{subsection.4.7.6}%
+\contentsline {subsection}{\numberline {4.7.7}Roche Lobe}{18}{subsection.4.7.7}%
 \contentsline {subsection}{\numberline {4.7.8}S\sphinxhyphen {}type binary Critical Orbit}{18}{subsection.4.7.8}%
 \contentsline {subsection}{\numberline {4.7.9}Outer Orbit Limit}{18}{subsection.4.7.9}%
-\contentsline {subsection}{\numberline {4.7.10}Inner Rock Formation Limit}{18}{subsection.4.7.10}%
-\contentsline {subsection}{\numberline {4.7.11}Outer Rock Formation Limit}{18}{subsection.4.7.11}%
-\contentsline {subsection}{\numberline {4.7.12}Inner Water Frost Limit}{18}{subsection.4.7.12}%
+\contentsline {subsection}{\numberline {4.7.10}Inner Rock Formation Limit}{19}{subsection.4.7.10}%
+\contentsline {subsection}{\numberline {4.7.11}Outer Rock Formation Limit}{19}{subsection.4.7.11}%
+\contentsline {subsection}{\numberline {4.7.12}Inner Water Frost Limit}{19}{subsection.4.7.12}%
 \contentsline {subsection}{\numberline {4.7.13}Sol\sphinxhyphen {}Equivalent Water Frost Limit}{19}{subsection.4.7.13}%
-\contentsline {subsection}{\numberline {4.7.14}Outer Water Frost Limit}{19}{subsection.4.7.14}%
-\contentsline {section}{\numberline {4.8}Insolation Models}{19}{section.4.8}%
-\contentsline {subsection}{\numberline {4.8.1}Kopparapu}{19}{subsection.4.8.1}%
-\contentsline {subsection}{\numberline {4.8.2}Selsis}{20}{subsection.4.8.2}%
+\contentsline {subsection}{\numberline {4.7.14}Outer Water Frost Limit}{20}{subsection.4.7.14}%
+\contentsline {section}{\numberline {4.8}Insolation Models}{20}{section.4.8}%
+\contentsline {subsection}{\numberline {4.8.1}Kopparapu}{20}{subsection.4.8.1}%
+\contentsline {subsection}{\numberline {4.8.2}Selsis}{21}{subsection.4.8.2}%
 \contentsline {subsection}{\numberline {4.8.3}Relaxed Minimum Limit}{21}{subsection.4.8.3}%
 \contentsline {subsection}{\numberline {4.8.4}Relaxed Maximum Limit}{21}{subsection.4.8.4}%
-\contentsline {subsection}{\numberline {4.8.5}Conservative Minimum Limit}{21}{subsection.4.8.5}%
-\contentsline {subsection}{\numberline {4.8.6}Conservative Maximum Limit}{21}{subsection.4.8.6}%
-\contentsline {subsection}{\numberline {4.8.7}Earth\sphinxhyphen {}Equivalent Limit}{21}{subsection.4.8.7}%
-\contentsline {section}{\numberline {4.9}Habitability}{21}{section.4.9}%
-\contentsline {subsection}{\numberline {4.9.1}Habitable Zones}{21}{subsection.4.9.1}%
-\contentsline {subsubsection}{Single Star Habitable Zone}{21}{subsubsection*.100}%
-\contentsline {subsubsection}{Radiative Habitable Zone}{21}{subsubsection*.102}%
-\contentsline {subsubsection}{Permanent Habitable Zone}{21}{subsubsection*.104}%
-\contentsline {subsubsection}{Average Habitable Zone}{21}{subsubsection*.106}%
-\contentsline {subsection}{\numberline {4.9.2}Single Star Habitability}{21}{subsection.4.9.2}%
-\contentsline {subsection}{\numberline {4.9.3}Binary S\sphinxhyphen {}type Habitability}{22}{subsection.4.9.3}%
-\contentsline {subsection}{\numberline {4.9.4}Binary P\sphinxhyphen {}type Habitability}{22}{subsection.4.9.4}%
-\contentsline {subsection}{\numberline {4.9.5}Planet Habitability}{22}{subsection.4.9.5}%
-\contentsline {subsection}{\numberline {4.9.6}Satellite Habitability}{23}{subsection.4.9.6}%
-\contentsline {subsection}{\numberline {4.9.7}Trojan Satellite Habitability}{23}{subsection.4.9.7}%
+\contentsline {subsection}{\numberline {4.8.5}Conservative Minimum Limit}{22}{subsection.4.8.5}%
+\contentsline {subsection}{\numberline {4.8.6}Conservative Maximum Limit}{22}{subsection.4.8.6}%
+\contentsline {subsection}{\numberline {4.8.7}Earth\sphinxhyphen {}Equivalent Limit}{22}{subsection.4.8.7}%
+\contentsline {section}{\numberline {4.9}Habitability}{22}{section.4.9}%
+\contentsline {subsection}{\numberline {4.9.1}Habitable Zones}{22}{subsection.4.9.1}%
+\contentsline {subsubsection}{Single Star Habitable Zone}{22}{subsubsection*.100}%
+\contentsline {subsubsection}{Radiative Habitable Zone}{22}{subsubsection*.102}%
+\contentsline {subsubsection}{Permanent Habitable Zone}{23}{subsubsection*.104}%
+\contentsline {subsubsection}{Average Habitable Zone}{23}{subsubsection*.106}%
+\contentsline {subsection}{\numberline {4.9.2}Single Star Habitability}{23}{subsection.4.9.2}%
+\contentsline {subsection}{\numberline {4.9.3}Binary S\sphinxhyphen {}type Habitability}{23}{subsection.4.9.3}%
+\contentsline {subsection}{\numberline {4.9.4}Binary P\sphinxhyphen {}type Habitability}{24}{subsection.4.9.4}%
+\contentsline {subsection}{\numberline {4.9.5}Planet Habitability}{24}{subsection.4.9.5}%
+\contentsline {subsection}{\numberline {4.9.6}Satellite Habitability}{24}{subsection.4.9.6}%
+\contentsline {subsection}{\numberline {4.9.7}Trojan Satellite Habitability}{25}{subsection.4.9.7}%
