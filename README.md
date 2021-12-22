@@ -8,12 +8,12 @@ To install this package, run:
 
 ```
 python3 setup.py sdist bdist_wheel
-pip3 install dist/stellar_system_creator-0.0.5.0.tar.gz
+pip3 install dist/stellar_system_creator-0.0.5.2.tar.gz
 ```
 
 If you want to check out the example code, look in the folder `examples/...`
 
-To run the gui (which is still under construction) use the following code:
+To run the GUI (which is still under construction) use the following code:
 
 ```python
 import sys
@@ -36,17 +36,37 @@ if __name__ == "__main__":
     sys.exit(app.exec_())
 ```
 
-Most buttons do not work. What does work are all the details buttons in the treeview and the Render button.
-You can modify any of the existing examples, but not create new ones yet.
+What you can do with the GUI:
+1. Create new stellar and planetary systems.
+2. Modify existing examples.
+3. Use P-type binaries, planets, satellites, asteroid belts, trojans, trojan satellites.
+4. Change each star/planet/satellite's image (not available for trojans or asteroid belts)
+5. Render the system as an image (but not save the image)
 
-When rendering, allow the program to work through it (takes 20-60 seconds),
-since it is adding 500 images on a single plt.figure (due to solar system rendering ~460 images for a single asteroid belt).
+What you can NOT do with the GUI just yet:
+1. Create S-type solar systems.
+2. Create rings or planetary binaries.
+3. Render image with options to add/remove lines of interest (e.g. habitability zone, orbit, frostline, etc.).
+4. Add your own image system background.
+5. Save the image.
+
+When rendering, allow the program to work through it (takes 20-60 seconds) if you added asteroid belts and/or trojans.
+It is adding 500 images on a single plt.figure.
 
 # License 
 GNU GPL v3 license.
 
 # Copyright
 Copyright (C) 2021 Selewirre Iskvary
+
+# User Support
+I would greatly appreciate it if users clearly state that their illustrations and calculations were made 
+(partially or completely) with this project.
+
+# Other Sources
+Great worldbuiling sources of this type can be found on:
+1. [Artifexian world-building videos](https://www.youtube.com/playlist?list=PLduA6tsl3gygXJbq_iQ_5h2yri4WL6zsS)
+2. [Worldbuilding Pasta](https://worldbuildingpasta.blogspot.com/)
 
 # Contact
 Please report any questions, issues, concerns, suggestions at <selewirre@gmail.com>

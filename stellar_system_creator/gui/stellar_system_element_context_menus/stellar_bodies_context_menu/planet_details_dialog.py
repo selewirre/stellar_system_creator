@@ -5,7 +5,7 @@ from stellar_system_creator.stellar_system_elements.stellar_body import Planet, 
     Trojan, AsteroidBelt
 from .basic_details_dialog import BasicDetailsDialog
 from ..stellar_bodies_context_menu.detail_dialog_widgets import UnitLabel, \
-    Label, GroupBox, TabWidget, Tab, ComboBox, LineEdit, UnitLineEdit, TextBrowser
+    Label, GroupBox, TabWidget, Tab, ComboBox, LineEdit, UnitLineEdit, TextBrowser, CheckBox
 from .basic_details_tabs import InsolationTab, ParentHabitabilityTab, ImageTab, ChildHabitabilityTab
 
 
@@ -54,6 +54,12 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         self.tab_widget.addTab(self.habitability_tab, "Habitability")
         self.tab_widget.addTab(self.image_tab, "Image")
 
+    def _set_check_boxes(self):
+        super()._set_check_boxes()
+        sse: Planet = self.parent_item.ssc_object
+
+        self.check_boxes['Use Suggested Eccentricity'] = CheckBox(self.le['Eccentricity'])
+
     def _set_other_labels(self):
         self.other_labels = {'Habitability Tab': self.habitability_tab}
 
@@ -82,6 +88,7 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         sse: Planet = self.parent_item.ssc_object
         super()._set_labels()
 
+        self.labels['Suggested Eccentricity'] = Label(sse, 'suggested_orbital_eccentricity')
         self.labels['Chemical Composition'] = Label(sse, 'chemical_composition')
         self.labels['Tectonic Activity'] = Label(sse, 'tectonic_activity')
         self.labels['Orbital Stability'] = Label(sse, 'orbital_stability')
@@ -234,7 +241,9 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         self.basic_orbital_characteristics_group_box.setLayout(basic_orbital_characteristics_box_layout)
         self.add_key_to_layout(basic_orbital_characteristics_box_layout, self.other_edits, 'Orbit Type')
         self.add_key_to_layout(basic_orbital_characteristics_box_layout, self.labels, 'Orbital Type Factor')
+        self.add_key_to_layout(basic_orbital_characteristics_box_layout, self.check_boxes, 'Use Suggested Eccentricity')
         self.add_key_to_layout(basic_orbital_characteristics_box_layout, self.le, 'Eccentricity')
+        self.add_key_to_layout(basic_orbital_characteristics_box_layout, self.labels, 'Suggested Eccentricity')
 
         self.orbital_distance_characteristics_group_box = GroupBox('Orbital Distance Characteristics')
         orbital_distance_characteristics_box_layout = QFormLayout()
@@ -427,7 +436,9 @@ class TrojanSatelliteDetailsDialog(SatelliteDetailsDialog):
         basic_orbital_characteristics_box_layout.insertRow(1, f"{key}:", self.other_edits[key])
 
         self.other_edits['Orbit Type'].setEnabled(False)
+        self.check_boxes['Use Suggested Eccentricity'].setEnabled(False)
         self.le['Eccentricity'].setEnabled(False)
+        self.labels['Suggested Eccentricity'].setEnabled(False)
         self.ule['Semi-Major Axis'].setEnabled(False)
         self.ule['Inclination'].setEnabled(False)
         self.ule['Argument of Periapsis'].setEnabled(False)
@@ -521,7 +532,9 @@ class TrojanDetailsDialog(PlanetDetailsDialog):
         orbital_distance_characteristics_box_layout.insertRow(0, f"{key}:", self.ule[key])
 
         self.other_edits['Orbit Type'].setEnabled(False)
+        self.check_boxes['Use Suggested Eccentricity'].setEnabled(False)
         self.le['Eccentricity'].setEnabled(False)
+        self.labels['Suggested Eccentricity'].setEnabled(False)
         self.ule['Semi-Major Axis'].setEnabled(False)
         self.ule['Inclination'].setEnabled(False)
         self.ule['Argument of Periapsis'].setEnabled(False)
