@@ -1,15 +1,16 @@
 from typing import Union, Dict, List
 
 import pkg_resources
+from PyQt5.QtGui import QPixmap
 from bs4 import BeautifulSoup
 import codecs
 
 import numpy as np
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QHBoxLayout, QGroupBox, QWidget, QComboBox, QLineEdit, QLabel, QTextBrowser, QSizePolicy, \
     QCheckBox, QTabBar, QStylePainter, QStyleOptionTab, QStyle, QTabWidget, QScrollArea, \
-    QRadioButton, QPushButton, QFileDialog
+    QRadioButton, QPushButton, QFileDialog, QToolTip, QBoxLayout, QVBoxLayout
 
 from stellar_system_creator.astrothings.radius_models.planetary_radius_model import planet_compositions
 from stellar_system_creator.astrothings.units import Q_
@@ -18,20 +19,51 @@ from bidict import bidict
 from stellar_system_creator.astrothings.insolation_models.insolation_models import InsolationThresholdModel
 from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
 from stellar_system_creator.stellar_system_elements.stellar_body import StellarBody, Star, Planet, Satellite
+QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)  # enable highdpi scaling
+QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)  # use highdpi icons
 
 
 class DetailsLabel(QLabel):
     def __init__(self, text: str, relative_tooltip_url_directory: str):
+        text = f"ⓘ {text}"
+
         super().__init__(text)
-        filename = pkg_resources.resource_filename(
-            'stellar_system_creator', f'documentation/build/html/quantities/{relative_tooltip_url_directory}')
-        tooltip_text = get_html_script(filename)
-        self.setToolTip(tooltip_text)
+
+        self.documentation_filename = relative_tooltip_url_directory
+        self.setToolTip('Double-click for more info.')
+
+    def mouseDoubleClickEvent(self, a0: QtGui.QMouseEvent) -> None:
+        from stellar_system_creator.gui.gui_window import Window
+        from stellar_system_creator.gui.gui_menubar import HelpMenu
+        # noinspection PyTypeChecker
+        window_widget: Window = self.parent().parent().parent().parent().parent().parent().parent(). \
+            parent().parent().parent().parent().parent()
+        help_menu: HelpMenu = window_widget.menubar.findChild(HelpMenu)
+        help_menu.open_documentation_process(self.documentation_filename)
+
+
+class DetailsGroupBox(QGroupBox):
+    def __init__(self, text: str, relative_tooltip_url_directory: str):
+        text = f"ⓘ {text}"
+        super().__init__(text)
+        self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum)
+        self.documentation_filename = relative_tooltip_url_directory
+        self.setToolTip('Double-click for more info.')
+
+    def mouseDoubleClickEvent(self, a0: QtGui.QMouseEvent) -> None:
+        from stellar_system_creator.gui.gui_window import Window
+        from stellar_system_creator.gui.gui_menubar import HelpMenu
+        # noinspection PyTypeChecker
+        window_widget: Window = self.parent().parent().parent().parent().parent().parent(). \
+            parent().parent().parent().parent().parent()
+        help_menu: HelpMenu = window_widget.menubar.findChild(HelpMenu)
+        help_menu.open_documentation_process(self.documentation_filename)
 
 
 class UnitLineEdit(QWidget):
 
-    def __init__(self, sse: Union[StellarBody, StellarBinary], value_name: str, influenced_labels: Dict, *args, **kwargs):
+    def __init__(self, sse: Union[StellarBody, StellarBinary], value_name: str, influenced_labels: Dict, *args,
+                 **kwargs):
         super().__init__(*args, **kwargs)
 
         self.sse = sse
@@ -48,8 +80,8 @@ class UnitLineEdit(QWidget):
         self.setLayout(layout)
         self.line_edit.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
         self.unit_drop_menu.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.setFixedSize(300, self.sizeHint().height())
-        self.unit_drop_menu.setFixedWidth(150)
+        self.setFixedSize(150, self.sizeHint().height())
+        self.unit_drop_menu.setFixedWidth(75)
 
         self.influenced_labels = influenced_labels
 
@@ -113,11 +145,11 @@ class UnitLabel(QWidget):
         self.label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
         self.unit_drop_menu.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         if not self.sizeflag:
-            self.setFixedSize(300, self.sizeHint().height())
+            self.setFixedSize(150, self.sizeHint().height())
         else:
             layout.addStretch()
             # self.setFixedSize(600, self.sizeHint().height())
-        self.unit_drop_menu.setFixedWidth(150)
+        self.unit_drop_menu.setFixedWidth(75)
 
     def get_value(self) -> Q_:
         if isinstance(self.sse, dict):
@@ -155,13 +187,14 @@ class UnitLabel(QWidget):
 
 class LineEdit(QLineEdit):
 
-    def __init__(self, sse: Union[StellarBody, StellarBinary], value_name: str, influenced_labels: Dict, *args, **kwargs):
+    def __init__(self, sse: Union[StellarBody, StellarBinary], value_name: str, influenced_labels: Dict, *args,
+                 **kwargs):
         super().__init__(*args, **kwargs)
         self.sse = sse
         self.value_name = value_name
         self.setText(get_value_string_no_unit(self.sse.__dict__[self.value_name]))
         self.editingFinished.connect(self.change_text_action)
-        self.setFixedSize(300, self.sizeHint().height())
+        self.setFixedSize(150, self.sizeHint().height())
         # self.inputRejected.connect(self.keep_old_text_action)
 
         self.influenced_labels = influenced_labels
@@ -327,7 +360,7 @@ class InsolationModelRadioButtons(QWidget):
         layout = QHBoxLayout()
         self.setLayout(layout)
         self.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
-        self.setFixedWidth(400)
+        self.setFixedWidth(200)
 
         kopparapu_button = QRadioButton("Kopparapu")
         layout.addWidget(kopparapu_button)
@@ -352,7 +385,7 @@ class ComboBox(QComboBox):
         self.influenced_labels = influenced_labels
 
         self.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
-        self.setFixedWidth(300)
+        self.setFixedWidth(150)
 
         self.addItems(self.value_list)
         self.setCurrentText(self._get_value())
@@ -382,24 +415,24 @@ class ImageLabel(QLabel):
 
     @staticmethod
     def get_image(image_array):
-            try:
-                if image_array.shape[0] > image_array.shape[1]:
-                    padding = (image_array.shape[0] - image_array.shape[1]) // 2
-                    image_array = np.pad(image_array, ((0, 0), (padding, padding), (0, 0)))
-                else:
-                    padding = (image_array.shape[1] - image_array.shape[0]) // 2
-                    image_array = np.pad(image_array, ((padding, padding), (0, 0), (0, 0)))
+        try:
+            if image_array.shape[0] > image_array.shape[1]:
+                padding = (image_array.shape[0] - image_array.shape[1]) // 2
+                image_array = np.pad(image_array, ((0, 0), (padding, padding), (0, 0)))
+            else:
+                padding = (image_array.shape[1] - image_array.shape[0]) // 2
+                image_array = np.pad(image_array, ((padding, padding), (0, 0), (0, 0)))
 
-                # noinspection PyTypeChecker
-                image = QtGui.QImage(image_array, image_array.shape[1], image_array.shape[0],
-                                     image_array.shape[1] * 4, QtGui.QImage.Format_RGBA8888)
+            # noinspection PyTypeChecker
+            image = QtGui.QImage(image_array, image_array.shape[1], image_array.shape[0],
+                                 image_array.shape[1] * 4, QtGui.QImage.Format_RGBA8888)
 
-                pix = QtGui.QPixmap(image)
-            except Exception:
-                pix = QtGui.QPixmap()
+            pix = QtGui.QPixmap(image)
+        except Exception:
+            pix = QtGui.QPixmap()
 
-            pix = pix.scaled(550, 550, QtCore.Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            return pix
+        pix = pix.scaled(275, 275, QtCore.Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        return pix
 
 
 class ImageLineEdit(QWidget):
@@ -420,9 +453,9 @@ class ImageLineEdit(QWidget):
         self.setLayout(layout)
         self.line_edit.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
         self.browse_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.setFixedSize(800, self.sizeHint().height())
-        self.line_edit.setFixedWidth(600)
-        self.browse_button.setFixedWidth(120)
+        self.setFixedSize(400, self.sizeHint().height())
+        self.line_edit.setFixedWidth(300)
+        self.browse_button.setFixedWidth(60)
 
         self.influenced_labels = influenced_labels
 
@@ -481,6 +514,8 @@ def get_value_string(value: Q_):
 def get_value_string_no_unit(value):
     if isinstance(value, dict):
         return '\n'.join([f'{key}:\t{value[key]}' for key in value])
+    elif isinstance(value, bool):
+        return str(value)
     elif isinstance(value, (int, float)):
         return f'{value:.3g}'
     else:
@@ -614,7 +649,23 @@ def get_html_script(url: str) -> str:
     for script in soup(["script", "style"]):
         script.extract()  # rip it out
 
-    text = '\n'.join([element.get_text() for element in soup.body.find_all('p')][:-1])
+    # print(soup.contents)
+    # print(soup.find_all('h1'))
+    t = str(soup.find_all('section')[1])
+    t = t.split('\n')[2:-1]
+    t = '\n'.join(t)
+    # print(t)
+    # t = str(soup.contents[-1])
+    # print(t)
+    # t = t.replace('math notranslate nohighlight','math')
+    t = t.replace('span class="math notranslate nohighlight"', 'mathjax')
+    # t = t.replace('span class="math notranslate nohighlight"', 'mathjax')
+    return t
+    # text = '\n'.join([element.get_text() for element in soup.body.find_all('p')][:-1])
 
-    return text
+    # return text
 
+# a = get_html_script('/home/villy/Documents/projects/stellar_system_creator/stellar_system_creator/documentation/build/html/quantities/geometric/radius.html')
+
+
+# print(a)

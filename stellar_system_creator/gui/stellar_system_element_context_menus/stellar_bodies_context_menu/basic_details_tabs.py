@@ -2,8 +2,10 @@ from typing import Union, Dict
 
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGroupBox, QFormLayout, QRadioButton, QTabWidget, QSizePolicy
 
-from stellar_system_creator.gui.stellar_system_element_context_menus.stellar_bodies_context_menu.detail_dialog_widgets import Tab, \
-    InsolationModelRadioButtons, clearLayout, Label, UnitLabel, GroupBox, ImageLabel, LineEdit
+from stellar_system_creator.gui.stellar_system_element_context_menus.stellar_bodies_context_menu.detail_dialog_widgets import \
+    Tab, \
+    InsolationModelRadioButtons, clearLayout, Label, UnitLabel, GroupBox, ImageLabel, LineEdit, DetailsLabel, \
+    DetailsGroupBox
 from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
 from stellar_system_creator.stellar_system_elements.stellar_body import Star, Planet, Satellite
 
@@ -39,7 +41,7 @@ class InsolationTab(Tab):
 
     def _set_boxes(self):
         # setting model box
-        self.model_group_box = QGroupBox('Model')
+        self.model_group_box = DetailsGroupBox('Model', 'quantities/insolation_models/insolation_models.html')
         model_box_layout = QFormLayout()
         self.model_group_box.setLayout(model_box_layout)
 
@@ -75,8 +77,11 @@ class InsolationTab(Tab):
         # setting common habitability limits group box
         keys = ['Conservative Minimum Limit Name', 'Conservative Maximum Limit Name',
                 'Relaxed Minimum Limit Name', 'Relaxed Maximum Limit Name', 'Earth Equivalent']
-        for key in keys:
-            self.common_habitability_limits_group_box.layout().addRow(f"{key}:", self.insolation_labels[key])
+        tooltip_dirs = ['conservative_minimum_limit', 'conservative_maximum_limit', 'relaxed_minimum_limit',
+                        'relaxed_maximum_limit', 'earth_equivalent_limit']
+        for i, key in enumerate(keys):
+            label = DetailsLabel(f"{key}:", f'quantities/insolation_models/{tooltip_dirs[i]}.html')
+            self.common_habitability_limits_group_box.layout().addRow(label, self.insolation_labels[key])
 
     def update_text(self):
         for key in self.insolation_labels:
@@ -84,7 +89,10 @@ class InsolationTab(Tab):
 
     def change_insolation_model(self, button: QRadioButton):
         if button.isChecked():
-            self.sse.reset_insolation_model_and_habitability(button.text())
+            if isinstance(self.sse.parent, StellarBinary):
+                self.sse.parent.reset_insolation_model_and_habitability(button.text())
+            else:
+                self.sse.reset_insolation_model_and_habitability(button.text())
             layouts = [self.common_habitability_limits_group_box.layout(), self.threshold_equivalent_group_box.layout()]
             for layout in layouts:
                 clearLayout(layout)
@@ -133,7 +141,7 @@ class ParentHabitabilityTab(Tab):
         self.outlook_group_box.setLayout(outlook_box_layout)
 
         # setting zones group box
-        self.zones_group_box = GroupBox('Zones')
+        self.zones_group_box = DetailsGroupBox('Zones', 'quantities/habitability/habitable_zones/habitable_zones.html')
         zones_box_layout = QVBoxLayout()
         self.zones_group_box.setLayout(zones_box_layout)
 
@@ -144,7 +152,8 @@ class ParentHabitabilityTab(Tab):
         self.tab_layout.addStretch()
 
     def _set_outlook_box_cells(self):
-        self.outlook_group_box.layout().addRow("Habitability:", self.influenced_labels['Habitability'])
+        label = DetailsLabel("Habitability:", 'quantities/habitability/habitability.html')
+        self.outlook_group_box.layout().addRow(label, self.influenced_labels['Habitability'])
         self.outlook_group_box.layout().addRow("Violations:", self.influenced_labels['Habitability Violations'])
 
     def _set_zones_box_cells(self):

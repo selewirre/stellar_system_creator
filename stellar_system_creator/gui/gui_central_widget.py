@@ -1,7 +1,9 @@
 from typing import Union
 
+import pkg_resources
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSplitter, QMessageBox
 
 from stellar_system_creator.filing import load
@@ -67,7 +69,10 @@ class CentralWidget(QTabWidget):
         label.mousePressEvent = mousePressEvent
         # hide_button_icon = self.style().standardIcon(getattr(QStyle, 'SP_TitleBarMinButton'))
         # hide_button = QPushButton(hide_button_icon, '', self)
-        hide_button = QPushButton('-', tab_header)
+        hide_button = QPushButton(parent=tab_header)
+        minimize_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/gui_icons/window-minimize.svg')
+        hide_button.setIcon(QIcon(minimize_dir))
+        hide_button.setStyleSheet("padding: 1px;")
         hide_button.adjustSize()
         # hide_button.setSize(hide_button.size().height(), 0.8*hide_button.size().width())
 

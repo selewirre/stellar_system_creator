@@ -124,43 +124,53 @@ class StarDetailsDialog(BasicDetailsDialog):
         self.material_characteristics_group_box = GroupBox('Material Characteristics')
         material_characteristics_box_layout = QFormLayout()
         self.material_characteristics_group_box.setLayout(material_characteristics_box_layout)
-        self.add_key_to_layout(material_characteristics_box_layout, self.ule, 'Mass')
-        self.add_key_to_layout(material_characteristics_box_layout, self.ulabels, 'Density')
+        self.add_key_to_layout(material_characteristics_box_layout, self.ule, 'Mass', 'quantities/material/mass.html')
+        self.add_key_to_layout(material_characteristics_box_layout, self.ulabels, 'Density',
+                               'quantities/material/density.html')
 
         # setting Geometric characteristics group box
         self.geometric_characteristics_group_box = GroupBox('Geometric Characteristics')
         geometric_characteristics_box_layout = QFormLayout()
         self.geometric_characteristics_group_box.setLayout(geometric_characteristics_box_layout)
         self.add_key_to_layout(geometric_characteristics_box_layout, self.check_boxes, 'Use Suggested Radius')
-        self.add_key_to_layout(geometric_characteristics_box_layout, self.ule, 'Radius')
+        self.add_key_to_layout(geometric_characteristics_box_layout, self.ule, 'Radius',
+                               'quantities/geometric/radius.html')
         keys = ['Suggested Radius', 'Circumference', 'Surface Area', 'Volume']
-        self.add_keys_to_layout(geometric_characteristics_box_layout, self.ulabels, keys)
+        tooltip_dirs = [f'quantities/geometric/{s}.html' for s in ['radius', 'circumference', 'surface_area', 'volume']]
+        self.add_keys_to_layout(geometric_characteristics_box_layout, self.ulabels, keys, tooltip_dirs)
 
         # setting Spectral characteristics group box
         self.spectral_characteristics_group_box = GroupBox('Spectral Characteristics')
         spectral_characteristics_box_layout = QFormLayout()
         self.spectral_characteristics_group_box.setLayout(spectral_characteristics_box_layout)
         self.add_key_to_layout(spectral_characteristics_box_layout, self.check_boxes, 'Use Suggested Luminosity')
-        self.add_key_to_layout(spectral_characteristics_box_layout, self.ule, 'Luminosity')
+        self.add_key_to_layout(spectral_characteristics_box_layout, self.ule, 'Luminosity',
+                               'quantities/surface/emission/luminosity.html')
         keys = ['Suggested Luminosity', 'Temperature', 'Peak Wavelength']
-        self.add_keys_to_layout(spectral_characteristics_box_layout, self.ulabels, keys)
+        tooltip_dirs = [f'quantities/surface/emission/{s}.html'
+                        for s in ['luminosity', 'temperature', 'peak_wavelength']]
+        self.add_keys_to_layout(spectral_characteristics_box_layout, self.ulabels, keys, tooltip_dirs)
 
         # setting Rotational characteristics group box
         self.rotational_characteristics_group_box = GroupBox('Rotational Characteristics')
         rotational_characteristics_box_layout = QFormLayout()
         self.rotational_characteristics_group_box.setLayout(rotational_characteristics_box_layout)
         self.add_key_to_layout(rotational_characteristics_box_layout, self.check_boxes, 'Use Suggested Spin Period')
-        self.add_key_to_layout(rotational_characteristics_box_layout, self.ule, 'Spin Period')
-        self.add_key_to_layout(rotational_characteristics_box_layout, self.ulabels, 'Suggested Spin Period')
+        self.add_key_to_layout(rotational_characteristics_box_layout, self.ule, 'Spin Period',
+                               'quantities/rotational/spin_period.html')
+        self.add_key_to_layout(rotational_characteristics_box_layout, self.ulabels, 'Suggested Spin Period',
+                               'quantities/rotational/spin_period.html')
 
         # setting age characteristics group box
         self.age_characteristics_group_box = GroupBox('Age Characteristics')
         age_characteristics_box_layout = QFormLayout()
         self.age_characteristics_group_box.setLayout(age_characteristics_box_layout)
         self.add_key_to_layout(age_characteristics_box_layout, self.check_boxes, 'Use Suggested Age')
-        self.add_key_to_layout(age_characteristics_box_layout, self.ule, 'Age')
-        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Suggested Age')
-        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Lifetime')
+        self.add_key_to_layout(age_characteristics_box_layout, self.ule, 'Age', 'quantities/life/age.html')
+        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Suggested Age',
+                               'quantities/life/age.html')
+        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Lifetime',
+                               'quantities/life/lifetime.html')
 
         tab_layout.addWidget(self.material_characteristics_group_box)
         tab_layout.addWidget(self.geometric_characteristics_group_box)
@@ -183,21 +193,29 @@ class StarDetailsDialog(BasicDetailsDialog):
         self.basic_limits_group_box.setLayout(basic_limits_box_layout)
         keys = ['Tidal Locking Radius', 'Rough Inner Orbit Limit', 'Dense Roche Limit', 'Inner Orbit Limit',
                 'Rough Outer Orbit Limit', 'Hill Sphere', 'S-Type Critical Orbit', 'Outer Orbit Limit']
-        self.add_keys_to_layout(basic_limits_box_layout, self.ulabels, keys)
+        tooltip_dirs = [f'quantities/children_orbit_limits/{s}.html'
+                        for s in ['tidal_locking_radius', None, 'dense_roche_limit', 'inner_orbit_limit',
+                                  None, 'hill_sphere', 's_type_critical_orbit', 'outer_orbit_limit']]
+        self.add_keys_to_layout(basic_limits_box_layout, self.ulabels, keys, tooltip_dirs)
 
         # setting Rock Line group box
         self.rock_line_group_box = GroupBox('Rock Formation Limits')
         rock_line_box_layout = QFormLayout()
         self.rock_line_group_box.setLayout(rock_line_box_layout)
         keys = ['Inner Rock Formation Limit', 'Outer Rock Formation Limit']
-        self.add_keys_to_layout(rock_line_box_layout, self.ulabels, keys)
+        tooltip_dirs = [f'quantities/children_orbit_limits/{s}.html'
+                        for s in ['inner_rock_formation_limit', 'outer_rock_formation_limit']]
+        self.add_keys_to_layout(rock_line_box_layout, self.ulabels, keys, tooltip_dirs)
 
         # setting Water Frost Line group box
         self.water_frost_line_group_box = GroupBox('Water Frost Limits')
         water_frost_line_box_layout = QFormLayout()
         self.water_frost_line_group_box.setLayout(water_frost_line_box_layout)
         keys = ['Inner Water Frost Limit', 'Sol Equivalent Water Frost Limit', 'Outer Water Frost Limit']
-        self.add_keys_to_layout(water_frost_line_box_layout, self.ulabels, keys)
+        tooltip_dirs = [f'quantities/children_orbit_limits/{s}.html'
+                        for s in ['inner_water_frost_limit', 'sol_equivalent_water_frost_limit',
+                                  'outer_water_frost_limit']]
+        self.add_keys_to_layout(water_frost_line_box_layout, self.ulabels, keys, tooltip_dirs)
 
         tab_layout.addWidget(self.basic_limits_group_box)
         tab_layout.addWidget(self.rock_line_group_box)

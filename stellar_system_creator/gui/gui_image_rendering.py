@@ -2,16 +2,19 @@ import tempfile
 from functools import partial
 from typing import Union
 
+import pkg_resources
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, QThread
+from PyQt5.QtGui import QIcon
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QMenu, QAction, QFileDialog
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QMenu, QAction, QFileDialog, QSizePolicy
 
 from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
 from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem
 
 # https://stackoverflow.com/questions/57432570/generate-a-svg-file-with-pyqt5
+
 
 class SystemRenderingWidget(QSvgWidget):
 
@@ -68,7 +71,10 @@ class SystemImageWidget(QWidget):
         self.options_widget = QWidget(self)
         layout = QHBoxLayout()
 
-        self.render_button = QPushButton('Render', self)
+        self.render_button = QPushButton(parent=self)
+        render_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/logo.ico')
+        self.render_button.setIcon(QIcon(render_dir))
+        self.render_button.setStyleSheet("padding: 1px;")
         self.render_button.adjustSize()
         self.render_button.pressed.connect(self.render_process)
         self.render_thread = None
@@ -95,12 +101,13 @@ class ImageRenderingProcess(QThread):
         self.render_button = render_button
 
     def run(self):
-        button_text = self.render_button.text()
-        self.render_button.setText('Loading')
+        button_icon = self.render_button.icon()
+        loading_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/gui_icons/loading.svg')
+        self.render_button.setIcon(QIcon(loading_dir))
         self.render_button.setDisabled(True)
         self.rendering_widget.render_image(self.ssc_object)
         self.render_button.setEnabled(True)
-        self.render_button.setText(button_text)
+        self.render_button.setIcon(button_icon)
 
 
 # class ImageContextMenu(QMenu):

@@ -1,9 +1,14 @@
+import codecs
+
 import pkg_resources
 import sys
 from functools import partial
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMenu, QAction, QFileDialog, QMenuBar, QMessageBox
+from PyQt5.QtCore import Qt, QUrl
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage
+from PyQt5.QtWidgets import QMenu, QAction, QFileDialog, QMenuBar, QMessageBox, QDialog, QVBoxLayout, QToolBar, \
+    QPushButton, QSizePolicy, QHBoxLayout
 
 from stellar_system_creator.astrothings.units import ureg
 from stellar_system_creator.filing import save as save_ssc_object, add_extension_if_necessary
@@ -173,15 +178,103 @@ class HelpMenu(QMenu):
         self._create_menu_actions(menubar)
         self._connect_actions()
         self._create_menu()
+        self.help_dialog = HelpDialog(self)
 
     def _create_menu(self):
         self.addAction(self.documentation_action)
 
     def _connect_actions(self):
-        self.documentation_action.triggered.connect(open_documentation)
+        # self.documentation_action.triggered.connect(open_documentation)
+        self.documentation_action.triggered.connect(self.open_documentation_process)
 
     def _create_menu_actions(self, menubar):
         self.documentation_action = QAction("&Documentation", menubar)
+
+    def open_documentation_process(self, page_directory=None):
+        if page_directory is not None:
+            if page_directory:
+                self.help_dialog.loadPage(page_directory)
+        self.help_dialog.show()
+
+
+class HelpDialog(QDialog):
+    """Source: https://zetcode.com/pyqt/qwebengineview/"""
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setWindowTitle('Documentation')
+        self.setModal(False)
+        self.setFixedSize(600, 450)
+
+        self._set_web_engine_view()
+        self._set_toolbar()
+        layout = QVBoxLayout()
+        layout.addWidget(self.toolbar)
+        layout.addWidget(self.web_engine_view)
+        layout.addStretch()
+        self.setLayout(layout)
+
+    def _set_toolbar(self):
+        self.toolbar = QToolBar(self)
+
+        # setting back button
+        self.back_button = QPushButton()
+        self.back_button.setEnabled(False)
+        left_arrow_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/gui_icons/left-arrow.svg')
+        self.back_button.setIcon(QIcon(left_arrow_dir))
+        self.back_button.clicked.connect(self.back_process)
+        self.toolbar.addWidget(self.back_button)
+
+        # setting forward button
+        self.forward_button = QPushButton()
+        self.forward_button.setEnabled(False)
+        right_arrow_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/gui_icons/right-arrow.svg')
+        self.forward_button.setIcon(QIcon(right_arrow_dir))
+        self.forward_button.clicked.connect(self.forward_process)
+        self.toolbar.addWidget(self.forward_button)
+
+        # setting home button
+        self.home_button = QPushButton()
+        home_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/gui_icons/home.svg')
+        self.home_button.setIcon(QIcon(home_dir))
+        self.home_button.clicked.connect(self.homing_process)
+        self.toolbar.addSeparator()
+        self.toolbar.addWidget(self.home_button)
+
+        self.toolbar.layout().setContentsMargins(0, 0, 0, 0)
+        self.toolbar.layout().setSpacing(0)
+
+    def _set_web_engine_view(self):
+        self.web_engine_view = QWebEngineView()
+        self.loadPage()
+        self.web_engine_view.page().urlChanged.connect(self.loading_finished_process)
+        # self.web_engine_view.page().titleChanged.connect(self.setWindowTitle)
+        # self.windowTitleChanged.connect(self.setWindowTitle)
+
+    def loadPage(self, page_directory='index.html'):
+        filename = pkg_resources.resource_filename('stellar_system_creator',
+                                                   f'documentation/build/html/{page_directory}')
+        file = QUrl.fromLocalFile(filename)
+        self.web_engine_view.load(file)
+
+    def loading_finished_process(self):
+        if self.web_engine_view.history().canGoBack():
+            self.back_button.setEnabled(True)
+        else:
+            self.back_button.setEnabled(False)
+
+        if self.web_engine_view.history().canGoForward():
+            self.forward_button.setEnabled(True)
+        else:
+            self.forward_button.setEnabled(False)
+
+    def back_process(self):
+        self.web_engine_view.page().triggerAction(QWebEnginePage.Back)
+
+    def forward_process(self):
+        self.web_engine_view.page().triggerAction(QWebEnginePage.Forward)
+
+    def homing_process(self):
+        self.loadPage()
 
 
 def new_project(parent, system_type):

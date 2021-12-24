@@ -3,24 +3,21 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Stellar System Creator's documentation!
-==================================================
-
-
+Welcome to Stellar System Creator!
+==================================
 
 .. toctree::
+   :maxdepth: -1
+
    introduction
    celestial_bodies/celestial_bodies
    celestial_systems/celestial_systems
    quantities/quantities
-
-.. :maxdepth: 2
-.. :caption: Contents:
-
-
 
 .. Indices and tables
    ==================
    * :ref:`genindex`
    * :ref:`modindex`
    * :ref:`search`
+   .. :maxdepth: 2
+   .. :caption: Contents:

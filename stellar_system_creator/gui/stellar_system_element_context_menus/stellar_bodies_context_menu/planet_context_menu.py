@@ -20,7 +20,7 @@ class PlanetTreeViewItemContextMenu(StellarBodyTreeViewItemContextMenu):
 
     def details_action_process(self):
         details_dialog = PlanetDetailsDialog(self.parent_item)
-        details_dialog.exec()
+        details_dialog.show()
 
 
 class SatelliteTreeViewItemContextMenu(StellarBodyTreeViewItemContextMenu):
@@ -39,7 +39,7 @@ class SatelliteTreeViewItemContextMenu(StellarBodyTreeViewItemContextMenu):
 
     def details_action_process(self):
         details_dialog = SatelliteDetailsDialog(self.parent_item)
-        details_dialog.exec()
+        details_dialog.show()
 
 
 class AsteroidBeltTreeViewItemContextMenu(StellarBodyTreeViewItemContextMenu):
@@ -58,7 +58,7 @@ class AsteroidBeltTreeViewItemContextMenu(StellarBodyTreeViewItemContextMenu):
 
     def details_action_process(self):
         details_dialog = AsteroidBeltDetailsDialog(self.parent_item)
-        details_dialog.exec()
+        details_dialog.show()
 
 
 class TrojanTreeViewItemContextMenu(StellarBodyTreeViewItemContextMenu):
@@ -77,7 +77,7 @@ class TrojanTreeViewItemContextMenu(StellarBodyTreeViewItemContextMenu):
 
     def details_action_process(self):
         details_dialog = TrojanDetailsDialog(self.parent_item)
-        details_dialog.exec()
+        details_dialog.show()
 
 
 class TrojanSatelliteTreeViewItemContextMenu(StellarBodyTreeViewItemContextMenu):
@@ -96,4 +96,4 @@ class TrojanSatelliteTreeViewItemContextMenu(StellarBodyTreeViewItemContextMenu)
 
     def details_action_process(self):
         details_dialog = TrojanSatelliteDetailsDialog(self.parent_item)
-        details_dialog.exec()
+        details_dialog.show()

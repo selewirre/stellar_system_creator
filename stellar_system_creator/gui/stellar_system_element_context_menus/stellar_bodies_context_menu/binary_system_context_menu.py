@@ -20,5 +20,5 @@ class StellarBinaryTreeViewItemContextMenu(StellarBodyTreeViewItemContextMenu):
     def details_action_process(self):
         # pass
         details_dialog = StellarBinaryDetailsDialog(self.parent_item)
-        details_dialog.exec()
+        details_dialog.show()
 

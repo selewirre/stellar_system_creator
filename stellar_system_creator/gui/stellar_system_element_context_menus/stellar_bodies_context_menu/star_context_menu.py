@@ -19,5 +19,5 @@ class StarTreeViewItemContextMenu(StellarBodyTreeViewItemContextMenu):
 
     def details_action_process(self):
         details_dialog = StarDetailsDialog(self.parent_item)
-        details_dialog.exec()
+        details_dialog.show()
 
