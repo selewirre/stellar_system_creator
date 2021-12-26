@@ -4,7 +4,7 @@ import pkg_resources
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QSplitter, QMessageBox
+from PyQt5.QtWidgets import QSplitter, QMessageBox, QDialog, QLineEdit, QFormLayout, QDialogButtonBox
 
 from stellar_system_creator.filing import load
 from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
@@ -27,9 +27,10 @@ class CentralWidget(QTabWidget):
         self.tabCloseRequested.connect(self.close_tab)
 
     def add_new_tab(self, filename):
+        tab_content = QSplitter(Qt.Horizontal)
         ssc_object = load(filename)
         tree_view = ProjectTreeView(ssc_object)
-        tab_header = self.make_tab_header(tree_view.ssc_object.name)
+        tab_header = self.make_tab_header(tree_view.ssc_object.name, tree_view, tab_content)
 
         left_side_widget = QWidget()
         left_side_layout = QVBoxLayout()
@@ -41,7 +42,7 @@ class CentralWidget(QTabWidget):
 
         right_side_widget = SystemImageWidget(tree_view)
 
-        tab_content = QSplitter(Qt.Horizontal)
+
         tab_content.addWidget(left_side_widget)
         tab_content.addWidget(right_side_widget)
         tab_content.setStretchFactor(0, 0)
@@ -54,19 +55,24 @@ class CentralWidget(QTabWidget):
         self.setCurrentIndex(tab_index)
         # tab_content.widget(0).hide()
 
-    def make_tab_header(self, label_text):
+    def make_tab_header(self, label_text, tree_view, tab_content):
         tab_header = QWidget(self)
         layout = QHBoxLayout()
 
-        label = QLabel(label_text)
+        class Label(QLabel):
+            def __init__(self, *args, **kwargs):
+                super(Label, self).__init__(*args, **kwargs)
+                self.tab_dialolog = TabHeaderDialog(tree_view, self, tab_content)
+
+            def mousePressEvent(self, a0: QtGui.QMouseEvent) -> None:
+                if a0.button() == QtCore.Qt.RightButton:
+                    self.tab_dialolog.show()
+                super().mousePressEvent(a0)
+
+        label = Label(label_text)
         label.adjustSize()
         layout.addWidget(label)
 
-        def mousePressEvent(a0: QtGui.QMouseEvent) -> None:
-            if a0.button() == QtCore.Qt.LeftButton:
-                print('I will add functionality soon!')
-
-        label.mousePressEvent = mousePressEvent
         # hide_button_icon = self.style().standardIcon(getattr(QStyle, 'SP_TitleBarMinButton'))
         # hide_button = QPushButton(hide_button_icon, '', self)
         hide_button = QPushButton(parent=tab_header)
@@ -123,3 +129,60 @@ class CentralWidget(QTabWidget):
     def get_ssc_object_of_current_tab(self) -> Union[StellarSystem, PlanetarySystem]:
         project_tree_view = self.get_project_tree_view_of_current_tab()
         return project_tree_view.ssc_object
+
+
+class TabHeaderDialog(QDialog):
+
+    def __init__(self, parent_item, header_label: QLabel, parent):
+        from gui_project_tree_view import ProjectTreeView
+        self.parent_item: ProjectTreeView = parent_item
+        super().__init__(parent)
+        self.setModal(False)
+        self.setWindowTitle(f'{self.parent_item.ssc_object.name} details')
+        self.header_label = header_label
+
+        self._set_button_box()
+        self._set_dialog_widget()
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.dialog_widget)
+        layout.addWidget(self.button_box)
+        layout.addStretch()
+        self.setLayout(layout)
+
+    def _set_dialog_widget(self):
+        self.dialog_widget = QWidget()
+
+        self.name_line_edit = QLineEdit(self.parent_item.ssc_object.name)
+
+        layout = QFormLayout()
+        layout.addRow('Name', self.name_line_edit)
+        self.dialog_widget.setLayout(layout)
+
+    def _set_button_box(self):
+        self.button_box = QDialogButtonBox((QDialogButtonBox.Cancel | QDialogButtonBox.Ok), self)
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
+
+    def keyPressEvent(self, a0: QtGui.QKeyEvent) -> None:
+        if a0.key() == Qt.Key_Enter or a0.key() == Qt.Key_Return or a0.key() == Qt.Key_Escape:
+            return
+        super().keyPressEvent(a0)
+
+    def accept(self) -> None:
+        siw: SystemImageWidget = self.parent().findChild(SystemImageWidget)
+        for i in range(siw.rendering_settings_dialog.available_systems_drop_down.count()):
+            old_text = siw.rendering_settings_dialog.available_systems_drop_down.itemText(i)
+            new_text = old_text.replace(self.header_label.text(), self.name_line_edit.text(), 1)
+            siw.rendering_settings_dialog.available_systems_drop_down.setItemText(i, new_text)
+
+        self.parent_item.ssc_object.name = self.name_line_edit.text()
+        self.header_label.setText(self.name_line_edit.text())
+        super().accept()
+
+    def reject(self) -> None:
+        super().reject()
+
+
+
+

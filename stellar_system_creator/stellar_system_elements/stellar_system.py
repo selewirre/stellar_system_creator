@@ -288,8 +288,12 @@ class MultiStellarSystemSType:
 
     def remove_child(self, garbage_child) -> None:
         self.children = [child for child in self.children if child != garbage_child]
+        self.size = len(self.children)
 
-    def draw_multi_stellar_system(self, save_fig=False) -> None:
+    def remove_object(self, garbage_object):
+        self.remove_child(garbage_object)
+
+    def draw_multi_stellar_system(self, save_fig=False, save_name=None, save_format='pdf', save_temp_file=None) -> None:
         if self.fig is None and self.axs is None:
             fig, axs = plt.subplots(self.size, 1, figsize=(11, 3*self.size))
             self.fig: plt.Figure = fig
@@ -306,4 +310,10 @@ class MultiStellarSystemSType:
             self.children[i].draw_stellar_system()
 
         if save_fig:
-            plt.savefig(f"{self.name}.pdf", dpi=1200)
+            if save_name is None:
+                save_name = self.name
+            if save_temp_file is None:
+                plt.savefig(f"{save_name}.{save_format}", dpi=1200, format=save_format)
+            else:
+                plt.savefig(save_temp_file, dpi=1200, format=save_format)
+

@@ -5,7 +5,7 @@ from stellar_system_creator.stellar_system_elements.stellar_body import Planet, 
     Trojan, AsteroidBelt
 from .basic_details_dialog import BasicDetailsDialog
 from ..stellar_bodies_context_menu.detail_dialog_widgets import UnitLabel, \
-    Label, GroupBox, TabWidget, Tab, ComboBox, LineEdit, UnitLineEdit, TextBrowser, CheckBox
+    Label, GroupBox, TabWidget, Tab, ComboBox, LineEdit, UnitLineEdit, TextBrowser, CheckBox, DetailsLabel
 from .basic_details_tabs import InsolationTab, ParentHabitabilityTab, ImageTab, ChildHabitabilityTab
 
 
@@ -159,8 +159,10 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         self.composition_group_box = GroupBox('Composition')
         composition_box_layout = QFormLayout()
         self.composition_group_box.setLayout(composition_box_layout)
-        self.add_keys_to_layout(composition_box_layout, self.other_edits, ['Composition Type'])
-        self.add_keys_to_layout(composition_box_layout, self.all_labels, ['Chemical Composition'])
+        self.add_keys_to_layout(composition_box_layout, self.other_edits, ['Composition Type'],
+                                ['quantities/material/composition_type.html'])
+        self.add_keys_to_layout(composition_box_layout, self.all_labels, ['Chemical Composition'],
+                                ['quantities/material/chemical_composition.html'])
 
         tab_layout.addWidget(self.designations_group_box)
         tab_layout.addWidget(self.classifications_group_box)
@@ -179,17 +181,21 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         self.material_characteristics_group_box = GroupBox('Material Characteristics')
         material_characteristics_box_layout = QFormLayout()
         self.material_characteristics_group_box.setLayout(material_characteristics_box_layout)
-        self.add_key_to_layout(material_characteristics_box_layout, self.ule, 'Mass')
-        self.add_key_to_layout(material_characteristics_box_layout, self.ulabels, 'Density')
+        self.add_key_to_layout(material_characteristics_box_layout, self.ule, 'Mass',
+                               'quantities/material/mass.html')
+        self.add_key_to_layout(material_characteristics_box_layout, self.ulabels, 'Density',
+                               'quantities/material/density.html')
 
         # setting Geometric characteristics group box
         self.geometric_characteristics_group_box = GroupBox('Geometric Characteristics')
         geometric_characteristics_box_layout = QFormLayout()
         self.geometric_characteristics_group_box.setLayout(geometric_characteristics_box_layout)
         self.add_key_to_layout(geometric_characteristics_box_layout, self.check_boxes, 'Use Suggested Radius')
-        self.add_key_to_layout(geometric_characteristics_box_layout, self.ule, 'Radius')
+        self.add_key_to_layout(geometric_characteristics_box_layout, self.ule, 'Radius',
+                               'quantities/geometric/radius.html')
         keys = ['Suggested Radius', 'Circumference', 'Surface Area', 'Volume']
-        self.add_keys_to_layout(geometric_characteristics_box_layout, self.ulabels, keys)
+        tooltip_dirs = [f'quantities/geometric/{s}.html' for s in ['radius', 'circumference', 'surface_area', 'volume']]
+        self.add_keys_to_layout(geometric_characteristics_box_layout, self.ulabels, keys, tooltip_dirs)
 
         # setting Spectral characteristics group box
         # self.spectral_characteristics_group_box = GroupBox('Spectral Characteristics')
@@ -205,19 +211,26 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         rotational_characteristics_box_layout = QFormLayout()
         self.rotational_characteristics_group_box.setLayout(rotational_characteristics_box_layout)
         self.add_key_to_layout(rotational_characteristics_box_layout, self.check_boxes, 'Use Suggested Spin Period')
-        self.add_key_to_layout(rotational_characteristics_box_layout, self.ule, 'Spin Period')
-        self.add_key_to_layout(rotational_characteristics_box_layout, self.ulabels, 'Suggested Spin Period')
-        self.add_key_to_layout(rotational_characteristics_box_layout, self.ulabels, 'Day Period')
-        self.add_key_to_layout(rotational_characteristics_box_layout, self.ule, 'Axial Tilt')
+        self.add_key_to_layout(rotational_characteristics_box_layout, self.ule, 'Spin Period',
+                               'quantities/rotational/spin_period.html')
+        self.add_key_to_layout(rotational_characteristics_box_layout, self.ulabels, 'Suggested Spin Period',
+                               'quantities/rotational/spin_period.html')
+        self.add_key_to_layout(rotational_characteristics_box_layout, self.ulabels, 'Day Period',
+                               'quantities/rotational/day_period.html')
+        self.add_key_to_layout(rotational_characteristics_box_layout, self.ule, 'Axial Tilt',
+                               'quantities/rotational/axial_tilt.html')
 
         # setting age characteristics group box
         self.age_characteristics_group_box = GroupBox('Age Characteristics')
         age_characteristics_box_layout = QFormLayout()
         self.age_characteristics_group_box.setLayout(age_characteristics_box_layout)
         self.add_key_to_layout(age_characteristics_box_layout, self.check_boxes, 'Use Suggested Age')
-        self.add_key_to_layout(age_characteristics_box_layout, self.ule, 'Age')
-        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Suggested Age')
-        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Lifetime')
+        self.add_key_to_layout(age_characteristics_box_layout, self.ule, 'Age',
+                               'quantities/life/age.html')
+        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Suggested Age',
+                               'quantities/life/age.html')
+        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Lifetime',
+                               'quantities/life/lifetime.html')
 
         tab_layout.addWidget(self.material_characteristics_group_box)
         tab_layout.addWidget(self.geometric_characteristics_group_box)
@@ -239,36 +252,51 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         self.basic_orbital_characteristics_group_box = GroupBox('Basic Orbital Characteristics')
         basic_orbital_characteristics_box_layout = QFormLayout()
         self.basic_orbital_characteristics_group_box.setLayout(basic_orbital_characteristics_box_layout)
-        self.add_key_to_layout(basic_orbital_characteristics_box_layout, self.other_edits, 'Orbit Type')
-        self.add_key_to_layout(basic_orbital_characteristics_box_layout, self.labels, 'Orbital Type Factor')
+        self.add_key_to_layout(basic_orbital_characteristics_box_layout, self.other_edits, 'Orbit Type',
+                               'quantities/orbital/orbit_type.html')
+        self.add_key_to_layout(basic_orbital_characteristics_box_layout, self.labels, 'Orbital Type Factor',
+                               'quantities/orbital/orbit_type_factor.html')
         self.add_key_to_layout(basic_orbital_characteristics_box_layout, self.check_boxes, 'Use Suggested Eccentricity')
-        self.add_key_to_layout(basic_orbital_characteristics_box_layout, self.le, 'Eccentricity')
-        self.add_key_to_layout(basic_orbital_characteristics_box_layout, self.labels, 'Suggested Eccentricity')
+        self.add_key_to_layout(basic_orbital_characteristics_box_layout, self.le, 'Eccentricity',
+                               'quantities/orbital/eccentricity.html')
+        self.add_key_to_layout(basic_orbital_characteristics_box_layout, self.labels, 'Suggested Eccentricity',
+                               'quantities/orbital/eccentricity.html')
 
         self.orbital_distance_characteristics_group_box = GroupBox('Orbital Distance Characteristics')
         orbital_distance_characteristics_box_layout = QFormLayout()
         self.orbital_distance_characteristics_group_box.setLayout(orbital_distance_characteristics_box_layout)
-        self.add_key_to_layout(orbital_distance_characteristics_box_layout, self.ule, 'Semi-Major Axis')
-        keys = ['Semi-Major Axis Minimum Limit', 'Semi-Major Axis Maximum Limit', 'Semi-Minor Axis', 'Apoapsis', 'Periapsis']
-        self.add_keys_to_layout(orbital_distance_characteristics_box_layout, self.ulabels, keys)
+        self.add_key_to_layout(orbital_distance_characteristics_box_layout, self.ule, 'Semi-Major Axis',
+                               'quantities/orbital/semi_major_axis.html')
+        keys = ['Semi-Major Axis Minimum Limit', 'Semi-Major Axis Maximum Limit', 'Semi-Minor Axis', 'Apoapsis',
+                'Periapsis']
+        tooltip_dirs = [f'quantities/orbital/{fn}.html' for fn in
+                        ['semi_major_axis_minimum_limit', 'semi_major_axis_maximum_limit', 'semi_minor_axis',
+                         'apoapsis', 'periapsis']]
+        self.add_keys_to_layout(orbital_distance_characteristics_box_layout, self.ulabels, keys, tooltip_dirs)
 
         self.other_orbital_characteristics_group_box = GroupBox('Other Orbital Characteristics')
         other_orbital_characteristics_box_layout = QFormLayout()
         self.other_orbital_characteristics_group_box.setLayout(other_orbital_characteristics_box_layout)
         keys = ['Orbital Period', 'Orbital Velocity']
-        self.add_keys_to_layout(other_orbital_characteristics_box_layout, self.ulabels, keys)
+        tooltip_dirs = [f'quantities/orbital/{fn}.html' for fn in
+                        ['orbital_period', 'orbital_velocity']]
+        self.add_keys_to_layout(other_orbital_characteristics_box_layout, self.ulabels, keys, tooltip_dirs)
 
         self.orbital_stability_characteristics_group_box = GroupBox('Orbital Stability')
         orbital_stability_characteristics_box_layout = QFormLayout()
         self.orbital_stability_characteristics_group_box.setLayout(orbital_stability_characteristics_box_layout)
         keys = ['Orbital Stability', 'Orbital Stability Violations']
-        self.add_keys_to_layout(orbital_stability_characteristics_box_layout, self.labels, keys)
+        tooltip_dirs = [f'quantities/orbital/{fn}.html' for fn in
+                        ['orbital_stability', None]]
+        self.add_keys_to_layout(orbital_stability_characteristics_box_layout, self.labels, keys, tooltip_dirs)
 
         self.orientation_characteristics_group_box = GroupBox('Orientation')
         orientation_characteristics_box_layout = QFormLayout()
         self.orientation_characteristics_group_box.setLayout(orientation_characteristics_box_layout)
         keys = ['Inclination', 'Argument of Periapsis', 'Longitude of the Ascending Node']
-        self.add_keys_to_layout(orientation_characteristics_box_layout, self.ule, keys)
+        tooltip_dirs = [f'quantities/orbital/{fn}.html' for fn in
+                        ['inclination', 'argument_of_periapsis', 'longitude_of_the_ascending_node']]
+        self.add_keys_to_layout(orientation_characteristics_box_layout, self.ule, keys, tooltip_dirs)
 
         tab_layout.addWidget(self.basic_orbital_characteristics_group_box)
         tab_layout.addWidget(self.orbital_distance_characteristics_group_box)
@@ -290,34 +318,47 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         temperature_characteristics_box_layout = QFormLayout()
         self.temperature_characteristics_group_box.setLayout(temperature_characteristics_box_layout)
         keys = ['Albedo', 'Normalized Greenhouse', 'Emissivity', 'Heat Distribution']
-        self.add_keys_to_layout(temperature_characteristics_box_layout, self.le, keys)
+        tooltip_dirs = [f'quantities/surface/emission/{fn}.html' for fn in
+                        ['albedo', 'normalized_greenhouse', 'emissivity', 'heat_distribution']]
+        self.add_keys_to_layout(temperature_characteristics_box_layout, self.le, keys, tooltip_dirs)
         keys = ['Incident Flux', 'Temperature']
-        self.add_keys_to_layout(temperature_characteristics_box_layout, self.ulabels, keys)
+        tooltip_dirs = [f'quantities/surface/emission/{fn}.html' for fn in
+                        ['incident_flux', 'temperature']]
+        self.add_keys_to_layout(temperature_characteristics_box_layout, self.ulabels, keys, tooltip_dirs)
         self.add_key_to_layout(temperature_characteristics_box_layout, self.check_boxes, 'Use Suggested Luminosity')
-        self.add_key_to_layout(temperature_characteristics_box_layout, self.ule, 'Luminosity')
-        self.add_key_to_layout(temperature_characteristics_box_layout, self.ulabels, 'Suggested Luminosity')
+        self.add_key_to_layout(temperature_characteristics_box_layout, self.ule, 'Luminosity',
+                               'quantities/surface/emission/luminosity.html')
+        self.add_key_to_layout(temperature_characteristics_box_layout, self.ulabels, 'Suggested Luminosity',
+                               'quantities/surface/emission/luminosity.html')
 
         # setting gravity related characteristics
         self.gravity_characteristics_group_box = GroupBox('Gravity Characteristics')
         gravity_characteristics_box_layout = QFormLayout()
         self.gravity_characteristics_group_box.setLayout(gravity_characteristics_box_layout)
         keys = ['Surface Gravity', 'Escape Velocity']
-        self.add_keys_to_layout(gravity_characteristics_box_layout, self.ulabels, keys)
+        tooltip_dirs = [f'quantities/surface/gravity/{fn}.html' for fn in
+                        ['surface_gravity', 'escape_velocity']]
+        self.add_keys_to_layout(gravity_characteristics_box_layout, self.ulabels, keys, tooltip_dirs)
 
         # setting gravity related characteristics
         self.internal_heating_characteristics_group_box = GroupBox('Internal Heating Characteristics')
         internal_heating_characteristics_box_layout = QFormLayout()
         self.internal_heating_characteristics_group_box.setLayout(internal_heating_characteristics_box_layout)
-        self.add_key_to_layout(internal_heating_characteristics_box_layout, self.labels, 'Tectonic Activity')
+        self.add_key_to_layout(internal_heating_characteristics_box_layout, self.labels, 'Tectonic Activity',
+                               'quantities/surface/internal_heating/tectonic_activity.html')
         keys = ['Primordial Heating', 'Radiogenic Heating', 'Tidal Heating', 'Total Heating']
-        self.add_keys_to_layout(internal_heating_characteristics_box_layout, self.ulabels, keys)
+        tooltip_dirs = [f'quantities/surface/internal_heating/{fn}.html' for fn in
+                        ['primordial_heating', 'radiogenic_heating', 'tidal_heating', 'internal_heating']]
+        self.add_keys_to_layout(internal_heating_characteristics_box_layout, self.ulabels, keys, tooltip_dirs)
 
         # setting tidal related characteristics
         self.tidal_characteristics_group_box = GroupBox('Internal Heating Characteristics')
         tidal_characteristics_box_layout = QFormLayout()
         self.tidal_characteristics_group_box.setLayout(tidal_characteristics_box_layout)
         keys = ['Induced Tide Height to Parent', 'Induced Tide Height to Self']
-        self.add_keys_to_layout(tidal_characteristics_box_layout, self.ulabels, keys)
+        tooltip_dirs = [f'quantities/surface/{fn}.html' for fn in
+                        ['induced_tide', 'induced_tide']]
+        self.add_keys_to_layout(tidal_characteristics_box_layout, self.ulabels, keys, tooltip_dirs)
 
         tab_layout.addWidget(self.temperature_characteristics_group_box)
         tab_layout.addWidget(self.gravity_characteristics_group_box)
@@ -339,7 +380,10 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         self.basic_limits_group_box.setLayout(basic_limits_box_layout)
         keys = ['Tidal Locking Radius', 'Dense Roche Limit', 'Inner Orbit Limit',
                 'Hill Sphere', 'S-Type Critical Orbit', 'Outer Orbit Limit']
-        self.add_keys_to_layout(basic_limits_box_layout, self.ulabels, keys)
+        tooltip_dirs = [f'quantities/children_orbit_limits/{fn}.html' for fn in
+                        ['tidal_locking_radius', 'dense_roche_limit', 'inner_orbit_limit', 'hill_sphere',
+                         's_type_critical_orbit', 'outer_orbit_limit']]
+        self.add_keys_to_layout(basic_limits_box_layout, self.ulabels, keys, tooltip_dirs)
 
         tab_layout.addWidget(self.basic_limits_group_box)
         tab_layout.addStretch()
@@ -357,11 +401,12 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         relative_size_box_layout = QFormLayout()
         self.relative_size_group_box.setLayout(relative_size_box_layout)
         keys = ['Angular Diameter from Parent', 'Angular Diameter of Parent']
-        self.add_keys_to_layout(relative_size_box_layout, self.ulabels, keys)
+        tooltip_dirs = [f'quantities/surface/{fn}.html' for fn in
+                        ['angular_diameter', 'angular_diameter']]
+        self.add_keys_to_layout(relative_size_box_layout, self.ulabels, keys, tooltip_dirs)
 
         tab_layout.addWidget(self.relative_size_group_box)
         tab_layout.addStretch()
-
 
     # def _initialize_insolation_tab(self):
     #     sse: Planet = self.parent_item.ssc_object
@@ -433,7 +478,8 @@ class TrojanSatelliteDetailsDialog(SatelliteDetailsDialog):
         super()._set_orbital_characteristics_tab()
         basic_orbital_characteristics_box_layout = self.basic_orbital_characteristics_group_box.layout()
         key = 'Lagrange Position'
-        basic_orbital_characteristics_box_layout.insertRow(1, f"{key}:", self.other_edits[key])
+        label = DetailsLabel(f"{key}:", 'quantities/orbital/lagrange_position.html')
+        basic_orbital_characteristics_box_layout.insertRow(1, label, self.other_edits[key])
 
         self.other_edits['Orbit Type'].setEnabled(False)
         self.check_boxes['Use Suggested Eccentricity'].setEnabled(False)
@@ -494,8 +540,10 @@ class TrojanDetailsDialog(PlanetDetailsDialog):
         self.material_characteristics_group_box = GroupBox('Material Characteristics')
         material_characteristics_box_layout = QFormLayout()
         self.material_characteristics_group_box.setLayout(material_characteristics_box_layout)
-        self.add_key_to_layout(material_characteristics_box_layout, self.ule, 'Mass')
-        self.add_key_to_layout(material_characteristics_box_layout, self.ulabels, 'Density')
+        self.add_key_to_layout(material_characteristics_box_layout, self.ule, 'Mass',
+                               'quantities/material/mass.html')
+        self.add_key_to_layout(material_characteristics_box_layout, self.ulabels, 'Density',
+                               'quantities/material/density.html')
 
         # # setting relative count
         # self.distribution_characteristics_group_box = GroupBox('Distribution Characteristics')
@@ -508,9 +556,12 @@ class TrojanDetailsDialog(PlanetDetailsDialog):
         age_characteristics_box_layout = QFormLayout()
         self.age_characteristics_group_box.setLayout(age_characteristics_box_layout)
         self.add_key_to_layout(age_characteristics_box_layout, self.check_boxes, 'Use Suggested Age')
-        self.add_key_to_layout(age_characteristics_box_layout, self.ule, 'Age')
-        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Suggested Age')
-        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Lifetime')
+        self.add_key_to_layout(age_characteristics_box_layout, self.ule, 'Age',
+                               'quantities/life/age.html')
+        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Suggested Age',
+                               'quantities/life/age.html')
+        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Lifetime',
+                               'quantities/life/lifetime.html')
 
         tab_layout.addWidget(self.material_characteristics_group_box)
         # tab_layout.addWidget(self.distribution_characteristics_group_box)
@@ -526,7 +577,8 @@ class TrojanDetailsDialog(PlanetDetailsDialog):
         super()._set_orbital_characteristics_tab()
         basic_orbital_characteristics_box_layout = self.basic_orbital_characteristics_group_box.layout()
         key = 'Lagrange Position'
-        basic_orbital_characteristics_box_layout.insertRow(1, f"{key}:", self.other_edits[key])
+        label = DetailsLabel(f"{key}:", 'quantities/orbital/lagrange_position.html')
+        basic_orbital_characteristics_box_layout.insertRow(1, label, self.other_edits[key])
         orbital_distance_characteristics_box_layout = self.orbital_distance_characteristics_group_box.layout()
         key = 'Extent'
         orbital_distance_characteristics_box_layout.insertRow(0, f"{key}:", self.ule[key])
@@ -590,17 +642,22 @@ class AsteroidBeltDetailsDialog(PlanetDetailsDialog):
         self.material_characteristics_group_box = GroupBox('Material Characteristics')
         material_characteristics_box_layout = QFormLayout()
         self.material_characteristics_group_box.setLayout(material_characteristics_box_layout)
-        self.add_key_to_layout(material_characteristics_box_layout, self.ule, 'Mass')
-        self.add_key_to_layout(material_characteristics_box_layout, self.ulabels, 'Density')
+        self.add_key_to_layout(material_characteristics_box_layout, self.ule, 'Mass',
+                               'quantities/material/mass.html')
+        self.add_key_to_layout(material_characteristics_box_layout, self.ulabels, 'Density',
+                               'quantities/material/density.html')
 
         # setting age characteristics group box
         self.age_characteristics_group_box = GroupBox('Age Characteristics')
         age_characteristics_box_layout = QFormLayout()
         self.age_characteristics_group_box.setLayout(age_characteristics_box_layout)
         self.add_key_to_layout(age_characteristics_box_layout, self.check_boxes, 'Use Suggested Age')
-        self.add_key_to_layout(age_characteristics_box_layout, self.ule, 'Age')
-        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Suggested Age')
-        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Lifetime')
+        self.add_key_to_layout(age_characteristics_box_layout, self.ule, 'Age',
+                               'quantities/life/age.html')
+        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Suggested Age',
+                               'quantities/life/age.html')
+        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Lifetime',
+                               'quantities/life/lifetime.html')
 
         tab_layout.addWidget(self.material_characteristics_group_box)
         tab_layout.addWidget(self.age_characteristics_group_box)

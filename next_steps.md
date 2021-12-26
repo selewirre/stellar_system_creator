@@ -42,18 +42,19 @@
 # GUI:
 1. For svgwidget:
    1. add zoom function
-   2. save image option
-   3. Add line drawing options for rendering
-   4. Add option for which system to draw (as drop-down menu)
-   5. make rendering button bigger, and make loading image rotate.
-2. Add S-type Binaries (multi-stellar systems) in treeview
-3. Add right-click functionalities for tree view
-    - add details on MultiStellarSystem
-    - make "details" process run if you double-click.
+   2. make rendering button bigger
+   3. make loading image rotate.
+2. Add right-click functionalities for tree view
+    - make "details" process run if you double-click?
     - add save as file (for planetary and stellar systems)
     - add load from file (for planetary and stellar systems)
-    - add warning message on delete permanently
-4. Add tree view header right-click functionalities (and allow name change like rest "system" types)
+3. fix p-type binary so that it will include both S-type and P-type in one (maybe not?)
+4. For documentation:
+   1. Add extent, rough limits
+   2. Add example of how to build a system
+   3. Add description of gui functionalities
+5. Add fast save project option
+6. Add new multisystem in New project option.
 
 
 

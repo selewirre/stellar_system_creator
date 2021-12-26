@@ -13,9 +13,10 @@ from PyQt5.QtWidgets import QMenu, QAction, QFileDialog, QMenuBar, QMessageBox, 
 from stellar_system_creator.astrothings.units import ureg
 from stellar_system_creator.filing import save as save_ssc_object, add_extension_if_necessary
 from stellar_system_creator.gui.gui_central_widget import CentralWidget
+from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
 from stellar_system_creator.stellar_system_elements.stellar_body import MainSequenceStar, Planet
-from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem
+from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem, MultiStellarSystemSType
 
 
 class MenuBar(QMenuBar):
@@ -44,6 +45,7 @@ class FileMenu(QMenu):
     def _create_menu(self):
 
         self.addMenu(self.new_project_submenu)
+        self.new_project_submenu.addAction(self.new_project_multi_stellar_system_action)
         self.new_project_submenu.addAction(self.new_project_stellar_system_action)
         self.new_project_submenu.addAction(self.new_project_planetary_system_action)
 
@@ -55,6 +57,7 @@ class FileMenu(QMenu):
         self.addAction(self.exit_action)
 
     def _connect_actions(self):
+        self.new_project_multi_stellar_system_action.triggered.connect(partial(new_project, self, 'Multi-Stellar System'))
         self.new_project_stellar_system_action.triggered.connect(partial(new_project, self, 'Stellar System'))
         self.new_project_planetary_system_action.triggered.connect(partial(new_project, self, 'Planetary System'))
         self.open_project_action.triggered.connect(partial(open_project, self))
@@ -63,6 +66,7 @@ class FileMenu(QMenu):
 
     def _create_menu_actions(self, menubar):
         self.new_project_submenu = QMenu("&New Project", menubar)
+        self.new_project_multi_stellar_system_action = QAction("&Multi-Stellar System...", menubar)
         self.new_project_stellar_system_action = QAction("&Stellar System...", menubar)
         self.new_project_planetary_system_action = QAction("&Planetary System...", menubar)
 
@@ -282,6 +286,13 @@ def new_project(parent, system_type):
     system_name = filename.split('/')[-1].split('.')[0]
     if filename != '':
         filename = add_extension_if_necessary(filename, 'ssc')
+        if system_type == 'Multi-Stellar System':
+            parent_star1 = MainSequenceStar(system_name + '1', 1 * ureg.M_s)
+            parent_star2 = MainSequenceStar(system_name + '2', 1 * ureg.M_s)
+            parent_binary = StellarBinary(system_name, parent_star1, parent_star2, 500*ureg.au, 0.6)
+            ss1 = StellarSystem(system_name + '1', parent_star1)
+            ss2 = StellarSystem(system_name + '2', parent_star2)
+            ssc_object = MultiStellarSystemSType(system_name, parent_binary, [ss1, ss2])
         if system_type == 'Stellar System':
             parent_star = MainSequenceStar(system_name, 1 * ureg.M_s)
             ssc_object = StellarSystem(system_name, parent_star)

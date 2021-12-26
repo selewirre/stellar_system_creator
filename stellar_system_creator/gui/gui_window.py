@@ -22,7 +22,7 @@ from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow
 
 # from stellar_system_creator.filing import load
-# from stellar_system_creator.gui.gui_example import get_dark_theme_pallet
+from stellar_system_creator.gui.gui_example import get_dark_theme_pallet
 from stellar_system_creator.gui.gui_menubar import MenuBar
 from stellar_system_creator.gui.gui_central_widget import CentralWidget
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)  # enable highdpi scaling
@@ -61,6 +61,7 @@ if __name__ == "__main__":
     win = Window()
     # import pkg_resources
     filename = '../examples/output_files/TrakunaStellarSystem.ssc'
+    # filename = '../examples/output_files/QuezuliferhQuaternaryMultiStellarSystem.ssc'
     win.central_widget.add_new_tab(filename)
     win.show()
     # win.showMaximized()

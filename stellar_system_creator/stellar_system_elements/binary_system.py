@@ -125,6 +125,9 @@ class BinarySystem:
         elif 'parent' not in self.__dict__:
             self.parent = parent
             self.parent.add_child(self)
+        elif self.parent is None:
+            self.parent = parent
+            self.parent.add_child(self)
         elif self.parent != parent:
             self.parent.remove_child(self)
             self.parent = parent

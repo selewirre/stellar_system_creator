@@ -1,7 +1,7 @@
 from typing import Union
 
 from PyQt5.QtWidgets import QMenu, QAction, QDialog, QDialogButtonBox, QVBoxLayout, QWidget, QLineEdit, QFormLayout, \
-    QComboBox, QHBoxLayout, QRadioButton, QSizePolicy
+    QComboBox, QHBoxLayout, QRadioButton, QSizePolicy, QMessageBox
 from PyQt5.Qt import QStandardItem
 
 from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
@@ -80,6 +80,41 @@ def add_star(name, tree_view_item):
     tree_view_item.appendRow(new_tree_view_item)
 
 
+def add_stellar_system(name, tree_view_item):
+    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
+        import TreeViewItemFromStellarSystemElement as tvifsse, TreeViewItemFromString
+    tree_view_item: TreeViewItemFromString
+
+    if tree_view_item.ssc_parent.children is not None:
+        if len(tree_view_item.ssc_parent.children) >= 2:
+            message_box = QMessageBox()
+            message_box.setIcon(QMessageBox.Information)
+            message_box.setWindowTitle("'Add Stellar System' has failed...")
+            message_box.setText(f"{tree_view_item.ssc_parent.name} already has two stellar systems. "
+                                f"Remove at least one before trying again.")
+            message_box.exec()
+            return
+
+    init_values = category_add_element_init_values['Stellar Parent']['Star']
+    new_object = MainSequenceStar(name=name, parent=tree_view_item.ssc_parent.parent, **init_values)
+    new_object_system = StellarSystem(name, new_object)
+    tree_view_item.ssc_parent.add_child(new_object_system)
+
+    new_tree_view_item = tvifsse(new_object_system)
+    tree_view_item.appendRow(new_tree_view_item)
+    new_tree_view_item.update_text()
+
+    stellar_parent_treeview = TreeViewItemFromString('Stellar Parent', new_object_system)
+    planetary_systems_treeview = TreeViewItemFromString('Planetary Systems', new_object_system)
+    asteroid_belts_treeview = TreeViewItemFromString('Asteroid Belts', new_object_system)
+    new_tree_view_item.appendRow(stellar_parent_treeview)
+    new_tree_view_item.appendRow(planetary_systems_treeview)
+    new_tree_view_item.appendRow(asteroid_belts_treeview)
+
+    new_planet_tree_view_item = tvifsse(new_object)
+    stellar_parent_treeview.appendRow(new_planet_tree_view_item)
+
+
 def add_planetary_system(name, tree_view_item):
     from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
         import TreeViewItemFromStellarSystemElement as tvifsse, TreeViewItemFromString
@@ -92,6 +127,7 @@ def add_planetary_system(name, tree_view_item):
 
     new_tree_view_item = tvifsse(new_object_system)
     tree_view_item.appendRow(new_tree_view_item)
+    new_tree_view_item.update_text()
 
     planetary_parent_treeview = TreeViewItemFromString('Planetary Parent', new_object_system)
     satellite_treeview = TreeViewItemFromString('Satellites', new_object_system)
@@ -172,7 +208,8 @@ def add_trojan_satellite(name, tree_view_item):
     tree_view_item.appendRow(new_tree_view_item)
 
 
-add_element_function = {'Stellar Binary': add_stellar_binary,
+add_element_function = {'Stellar System': add_stellar_system,
+                        'Stellar Binary': add_stellar_binary,
                         'Star': add_star,
                         'Planetary System': add_planetary_system,
                         'Planetary Parent': add_planet,
@@ -202,13 +239,15 @@ class CategoryBasedTreeViewItemContextMenu(QMenu):
 
     def _create_menu(self):
         self.addSection(self.parent_item.text())
-        self.addAction(self.add_element_action)
+        if self.category != 'S-type Binary':
+            self.addAction(self.add_element_action)
         self.addSeparator()
         self.addAction(self.expand_all_action)
         self.addAction(self.collapse_all_action)
         # if self.category != 'Stellar Parent':
-        self.addSeparator()
-        self.addAction(self.delete_all_action)
+        if self.category != 'S-type Binary':
+            self.addSeparator()
+            self.addAction(self.delete_all_action)
 
     def _connect_actions(self):
         self.add_element_action.triggered.connect(self.add_element_process)
@@ -239,8 +278,14 @@ class CategoryBasedTreeViewItemContextMenu(QMenu):
         tree_view.collapse_recursively(self.parent_item)
 
     def delete_all_process(self):
+        question = QMessageBox.question(self, 'Delete all?', f"Are you sure you want to permanently delete "
+                                                             f"all {self.parent_item.text()}?",
+                                        QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if question == QMessageBox.No:
+            return
+
         for i in reversed(range(self.parent_item.rowCount())):
-            self.parent_item.child(i).context_menu.delete_permanently_process()
+            self.parent_item.child(i).context_menu.delete_permanently_process(False)
 
 
 class AddElementDialog(QDialog):
