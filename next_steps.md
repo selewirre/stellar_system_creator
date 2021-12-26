@@ -26,7 +26,7 @@
      6. Start with terran atmosphere. add terran atm mods, carry on with mars atmosphere etc.
 9. Modify HZ for A-type stars: https://iopscience.iop.org/article/10.3847/1538-4357/aab8fa/pdf pg. 6, table 2
 10. Add other types of stars -> probably not, because they are not long-lasting.
-11. Add black holes https://arxiv.org/pdf/1909.06748.pdf (it would only be around AGNs and it is tricky)
+11. Add black holes https://arxiv.org/pdf/1909.06748.pdf (it would only be around AGNs, and it is tricky)
 12. add dwarfs?
 
 # Plotting:
@@ -40,14 +40,21 @@
 
 
 # GUI:
-1. Add zoom function and save image function for svgwidget
-2. Add line drawing options for rendering
-3. Add S-type Binaries (multistellar systems) in treeview
-4. Add trigger functions to Edit menu
-5. Add trigger functions to insert menu
-6. Add right-click functionalities for tree view.
-    - add details on MultiStellarSystem
-7. Add tree view header right-click functionalities (and allow name change like rest "system" types)
+1. For svgwidget:
+   1. add zoom function
+   2. make rendering button bigger
+   3. make loading image rotate.
+2. Add right-click functionalities for tree view
+    - make "details" process run if you double-click?
+    - add save as file (for planetary and stellar systems)
+    - add load from file (for planetary and stellar systems)
+3. fix p-type binary so that it will include both S-type and P-type in one (maybe not?)
+4. For documentation:
+   1. Add extent, rough limits
+   2. Add example of how to build a system
+   3. Add description of gui functionalities
+5. Add fast save project option
+6. Add new multisystem in New project option.
 
 
 
@@ -60,7 +67,7 @@
     - ammonia:
     - hydrogen fluoride:
     - hydrogen sulfide:
-3. Write down documentation, tutorials and examples
+3. Make tutorials and examples
 
 
 [comment]: <publishing options>

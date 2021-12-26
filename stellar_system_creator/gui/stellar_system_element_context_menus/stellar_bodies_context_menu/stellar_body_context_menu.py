@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QStandardItem
-from PyQt5.QtWidgets import QMenu, QAction
+from PyQt5.QtWidgets import QMenu, QAction, QMessageBox
 
 from .stellar_body_details_dialog import StellarBodyDetailsDialog
 
@@ -32,9 +32,16 @@ class StellarBodyTreeViewItemContextMenu(QMenu):
     def details_action_process(self):
         pass
 
-    def delete_permanently_process(self):
+    def delete_permanently_process(self, ask_question=True):
         from ..standard_items import TreeViewItemFromString
         parent: TreeViewItemFromString = self.parent_item.parent()
+        if ask_question:
+            question = QMessageBox.question(self, 'Delete permanently?', f"Are you sure you want to permanently delete "
+                                                                         f"{self.parent_item.ssc_object.name}",
+                                            QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if question == QMessageBox.No:
+                return
+
         for i in range(parent.rowCount()):
             if parent.child(i) == self.parent_item:
                 ssc = self.parent_item.ssc_object

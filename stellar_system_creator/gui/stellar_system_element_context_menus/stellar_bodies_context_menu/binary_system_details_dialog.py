@@ -156,14 +156,16 @@ class StellarBinaryDetailsDialog(BasicDetailsDialog):
         self.material_characteristics_group_box = GroupBox('Material Characteristics')
         material_characteristics_box_layout = QFormLayout()
         self.material_characteristics_group_box.setLayout(material_characteristics_box_layout)
-        self.add_key_to_layout(material_characteristics_box_layout, self.ulabels, 'Total Mass')
+        self.add_key_to_layout(material_characteristics_box_layout, self.ulabels, 'Total Mass',
+                               'quantities/material/mass.html')
 
         # setting age characteristics group box
         self.age_characteristics_group_box = GroupBox('Age Characteristics')
         age_characteristics_box_layout = QFormLayout()
         self.age_characteristics_group_box.setLayout(age_characteristics_box_layout)
-        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Age')
-        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Lifetime')
+        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Age', 'quantities/life/age.html')
+        self.add_key_to_layout(age_characteristics_box_layout, self.ulabels, 'Lifetime',
+                               'quantities/life/lifetime.html')
 
         tab_layout.addWidget(self.material_characteristics_group_box)
         tab_layout.addWidget(self.age_characteristics_group_box)
@@ -186,16 +188,20 @@ class StellarBinaryDetailsDialog(BasicDetailsDialog):
         self.orbital_distance_characteristics_group_box = GroupBox('Orbital Distance Characteristics')
         orbital_distance_characteristics_box_layout = QFormLayout()
         self.orbital_distance_characteristics_group_box.setLayout(orbital_distance_characteristics_box_layout)
-        self.add_key_to_layout(orbital_distance_characteristics_box_layout, self.ule, 'Mean Distance')
+        self.add_key_to_layout(orbital_distance_characteristics_box_layout, self.ule, 'Mean Distance',
+                               'quantities/orbital/semi_major_axis.html')
         keys = ['Minimum Distance', 'Maximum Distance']
-        self.add_keys_to_layout(orbital_distance_characteristics_box_layout, self.ulabels, keys)
-        self.add_key_to_layout(orbital_distance_characteristics_box_layout, self.labels, 'Contact')
+        tooltip_dirs = ['quantities/orbital/periapsis.html', 'quantities/orbital/apoapsis.html']
+        self.add_keys_to_layout(orbital_distance_characteristics_box_layout, self.ulabels, keys, tooltip_dirs)
+        self.add_key_to_layout(orbital_distance_characteristics_box_layout, self.labels, 'Contact',
+                               'quantities/orbital/contact.html')
 
         self.other_orbital_characteristics_group_box = GroupBox('Other Orbital Characteristics')
         other_orbital_characteristics_box_layout = QFormLayout()
         self.other_orbital_characteristics_group_box.setLayout(other_orbital_characteristics_box_layout)
         keys = ['Orbital Period']
-        self.add_keys_to_layout(other_orbital_characteristics_box_layout, self.ulabels, keys)
+        self.add_keys_to_layout(other_orbital_characteristics_box_layout, self.ulabels, keys,
+                                ['quantities/orbital/orbital_period.html'])
 
         tab_layout.addWidget(self.basic_orbital_characteristics_group_box)
         tab_layout.addWidget(self.orbital_distance_characteristics_group_box)
@@ -217,21 +223,31 @@ class StellarBinaryDetailsDialog(BasicDetailsDialog):
         keys = ['Tidal Locking Radius', 'Rough Inner Orbit Limit', 'Binary P-Type Critical Orbit (Inner)',
                 'Inner Orbit Limit', 'Rough Outer Orbit Limit', 'Hill Sphere',
                 'S-Type Critical Orbit', 'Outer Orbit Limit']
-        self.add_keys_to_layout(basic_limits_box_layout, self.ulabels, keys)
+        tooltip_dirs = [f'quantities/children_orbit_limits/{fn}.html' for fn in
+                        ['tidal_locking_radius', None, 'p_type_critical_orbit', 'inner_orbit_limit', None,
+                         'hill_sphere', 's_type_critical_orbit', 'outer_orbit_limit']
+                        ]
+        self.add_keys_to_layout(basic_limits_box_layout, self.ulabels, keys, tooltip_dirs)
 
         # setting Rock Line group box
         self.rock_line_group_box = GroupBox('Rock Formation Limits')
         rock_line_box_layout = QFormLayout()
         self.rock_line_group_box.setLayout(rock_line_box_layout)
         keys = ['Inner Rock Formation Limit', 'Outer Rock Formation Limit']
-        self.add_keys_to_layout(rock_line_box_layout, self.ulabels, keys)
+        tooltip_dirs = [f'quantities/children_orbit_limits/{s}.html'
+                        for s in ['inner_rock_formation_limit', 'outer_rock_formation_limit']]
+
+        self.add_keys_to_layout(rock_line_box_layout, self.ulabels, keys, tooltip_dirs)
 
         # setting Water Frost Line group box
         self.water_frost_line_group_box = GroupBox('Water Frost Limits')
         water_frost_line_box_layout = QFormLayout()
         self.water_frost_line_group_box.setLayout(water_frost_line_box_layout)
         keys = ['Inner Water Frost Limit', 'Sol Equivalent Water Frost Limit', 'Outer Water Frost Limit']
-        self.add_keys_to_layout(water_frost_line_box_layout, self.ulabels, keys)
+        tooltip_dirs = [f'quantities/children_orbit_limits/{s}.html'
+                        for s in ['inner_water_frost_limit', 'sol_equivalent_water_frost_limit',
+                                  'outer_water_frost_limit']]
+        self.add_keys_to_layout(water_frost_line_box_layout, self.ulabels, keys, tooltip_dirs)
 
         tab_layout.addWidget(self.basic_limits_group_box)
         tab_layout.addWidget(self.rock_line_group_box)

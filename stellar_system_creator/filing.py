@@ -6,7 +6,7 @@ import _pickle as cPickle
 
 from stellar_system_creator.stellar_system_elements.binary_system import BinarySystem
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
-from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem
+from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem, MultiStellarSystemSType
 from stellar_system_creator.stellar_system_elements.stellar_body import StellarBody
 
 
@@ -21,9 +21,10 @@ def add_extension_if_necessary(filename, extension):
     return filename
 
 
-def save(obj: Union[StellarBody, BinarySystem, PlanetarySystem, StellarSystem], filename: str) -> bool:
+def save(obj: Union[StellarBody, BinarySystem, PlanetarySystem, StellarSystem, MultiStellarSystemSType],
+         filename: str) -> bool:
     """Saving object (can be any class) via pickling under filename with extension .scc"""
-    supported_classes = [StellarBody, BinarySystem, PlanetarySystem, StellarSystem]
+    supported_classes = [StellarBody, BinarySystem, PlanetarySystem, StellarSystem, MultiStellarSystemSType]
 
     if any([isinstance(obj, cl) for cl in supported_classes]):
         filename = add_extension_if_necessary(filename, 'ssc')
@@ -39,7 +40,7 @@ def save(obj: Union[StellarBody, BinarySystem, PlanetarySystem, StellarSystem], 
         return False
 
 
-def load(filename: str) -> Union[StellarBody, BinarySystem, PlanetarySystem, StellarSystem]:
+def load(filename: str) -> Union[StellarBody, BinarySystem, PlanetarySystem, StellarSystem, MultiStellarSystemSType]:
     """Loading scc pickled files"""
     # filename = add_extension_if_necessary(filename, 'ssc')
 
