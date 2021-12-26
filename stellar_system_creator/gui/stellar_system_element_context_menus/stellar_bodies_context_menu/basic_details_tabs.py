@@ -1,11 +1,11 @@
 from typing import Union, Dict
 
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGroupBox, QFormLayout, QRadioButton, QTabWidget, QSizePolicy
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGroupBox, QFormLayout, QRadioButton, QTabWidget, QSizePolicy, QLabel
 
 from stellar_system_creator.gui.stellar_system_element_context_menus.stellar_bodies_context_menu.detail_dialog_widgets import Tab, \
     InsolationModelRadioButtons, clearLayout, Label, UnitLabel, GroupBox, ImageLabel, LineEdit
 from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
-from stellar_system_creator.stellar_system_elements.stellar_body import Star, Planet, Satellite
+from stellar_system_creator.stellar_system_elements.stellar_body import Star, Planet, Satellite, TrojanSatellite
 
 
 class InsolationTab(Tab):
@@ -221,7 +221,15 @@ class ChildHabitabilityTab(Tab):
         self.tab_layout.addStretch()
 
     def _set_outlook_box_cells(self):
-        self.outlook_group_box.layout().addRow("Habitability:", self.influenced_labels['Habitability'])
+        if isinstance(self.sse, Satellite):
+            label = DetailsLabel("Habitability:", 'quantities/habitability/satellite_habitability.html')
+        elif isinstance(self.sse, TrojanSatellite):
+            label = DetailsLabel("Habitability:", 'quantities/habitability/trojan_satellite_habitability.html')
+        elif isinstance(self.sse, Planet):
+            label = DetailsLabel("Habitability:", 'quantities/habitability/planet_habitability.html')
+        else:
+            label = QLabel('Habitability:')
+        self.outlook_group_box.layout().addRow(label, self.influenced_labels['Habitability'])
         self.outlook_group_box.layout().addRow("Violations:", self.influenced_labels['Habitability Violations'])
 
     # def _set_zones_box_cells(self):

@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 
+from stellar_system_creator.filing import save
 from stellar_system_creator.stellar_system_elements.stellar_body import MainSequenceStar
 from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
 from stellar_system_creator.astrothings.units import ureg
@@ -17,8 +18,8 @@ duheb_star = MainSequenceStar('DuhebStar', 0.6 * ureg.M_s)
 shugravu_binary = StellarBinary('ShugravuBinary', andra_star, croomsk_star,
                                 mean_distance=0.5 * ureg.au, eccentricity=0.5)
 # print(shugravu_binary)
-for key in shugravu_binary.habitable_zone_limits:
-    print(key, shugravu_binary.habitable_zone_limits[key])
+# for key in shugravu_binary.habitable_zone_limits:
+#     print(key, shugravu_binary.habitable_zone_limits[key])
 # shugravu_binary.primary_body.save_as_csv('output_files/AndraStar_in_ShugravuBinary.csv')
 # shugravu_binary.save_as_csv('output_files/ShugravuBinary.csv')
 
@@ -50,20 +51,22 @@ quezuliferh_quaternary = StellarBinary('QuezuliferhQuaternary', shugravu_binary,
 #     print(key, quezuliferh_quaternary.habitable_zone_limits[key])
 # for key in trakruna_binaryP.habitable_zone_limits:
 #     print(key, trakruna_binaryP.habitable_zone_limits[key])
-for key in shugravu_binary.habitable_zone_limits:
-    print(key, shugravu_binary.habitable_zone_limits[key])
+# for key in shugravu_binary.habitable_zone_limits:
+#     print(key, shugravu_binary.habitable_zone_limits[key])
 
 # quezuliferh_quaternary.primary_body.save_as_csv('output_files/ShugravuBinary_in_QuezuliferhQuaternary.csv')
 # quezuliferh_quaternary.save_as_csv('output_files/QuezuliferhQuaternary.csv')
 
-# shugravu_system = StellarSystem('Shugravu System', shugravu_binary)
-# trakrunaP_system = StellarSystem('TrakrunaP System', trakruna_binaryP)
-# quezuliferh_system = MultiStellarSystemSType('TrakrunaP System', quezuliferh_quaternary,
-#                                            [shugravu_system, trakrunaP_system])
+shugravu_system = StellarSystem('Shugravu System', shugravu_binary)
+trakrunaP_system = StellarSystem('TrakrunaP System', trakruna_binaryP)
+quezuliferh_system = MultiStellarSystemSType('Quezuliferh Quaternary System', quezuliferh_quaternary,
+                                             [shugravu_system, trakrunaP_system])
 
 # shugravu_system.draw_stellar_system()
 # trakrunaP_system.draw_stellar_system()
 # quezuliferh_system.draw_multi_stellar_system()
+save(quezuliferh_system, 'output_files/QuezuliferhQuaternaryMultiStellarSystem.ssc')
+
 
 # plt.show()
 

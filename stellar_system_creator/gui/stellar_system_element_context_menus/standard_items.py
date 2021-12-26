@@ -4,6 +4,7 @@ import numpy as np
 from PyQt5 import QtGui
 from PyQt5.QtGui import QIcon
 from PyQt5.Qt import QStandardItem
+from PyQt5.QtCore import pyqtSignal
 
 from .category_context_menu import CategoryBasedTreeViewItemContextMenu
 from .stellar_bodies_context_menu.binary_system_context_menu import StellarBinaryTreeViewItemContextMenu
@@ -12,11 +13,11 @@ from .stellar_bodies_context_menu.planet_context_menu import \
     TrojanTreeViewItemContextMenu, TrojanSatelliteTreeViewItemContextMenu
 from .stellar_bodies_context_menu.star_context_menu import \
     StarTreeViewItemContextMenu
-from .system_context_menu import BinarySystemTreeViewItemContextMenu, \
-    PlanetarySystemTreeViewItemContextMenu, StellarSystemTreeViewItemContextMenu
+from .system_context_menu import PlanetarySystemTreeViewItemContextMenu, StellarSystemTreeViewItemContextMenu, \
+    MultiStellarSystemTreeViewItemContextMenu
 from stellar_system_creator.stellar_system_elements.stellar_body import StellarBody, Star, Planet, Satellite, \
     AsteroidBelt, Trojan, TrojanSatellite
-from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem
+from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem, MultiStellarSystemSType
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
 from stellar_system_creator.stellar_system_elements.binary_system import BinarySystem, StellarBinary
 
@@ -25,7 +26,7 @@ class TreeViewItemFromString(QStandardItem):
     def __init__(self, category: str, ssc_parent):
         super().__init__()
         self.setEditable(False)
-        self.ssc_parent: Union[PlanetarySystem, StellarSystem] = ssc_parent
+        self.ssc_parent: Union[PlanetarySystem, StellarSystem, MultiStellarSystemSType] = ssc_parent
         self.category = category
         self.setText(self.category)
 
@@ -55,6 +56,8 @@ class TreeViewItemFromStellarSystemElement(QStandardItem):
     def _get_context_menu_class(self):
         if isinstance(self.ssc_object, StellarBinary):
             self.context_menu_class = StellarBinaryTreeViewItemContextMenu
+        elif isinstance(self.ssc_object, MultiStellarSystemSType):
+            self.context_menu_class = MultiStellarSystemTreeViewItemContextMenu
         elif isinstance(self.ssc_object, StellarSystem):
             self.context_menu_class = StellarSystemTreeViewItemContextMenu
         elif isinstance(self.ssc_object, PlanetarySystem):
@@ -95,4 +98,9 @@ class TreeViewItemFromStellarSystemElement(QStandardItem):
             pass
 
     def update_text(self):
+        from ..gui_image_rendering import SystemImageWidget, RenderingSettingsDialog
+        if self.model() is not None:
+            rendering_dialog: RenderingSettingsDialog = self.model().parent().parent().parent().\
+                findChild(SystemImageWidget).rendering_settings_dialog
+            rendering_dialog.update_available_systems_drop_down(self, self.text())
         self.setText(f"{self.ssc_object.name}")
