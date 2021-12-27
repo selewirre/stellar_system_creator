@@ -4,12 +4,12 @@ from typing import Union
 
 import matplotlib.pyplot as plt
 import pkg_resources
-from PyQt5 import QtGui
-from PyQt5.QtCore import Qt, QThread, QModelIndex
-from PyQt5.QtGui import QIcon
+from PyQt5 import QtGui, QtCore
+from PyQt5.QtCore import Qt, QThread, QModelIndex, QRectF, QPoint, QPointF
+from PyQt5.QtGui import QIcon, QResizeEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QMenu, QAction, QFileDialog, QSizePolicy, \
-    QComboBox, QCheckBox, QDialog, QDialogButtonBox, QMessageBox, QGraphicsView, QGraphicsScene
+    QComboBox, QCheckBox, QDialog, QDialogButtonBox, QMessageBox, QGraphicsView, QGraphicsScene, QGestureEvent
 
 from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
 from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items import \
@@ -19,16 +19,18 @@ from stellar_system_creator.gui.stellar_system_element_context_menus.stellar_bod
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
 from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem, MultiStellarSystemSType
 
-
 # https://stackoverflow.com/questions/57432570/generate-a-svg-file-with-pyqt5
 
 
 class SystemRenderingWidget(QSvgWidget):
 
-    def __init__(self, parent):
-        super().__init__(parent)
+    def __init__(self, graphics_view):
+        super().__init__()
         self.hide()
         self.latest_fig = None
+        self.graphics_view: GraphicsView = graphics_view
+        self.setMouseTracking(True)
+        self.old_pos = None
 
     def render_image(self, ssc_object: Union[MultiStellarSystemSType, StellarSystem, PlanetarySystem, None]):
 
@@ -50,8 +52,10 @@ class SystemRenderingWidget(QSvgWidget):
                 ssc_object.fig = None
                 ssc_object.ax = None
                 self.renderer().setAspectRatioMode(Qt.KeepAspectRatio)
-                self.show()
+                # self.setStyleSheet(self.graphics_view.styleSheet())
                 self.adjustSize()
+                self.show()
+                # self.graphics_view.fitInView(self.graphics_view.sceneRect(), Qt.KeepAspectRatio)
             else:
                 self.hide()
         else:
@@ -59,7 +63,7 @@ class SystemRenderingWidget(QSvgWidget):
 
     def change_draw_line_options(self, ssc_object):
         # noinspection PyTypeChecker
-        rsd: RenderingSettingsDialog = self.parent().parent().rendering_settings_dialog
+        rsd: RenderingSettingsDialog = self.graphics_view.parent().rendering_settings_dialog
         if isinstance(ssc_object, MultiStellarSystemSType):
             for child in ssc_object.children:
                 child.want_draw_stellar_system_limits = rsd.draw_stellar_system_limits_check_box.isChecked()
@@ -79,6 +83,23 @@ class SystemRenderingWidget(QSvgWidget):
             ssc_object.want_draw_planetary_system_limits = rsd.draw_planetary_system_limits_check_box.isChecked()
             ssc_object.want_draw_satellite_orbits = rsd.draw_satellite_orbit_line_check_box.isChecked()
             ssc_object.want_orbit_label = rsd.draw_satellite_orbit_distance_check_box.isChecked()
+
+    # https://learndataanalysis.org/drag-and-move-an-object-with-your-mouse-pyqt5-tutorial/
+    def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
+        self.old_pos = self.graphics_view.mapToScene(event.globalPos())
+        self.count_mouse_event_steps = 1
+
+    def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
+        if self.old_pos is not None:
+            self.count_mouse_event_steps += 1
+            if self.count_mouse_event_steps % 5 == 0:
+                newPos = self.graphics_view.mapToScene(event.globalPos())
+                delta = newPos - self.old_pos
+                self.graphics_view.translate(delta.x(), delta.y())
+                self.old_pos = newPos
+
+    def mouseReleaseEvent(self, event):
+        self.old_pos = None
 
 
 class SystemImageWidget(QWidget):
@@ -103,9 +124,15 @@ class SystemImageWidget(QWidget):
         # layout.sets
         self.setLayout(layout)
 
+    # def changed_scene_process(self):
+    #     self.graphics_view.fitInView(self.graphics_scene.sceneRect())
+
     def _set_graphics(self):
         self.graphics_scene = QGraphicsScene(self)
-        self.graphics_view = QGraphicsView(self.graphics_scene)
+        self.graphics_scene.setSceneRect(self.graphics_scene.itemsBoundingRect())
+        self.graphics_view = GraphicsView(self.graphics_scene, self)
+
+        # self.graphics_scene.setBackgroundBrush(self.graphics_view.backgroundBrush())
         self.system_rendering_widget = SystemRenderingWidget(self.graphics_view)
         self.graphics_scene.addWidget(self.system_rendering_widget)
 
@@ -175,6 +202,12 @@ class SystemImageWidget(QWidget):
                                                                        "PNG (*.png)")[0]
         if filename != '':
             fig.savefig(filename, dpi=1200)
+
+class GraphicsScene(QGraphicsScene):
+
+    def __init__(self, parent):
+        super(GraphicsScene, self).__init__(parent)
+        # self.setMinimumRenderSize(0)
 
 
 class RenderingSettingsDialog(QDialog):
@@ -374,27 +407,44 @@ class ImageRenderingProcess(QThread):
         self.render_button.setIcon(button_icon)
 
 
-# class ImageContextMenu(QMenu):
-#
-#     def __init__(self):
-#         super().__init__()
-#
-#         self._create_menu_actions()
-#         self._connect_actions()
-#         self._create_menu()
-#
-#     def _create_menu(self):
-#         self.addAction(self.save_image_action)
-#
-#     def _connect_actions(self):
-#         self.save_image_action.triggered.connect(self.save_image_process)
-#
-#     def _create_menu_actions(self):
-#         self.save_image_action = QAction(f"&Save Image...", self)
-#
-#     def save_image_process(self):
-#         filename: str = QFileDialog.getSaveFileName(self.parent(), 'Save Project')[0]
-#         if filename != '':
-#             self.parent().
-#         else:
-#             return
+class GraphicsView(QGraphicsView):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.total_zoom_factor = 1
+        self.setTransformationAnchor(QGraphicsView.NoAnchor)
+        # self.fitInView(self.sceneRect(), Qt.KeepAspectRatio)
+
+    def resizeEvent(self, event: QResizeEvent):
+        # self.fitInView(self.sceneRect(), Qt.KeepAspectRatio)
+        # self.scene().setBackgroundBrush(self.backgroundBrush())
+        # self.scene().update()
+        # self.scene().setBackgroundBrush(Qt.blue)
+        # self.setBackgroundBrush(self.scene().backgroundBrush())
+        super().resizeEvent(event)
+
+    def wheelEvent(self, event):
+        """
+        Zoom in or out of the view.
+        """
+        zoomInFactor = 1.1
+        zoomOutFactor = 1 / zoomInFactor
+
+        # Save the scene pos
+        oldPos = self.mapToScene(event.pos())
+
+        # Zoom
+        if event.angleDelta().y() > 0:
+            zoomFactor = zoomInFactor
+        else:
+            zoomFactor = zoomOutFactor
+        if 20 > self.total_zoom_factor * zoomFactor > 0.5:
+            self.scale(zoomFactor, zoomFactor)
+
+            # Get the new position
+            newPos = self.mapToScene(event.pos())
+
+            # Move scene to old position
+            delta = newPos - oldPos
+            self.translate(delta.x(), delta.y())
+            self.total_zoom_factor *= zoomFactor

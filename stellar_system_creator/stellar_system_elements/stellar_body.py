@@ -1,3 +1,4 @@
+import copy
 import warnings
 
 import pandas as pd
@@ -291,6 +292,12 @@ class StellarBody:
             final_output.append(value)
         dataframe = pd.DataFrame(data={'Characteristics': characteristics, 'Values': final_output})
         dataframe.to_csv(filename, index=False)
+
+    def copy(self):
+        return copy.deepcopy(self)
+
+    def __hash__(self):
+        return super().__hash__()
 
 
 class Star(StellarBody):

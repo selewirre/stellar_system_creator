@@ -57,7 +57,7 @@ class Window(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
-    # app.setPalette(get_dark_theme_pallet())
+    app.setPalette(get_dark_theme_pallet())
     win = Window()
     # import pkg_resources
     filename = '../examples/output_files/TrakunaStellarSystem.ssc'

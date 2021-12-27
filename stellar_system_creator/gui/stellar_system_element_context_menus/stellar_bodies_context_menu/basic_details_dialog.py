@@ -141,6 +141,7 @@ class BasicDetailsDialog(QDialog):
         self.confirm_text_changes()
         self.parent_item.update_text()
         self.parent_item.set_stellar_system_element_icon()
+        self.parent_item.model().parent().update_tab_title()
         super().accept()
 
     def reject(self) -> None:

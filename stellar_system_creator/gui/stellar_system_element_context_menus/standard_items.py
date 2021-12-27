@@ -103,4 +103,5 @@ class TreeViewItemFromStellarSystemElement(QStandardItem):
             rendering_dialog: RenderingSettingsDialog = self.model().parent().parent().parent().\
                 findChild(SystemImageWidget).rendering_settings_dialog
             rendering_dialog.update_available_systems_drop_down(self, self.text())
+            self.model().parent().update_tab_title()
         self.setText(f"{self.ssc_object.name}")

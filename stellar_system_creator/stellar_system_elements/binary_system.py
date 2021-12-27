@@ -1,3 +1,5 @@
+import copy
+
 import numpy as np
 from typing import Union, Tuple
 import warnings
@@ -241,6 +243,12 @@ class BinarySystem:
                 else:
                     keep_going_farther = False
         return parent
+
+    def copy(self):
+        return copy.deepcopy(self)
+
+    def __hash__(self):
+        return super().__hash__()
 
 
 class StellarBinary(BinarySystem):
