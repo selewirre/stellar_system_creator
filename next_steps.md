@@ -41,7 +41,6 @@
 
 # GUI:
 1. For svgwidget:
-   1. add zoom function
    2. make rendering button bigger
    3. make loading image rotate.
 2. Add right-click functionalities for tree view
@@ -53,10 +52,6 @@
    1. Add extent, rough limits
    2. Add example of how to build a system
    3. Add description of gui functionalities
-5. Add fast save project option
-6. Add new multisystem in New project option.
-
-
 
 # Miscellaneous:
 1. check out satellites around gasginats heating model https://iopscience.iop.org/article/10.1088/0004-637X/704/2/1341/pdf
