@@ -1,3 +1,4 @@
+import copy
 from typing import List, Union
 import numpy as np
 from matplotlib import pyplot as plt
@@ -171,3 +172,8 @@ class PlanetarySystem:
                         satellite.semi_major_axis.to('R_e').m / self.parent.radius.to('R_e').m,
                         np.fliplr(satellite.image_array), self.ax, normalization_factor=self.normalization_factor)
 
+    def copy(self):
+        return copy.deepcopy(self)
+
+    def __hash__(self):
+        return super().__hash__()

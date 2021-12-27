@@ -8,7 +8,7 @@ To install this package, run:
 
 ```
 python3 setup.py sdist bdist_wheel
-pip3 install dist/stellar_system_creator-0.0.5.3.tar.gz
+pip3 install dist/stellar_system_creator-0.0.6.0.tar.gz
 ```
 
 If you want to check out the example code, look in the folder `examples/...`
@@ -37,18 +37,17 @@ if __name__ == "__main__":
 ```
 
 What you can do with the GUI:
-1. Create new stellar and planetary systems.
+1. Create new multi-stellar, stellar and planetary systems.
 2. Modify existing examples.
-3. Use P-type binaries, planets, satellites, asteroid belts, trojans, trojan satellites.
+3. Use S-type or P-type binaries, planets, satellites, asteroid belts, trojans, trojan satellites.
 4. Change each star/planet/satellite's image (not available for trojans or asteroid belts)
-5. Render the system as an image (but not save the image)
+5. Render the system as an image.
+6. Use Render image options to add/remove lines of interest (e.g. habitability zone, orbit, frostline, etc.).
 
 What you can NOT do with the GUI just yet:
-1. Create S-type solar systems.
-2. Create rings or planetary binaries.
-3. Render image with options to add/remove lines of interest (e.g. habitability zone, orbit, frostline, etc.).
-4. Add your own image system background.
-5. Save the image.
+1. Create rings or planetary binaries.
+2. Add your own image system background.
+3. Add ssc files as subsystem (in add XX system option).
 
 When rendering, allow the program to work through it (takes 20-60 seconds) if you added asteroid belts and/or trojans.
 It is adding 500 images on a single plt.figure.
@@ -69,4 +68,4 @@ Great worldbuiling sources of this type can be found on:
 2. [Worldbuilding Pasta](https://worldbuildingpasta.blogspot.com/)
 
 # Contact
-Please report any questions, issues, concerns, suggestions at <selewirre@gmail.com>
+Please report any questions, issues, concerns, suggestions at <selewirre@gmail.com>.

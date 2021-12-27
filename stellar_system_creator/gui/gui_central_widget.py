@@ -29,7 +29,7 @@ class CentralWidget(QTabWidget):
     def add_new_tab(self, filename):
         tab_content = QSplitter(Qt.Horizontal)
         ssc_object = load(filename)
-        tree_view = ProjectTreeView(ssc_object)
+        tree_view = ProjectTreeView(ssc_object, filename)
         tab_header = self.make_tab_header(tree_view.ssc_object.name, tree_view, tab_content)
 
         left_side_widget = QWidget()
@@ -41,7 +41,6 @@ class CentralWidget(QTabWidget):
         left_side_widget.setLayout(left_side_layout)
 
         right_side_widget = SystemImageWidget(tree_view)
-
 
         tab_content.addWidget(left_side_widget)
         tab_content.addWidget(right_side_widget)
@@ -103,21 +102,26 @@ class CentralWidget(QTabWidget):
             tree_widget_of_current_tab.show()
 
     def close_tab(self, i):
-
         ssc_object_name = self.get_ssc_object_of_current_tab().name
-        close_tab_reply = QMessageBox.question(self, 'Exit Project',
-                                               f"Are you sure you want to close {ssc_object_name}? "
-                                               f"If there were any changes made after last saving action,"
-                                               f" they will be lost. Do you still want to close the project tab?",
-                                               QMessageBox.Yes | QMessageBox.Save | QMessageBox.No,
-                                               QMessageBox.No)
-
-        if close_tab_reply == QMessageBox.No:
-            return
+        if self.tabText(self.currentIndex()).startswith('*'):
+            close_tab_reply = QMessageBox.question(self, 'Exit Project',
+                                                   f"Are you sure you want to close {ssc_object_name}? "
+                                                   f"Any changes made after last saving action,"
+                                                   f" will be lost. Do you still want to close the project tab?",
+                                                   QMessageBox.Yes | QMessageBox.Save | QMessageBox.No,
+                                                   QMessageBox.No)
+        else:
+            close_tab_reply = QMessageBox.question(self, 'Exit Project',
+                                                   f"Are you sure you want to close {ssc_object_name}?",
+                                                   QMessageBox.Yes | QMessageBox.No,
+                                                   QMessageBox.No)
 
         if close_tab_reply == QMessageBox.Save:
             from gui_menubar import save_project
             save_project(self.parent().menuBar().children()[0])
+
+        if close_tab_reply == QMessageBox.No:
+            return
 
         self.removeTab(i)
 
@@ -178,6 +182,7 @@ class TabHeaderDialog(QDialog):
 
         self.parent_item.ssc_object.name = self.name_line_edit.text()
         self.header_label.setText(self.name_line_edit.text())
+        self.parent_item.model().parent().update_tab_title()
         super().accept()
 
     def reject(self) -> None:

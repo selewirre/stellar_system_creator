@@ -266,6 +266,7 @@ class CategoryBasedTreeViewItemContextMenu(QMenu):
         aed.exec()
         if aed.category is not None:
             add_element_function[aed.category](aed.name_line_edit.text(), self.parent_item)
+            self.parent_item.model().parent().update_tab_title()
 
     def expand_all_process(self):
         from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView

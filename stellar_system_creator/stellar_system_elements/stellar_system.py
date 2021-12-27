@@ -1,3 +1,4 @@
+import copy
 from typing import List, Union
 
 import numpy as np
@@ -260,6 +261,12 @@ class StellarSystem:
                                    normalization_factor=10, total_satellites_around_parent=total_satellites,
                                    satellite_no=i+1)
 
+    def copy(self):
+        return copy.deepcopy(self)
+
+    def __hash__(self):
+        return super().__hash__()
+
 
 class MultiStellarSystemSType:
 
@@ -317,3 +324,8 @@ class MultiStellarSystemSType:
             else:
                 plt.savefig(save_temp_file, dpi=1200, format=save_format)
 
+    def copy(self):
+        return copy.deepcopy(self)
+
+    def __hash__(self):
+        return super().__hash__()

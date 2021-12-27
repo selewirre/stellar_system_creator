@@ -4,7 +4,7 @@ from typing import Dict, List, Union
 import numpy as np
 
 from PyQt5.QtCore import Qt, QModelIndex
-from PyQt5.QtWidgets import QTreeView
+from PyQt5.QtWidgets import QTreeView, QVBoxLayout
 from PyQt5.Qt import QStandardItemModel
 
 from stellar_system_creator.filing import load
@@ -105,9 +105,11 @@ def set_tree_view_model_from_tree_view_dict(tree_model: QStandardItemModel, tree
 
 class ProjectTreeView(QTreeView):
 
-    def __init__(self, ssc_object):
+    def __init__(self, ssc_object, filename):
         super().__init__()
         self.ssc_object = ssc_object
+        self.replica_ssc_object = ssc_object.copy()
+        self.filename = filename
         self._get_system_tree()
 
         self.setHeaderHidden(True)
@@ -195,3 +197,18 @@ class ProjectTreeView(QTreeView):
         if root is not None:
             yield from recurse(root)
 
+    def update_tab_title(self):
+        from stellar_system_creator.gui.gui_central_widget import CentralWidget
+        central_widget: CentralWidget = self.parent().parent().parent().parent()
+        # print(central_widget.widget(central_widget.currentIndex()))
+        text = central_widget.tabText(central_widget.currentIndex())
+        # TODO: find a way to properly correct them
+        if not self.ssc_object == self.replica_ssc_object:
+            if not text.startswith('*'):
+                central_widget.setTabText(central_widget.currentIndex(), f'*{text}')
+        else:
+            if text.startswith('*'):
+                central_widget.setTabText(central_widget.currentIndex(), text[1:])
+
+    def update_replica_ssc_object(self):
+        self.replica_ssc_object = self.ssc_object

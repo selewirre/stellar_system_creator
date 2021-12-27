@@ -27,8 +27,8 @@ class MenuBar(QMenuBar):
 
     def _create_file_menu(self):
         FileMenu(self)
-        EditMenu(self)
-        InsertMenu(self)
+        # EditMenu(self)
+        # InsertMenu(self)
         HelpMenu(self)
 
 
@@ -51,9 +51,10 @@ class FileMenu(QMenu):
 
         self.addAction(self.open_project_action)
         self.addAction(self.save_project_action)
+        self.addAction(self.save_as_project_action)
         self.addSeparator()
-        self.addAction(self.settings_action)
-        self.addSeparator()
+        # self.addAction(self.settings_action)
+        # self.addSeparator()
         self.addAction(self.exit_action)
 
     def _connect_actions(self):
@@ -62,6 +63,7 @@ class FileMenu(QMenu):
         self.new_project_planetary_system_action.triggered.connect(partial(new_project, self, 'Planetary System'))
         self.open_project_action.triggered.connect(partial(open_project, self))
         self.save_project_action.triggered.connect(partial(save_project, self))
+        self.save_as_project_action.triggered.connect(partial(save_as_project, self))
         self.exit_action.triggered.connect(partial(exit_application, self))
 
     def _create_menu_actions(self, menubar):
@@ -73,8 +75,11 @@ class FileMenu(QMenu):
         self.open_project_action = QAction(QIcon.fromTheme("document-open"), "&Open Project...", menubar)
         self.open_project_action.setShortcut('Ctrl+O')
 
-        self.save_project_action = QAction(QIcon.fromTheme("document-save"), "&Save Project...", menubar)
+        self.save_project_action = QAction(QIcon.fromTheme("document-save"), "&Save Project", menubar)
         self.save_project_action.setShortcut('Ctrl+S')
+
+        self.save_as_project_action = QAction(QIcon.fromTheme("document-save"), "&Save Project As...", menubar)
+        self.save_as_project_action.setShortcut('Ctrl+Alt+S')
 
         self.settings_action = QAction("&Settings...", menubar)
 
@@ -320,7 +325,7 @@ def open_project(parent):
         message_box.exec()
 
 
-def save_project(parent):
+def save_as_project(parent):
     central_widget: CentralWidget = parent.parent().parent().central_widget
     ssc_object = central_widget.get_ssc_object_of_current_tab()
     filename: str = QFileDialog.getSaveFileName(parent, 'Save Project')[0]
@@ -328,6 +333,16 @@ def save_project(parent):
         save_ssc_object(ssc_object, filename)
     else:
         return
+
+
+def save_project(parent):
+    central_widget: CentralWidget = parent.parent().parent().central_widget
+    ssc_object = central_widget.get_ssc_object_of_current_tab()
+    filename = central_widget.get_project_tree_view_of_current_tab().filename
+    saved = save_ssc_object(ssc_object, filename)
+    tab_text = central_widget.tabText(central_widget.currentIndex())
+    if saved and tab_text.startswith('*'):
+        central_widget.setTabText(central_widget.currentIndex(), tab_text[1:])
 
 
 def exit_application(parent):
