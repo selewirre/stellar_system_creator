@@ -203,6 +203,7 @@ class SystemImageWidget(QWidget):
         if filename != '':
             fig.savefig(filename, dpi=1200)
 
+
 class GraphicsScene(QGraphicsScene):
 
     def __init__(self, parent):
@@ -325,6 +326,7 @@ class RenderingSettingsDialog(QDialog):
                     self.available_systems_drop_down.addItem(text)
 
         self.available_systems_drop_down.currentTextChanged.connect(self.available_system_selection_change_process)
+        self.available_systems_drop_down.model().sort(0)
 
     def available_system_selection_change_process(self):
         obj_name = self.available_systems_drop_down.currentText()
@@ -370,6 +372,7 @@ class RenderingSettingsDialog(QDialog):
             self.available_systems_drop_down.setItemText(old_text_index, text)
         else:
             self.available_systems_drop_down.addItem(text)
+        self.available_systems_drop_down.model().sort(0)
 
     def _set_button_box(self):
         self.button_box = QDialogButtonBox((QDialogButtonBox.Cancel | QDialogButtonBox.Ok), self)

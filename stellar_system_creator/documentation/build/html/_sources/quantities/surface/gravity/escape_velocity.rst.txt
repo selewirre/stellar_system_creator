@@ -1,6 +1,8 @@
 Escape Velocity
 ===============
 
+.. _escape_velocity:
+
 Escape velocity :math:`v_{\rm esc}` is the initial speed a small object needs to escape the gravitational
 pull of the celestial object it is bound to.
 

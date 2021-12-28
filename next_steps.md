@@ -48,10 +48,6 @@
     - add save as file (for planetary and stellar systems)
     - add load from file (for planetary and stellar systems)
 3. fix p-type binary so that it will include both S-type and P-type in one (maybe not?)
-4. For documentation:
-   1. Add extent, rough limits
-   2. Add example of how to build a system
-   3. Add description of gui functionalities
 
 # Miscellaneous:
 1. check out satellites around gasginats heating model https://iopscience.iop.org/article/10.1088/0004-637X/704/2/1341/pdf

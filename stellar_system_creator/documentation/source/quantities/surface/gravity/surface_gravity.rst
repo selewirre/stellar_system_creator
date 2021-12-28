@@ -1,6 +1,8 @@
 Surface Gravity
 ===============
 
+.. _surface_gravity:
+
 Surface gravity :math:`g` is the gravitational acceleration experienced at
 the surface of an object.
 

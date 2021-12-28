@@ -138,7 +138,7 @@ class CentralWidget(QTabWidget):
 class TabHeaderDialog(QDialog):
 
     def __init__(self, parent_item, header_label: QLabel, parent):
-        from gui_project_tree_view import ProjectTreeView
+        from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
         self.parent_item: ProjectTreeView = parent_item
         super().__init__(parent)
         self.setModal(False)

@@ -13,6 +13,7 @@ Welcome to Stellar System Creator!
    celestial_bodies/celestial_bodies
    celestial_systems/celestial_systems
    quantities/quantities
+   gui/gui
 
 .. Indices and tables
    ==================

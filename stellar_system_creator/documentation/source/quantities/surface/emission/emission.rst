@@ -1,6 +1,7 @@
 Emission
 ========
 
+.. _emission:
 
 .. toctree::
     albedo

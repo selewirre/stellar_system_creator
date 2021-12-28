@@ -12,6 +12,7 @@ An orbit is a curved trajectory of an object. This trajectory can either be circ
     apoapsis
     periapsis
     lagrange_position
+    extent
     contact
     roche_lobe
     orbital_period

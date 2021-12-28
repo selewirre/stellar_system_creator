@@ -8,7 +8,7 @@ To install this package, run:
 
 ```
 python3 setup.py sdist bdist_wheel
-pip3 install dist/stellar_system_creator-0.0.6.0.tar.gz
+pip3 install dist/stellar_system_creator-0.1.0.0.tar.gz
 ```
 
 If you want to check out the example code, look in the folder `examples/...`
@@ -46,7 +46,7 @@ What you can do with the GUI:
 
 What you can NOT do with the GUI just yet:
 1. Create rings or planetary binaries.
-2. Add your own image system background.
+2. Add your own image as system background.
 3. Add ssc files as subsystem (in add XX system option).
 
 When rendering, allow the program to work through it (takes 20-60 seconds) if you added asteroid belts and/or trojans.

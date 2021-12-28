@@ -1,6 +1,8 @@
 Surface
 =======
 
+.. _surface:
+
 .. toctree::
     emission/emission
     gravity/gravity

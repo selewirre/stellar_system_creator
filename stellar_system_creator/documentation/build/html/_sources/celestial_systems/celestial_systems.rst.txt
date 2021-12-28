@@ -8,5 +8,6 @@ and can be part of other celestial systems.
 
 .. toctree::
     binary_system
-    stellar_system
     planetary_system
+    stellar_system
+    multi_stellar_system

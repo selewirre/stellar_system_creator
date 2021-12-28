@@ -2,6 +2,8 @@
 Quantities
 ==========
 
+.. _quantities:
+
 Here, we will explore the various physical quantities found in this package.
 
 .. toctree::
