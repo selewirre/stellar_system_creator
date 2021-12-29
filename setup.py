@@ -33,11 +33,15 @@ setuptools.setup(
                                              'gui/*.ico',
                                              'gui/gui_icons/*'] + doc_files},
     install_requires=['astropy',
+                      'bidict',
+                      'blosc',
+                      'bs4',
                       'matplotlib',
                       'numpy',
                       'pandas',
                       'pint',
                       'pyqt5',
+                      'pyqtwebengine'
                       'scipy'],
     classifiers=[
         "Programming Language :: Python :: 3",
