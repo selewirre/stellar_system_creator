@@ -18,7 +18,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 setuptools.setup(
     name="stellar_system_creator",
-    version="0.1.0.0",
+    version="0.1.0.1",
     author="Selewirre Iskvary",
     author_email="selewirre@gmail.com",
     description="A tool for creating custom, scientifically plausible stellar systems.",
@@ -32,8 +32,7 @@ setuptools.setup(
                                              'visualization/default_images/*.png',
                                              'gui/*.ico',
                                              'gui/gui_icons/*'] + doc_files},
-    install_requires=['astropy',
-                      'bidict',
+    install_requires=['bidict',
                       'blosc',
                       'bs4',
                       'matplotlib',
@@ -41,7 +40,7 @@ setuptools.setup(
                       'pandas',
                       'pint',
                       'pyqt5',
-                      'pyqtwebengine'
+                      'pyqtwebengine',
                       'scipy'],
     classifiers=[
         "Programming Language :: Python :: 3",
