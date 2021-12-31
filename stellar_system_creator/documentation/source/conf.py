@@ -22,7 +22,7 @@ copyright = '2021, Selewirre Iskvary'
 author = 'Selewirre Iskvary'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1.0.2'
+release = '0.1.0.3'
 
 
 # -- General configuration ---------------------------------------------------

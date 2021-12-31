@@ -1,6 +1,8 @@
 import tempfile
 from functools import partial
 from typing import Union
+import os
+import glob
 
 import matplotlib.pyplot as plt
 import pkg_resources
@@ -31,30 +33,42 @@ class SystemRenderingWidget(QSvgWidget):
         self.graphics_view: GraphicsView = graphics_view
         self.setMouseTracking(True)
         self.old_pos = None
+        self.temp_file_name = '~.tempfile0'
+        self.temp_file = None
+        while len(glob.glob(self.temp_file_name)):
+            self.temp_file_name = self.temp_file_name[:-1] + str(int(self.temp_file_name[-1]) + 1)
+
+    def set_temp_file(self):
+        self.temp_file = open(self.temp_file_name, 'x+b')
+
+    def delete_temp_file(self):
+        self.temp_file.close()
+        os.remove(self.temp_file_name)
+        self.temp_file = None
 
     def render_image(self, ssc_object: Union[MultiStellarSystemSType, StellarSystem, PlanetarySystem, None]):
 
         if ssc_object is not None:
-            if ssc_object.parent is not None:
+            if ssc_object.parent is not None and self.temp_file is not None:
                 self.change_draw_line_options(ssc_object)
                 self.hide()
                 save_format = 'svg'
-                with tempfile.NamedTemporaryFile("r+b", delete=True) as fd:
-                    if isinstance(ssc_object, MultiStellarSystemSType):
-                        ssc_object.draw_multi_stellar_system(save_fig=True, save_temp_file=fd, save_format=save_format)
-                    elif isinstance(ssc_object, StellarSystem):
-                        ssc_object.draw_stellar_system(save_fig=True, save_temp_file=fd, save_format=save_format)
-                    elif isinstance(ssc_object, PlanetarySystem):
-                        ssc_object.draw_planetary_system(save_fig=True, save_temp_file=fd, save_format=save_format)
-                    fd.seek(0)
-                    self.renderer().load(fd.name)
+                fd = self.temp_file
+                if isinstance(ssc_object, MultiStellarSystemSType):
+                    ssc_object.draw_multi_stellar_system(save_fig=True, save_temp_file=fd, save_format=save_format)
+                elif isinstance(ssc_object, StellarSystem):
+                    ssc_object.draw_stellar_system(save_fig=True, save_temp_file=fd, save_format=save_format)
+                elif isinstance(ssc_object, PlanetarySystem):
+                    ssc_object.draw_planetary_system(save_fig=True, save_temp_file=fd, save_format=save_format)
+                fd.seek(0)
+                self.renderer().load(fd.name)
                 self.latest_fig = ssc_object.fig
                 ssc_object.fig = None
                 ssc_object.ax = None
                 self.renderer().setAspectRatioMode(Qt.KeepAspectRatio)
                 # self.setStyleSheet(self.graphics_view.styleSheet())
                 self.adjustSize()
-                self.show()
+                self.update()
                 # self.graphics_view.fitInView(self.graphics_view.sceneRect(), Qt.KeepAspectRatio)
             else:
                 self.hide()
@@ -149,12 +163,6 @@ class SystemImageWidget(QWidget):
         self.render_button.pressed.connect(self.render_process)
         self.render_thread = None
 
-        # TODO: Add dropdown menu with all systems that can be rendered
-        # TODO: Connect dropdown menu to treeview edit triggered process (still don't know exaclty how)
-        # print(self.tree_view.ssc_object.name)
-        # # if
-        # self.system_drop_menu = QComboBox()
-        # self.system_drop_menu.addItem(self.tree_view.ssc_object.name)
         self.target_treeview = self.tree_view
 
         self.rendering_settings_dialog = RenderingSettingsDialog(self)
@@ -180,8 +188,14 @@ class SystemImageWidget(QWidget):
         self.options_widget.setFixedSize(self.options_widget.sizeHint())
 
     def render_process(self):
+        self.system_rendering_widget.set_temp_file()
         self.render_thread = ImageRenderingProcess(self.target_treeview, self.system_rendering_widget, self.render_button)
+        self.render_thread.finished.connect(self.thread_finished_process)
         self.render_thread.start()
+
+    def thread_finished_process(self):
+        self.system_rendering_widget.show()
+        self.system_rendering_widget.delete_temp_file()
 
     def rendering_settings_process(self):
         self.rendering_settings_dialog.show()
