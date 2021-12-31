@@ -62,7 +62,7 @@ if __name__ == "__main__":
     # import pkg_resources
     filename = '../examples/output_files/TrakunaStellarSystem.ssc'
     # filename = '../examples/output_files/QuezuliferhQuaternaryMultiStellarSystem.ssc'
-    win.central_widget.add_new_tab(filename)
+    # win.central_widget.add_new_tab(filename)
     win.show()
     # win.showMaximized()
     sys.exit(app.exec_())

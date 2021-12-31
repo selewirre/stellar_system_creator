@@ -493,7 +493,7 @@ class TrojanSatelliteDetailsDialog(SatelliteDetailsDialog):
     def _set_other_edits(self):
         super()._set_other_edits()
         sse: Planet = self.parent_item.ssc_object
-        self.other_edits['Lagrange Position'] = ComboBox(sse, 'orbit_type', ['1', '-1'], self.all_labels)
+        self.other_edits['Lagrange Position'] = ComboBox(sse, 'lagrange_position', ['1', '-1'], self.all_labels)
 
     def _set_other_edit_init_values(self):
         super()._set_other_edit_init_values()
@@ -581,7 +581,8 @@ class TrojanDetailsDialog(PlanetDetailsDialog):
         basic_orbital_characteristics_box_layout.insertRow(1, label, self.other_edits[key])
         orbital_distance_characteristics_box_layout = self.orbital_distance_characteristics_group_box.layout()
         key = 'Extent'
-        orbital_distance_characteristics_box_layout.insertRow(0, f"{key}:", self.ule[key])
+        self.add_key_to_layout(orbital_distance_characteristics_box_layout, self.ule, key,
+                               'quantities/orbital/extent.html')
 
         self.other_edits['Orbit Type'].setEnabled(False)
         self.check_boxes['Use Suggested Eccentricity'].setEnabled(False)
@@ -595,7 +596,7 @@ class TrojanDetailsDialog(PlanetDetailsDialog):
     def _set_other_edits(self):
         super()._set_other_edits()
         sse: Planet = self.parent_item.ssc_object
-        self.other_edits['Lagrange Position'] = ComboBox(sse, 'orbit_type', ['1', '-1'], self.all_labels)
+        self.other_edits['Lagrange Position'] = ComboBox(sse, 'lagrange_position', ['1', '-1'], self.all_labels)
 
     def _set_other_edit_init_values(self):
         super()._set_other_edit_init_values()
@@ -672,7 +673,8 @@ class AsteroidBeltDetailsDialog(PlanetDetailsDialog):
         super()._set_orbital_characteristics_tab()
         orbital_distance_characteristics_box_layout = self.orbital_distance_characteristics_group_box.layout()
         key = 'Extent'
-        orbital_distance_characteristics_box_layout.insertRow(0, f"{key}:", self.ule[key])
+        self.add_key_to_layout(orbital_distance_characteristics_box_layout, self.ule, key,
+                               'quantities/orbital/extent.html')
 
         self.other_edits['Orbit Type'].setEnabled(False)
         self.le['Eccentricity'].setEnabled(False)

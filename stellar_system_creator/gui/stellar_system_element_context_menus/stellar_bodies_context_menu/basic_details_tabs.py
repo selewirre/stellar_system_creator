@@ -189,9 +189,12 @@ class ParentHabitabilityTab(Tab):
         return labels
 
     def update_text(self):
-        clearLayout(self.zones_group_box.layout())
-        self.habitability_labels = self.get_habitability_labels()
-        self._set_zones_box_cells()
+        try:
+            clearLayout(self.zones_group_box.layout())
+            self.habitability_labels = self.get_habitability_labels()
+            self._set_zones_box_cells()
+        except AttributeError:
+            pass
         # for key in self.habitability_labels:
         #     self.habitability_labels[key].update_text()
 

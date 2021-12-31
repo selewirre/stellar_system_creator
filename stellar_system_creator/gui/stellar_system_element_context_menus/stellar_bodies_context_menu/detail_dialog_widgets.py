@@ -121,6 +121,17 @@ class UnitLineEdit(QWidget):
         self.value = self.value.to(new_units)
         self.line_edit.setText(get_value_string(self.value))
 
+    def set_to_nan(self, process_change=True):
+        new_units = self.dict_pretty.inverse[self.unit_drop_menu.currentText()]
+        self.value = self.value.to(new_units) * np.nan
+        self.line_edit.setText(get_value_string(self.value))
+        self.sse.__dict__[self.value_name] = \
+            Q_(float(self.line_edit.text()), self.dict_pretty.inverse[self.unit_drop_menu.currentText()])
+        if process_change:
+            self.sse.__post_init__()
+            for key in self.influenced_labels:
+                self.influenced_labels[key].update_text()
+
 
 class UnitLabel(QWidget):
 
@@ -219,6 +230,14 @@ class LineEdit(QLineEdit):
     def get_value(self):
         return self.sse.__dict__[self.value_name]
 
+    def set_to_nan(self, process_change=True):
+        self.setText(str(np.nan))
+        self.sse.__dict__[self.value_name] = np.nan
+        if process_change:
+            self.sse.__post_init__()
+            for key in self.influenced_labels:
+                self.influenced_labels[key].update_text()
+
 
 class Label(QLabel):
 
@@ -295,15 +314,23 @@ class CheckBox(QCheckBox):
             self.update_text()
 
     def update_text(self) -> None:
+        disable_later = False
+        if not self.linked_line_edit.isEnabled():
+            disable_later = True
+            self.linked_line_edit.setEnabled(True)
         if self.isChecked():
             self.linked_line_edit.setFocus()
-            self.linked_line_edit.value_name = f'suggested_{self.value_name}'
-            self.linked_line_edit.keep_old_text_action()
-            self.linked_line_edit.value_name = f'{self.value_name}'
-            self.linked_line_edit.change_text_action()
+            self.linked_line_edit.set_to_nan()
+            # self.linked_line_edit.value_name = f'suggested_{self.value_name}'
+            # self.linked_line_edit.keep_old_text_action()
+            # self.linked_line_edit.value_name = f'{self.value_name}'
+            # self.linked_line_edit.change_text_action()
         else:
             self.linked_line_edit.setFocus()
             self.linked_line_edit.keep_old_text_action()  # unlike its name, it just takes the existing argument
+            self.linked_line_edit.change_text_action()
+        if disable_later:
+            self.linked_line_edit.setEnabled(False)
 
 
 class GroupBox(QGroupBox):
@@ -496,6 +523,13 @@ class ImageLineEdit(QWidget):
         if self.hasFocus() or self.line_edit.hasFocus():
             self.line_edit.setText(self.get_value())
 
+    def set_to_nan(self, process_change=True):
+        self.line_edit.setText(str(None))
+        self.sse.__dict__[self.value_name] = None
+        self.setFocus()
+        self.change_text_action(process_change)
+        self.clearFocus()
+
 
 def clearLayout(layout):
     while layout.count():
@@ -579,7 +613,7 @@ def get_unit_bidict(value: Q_):
                                   'hr': 'hour',
                                   'd': 'day',
                                   'a': 'year',
-                                  'Gyr': 'gigayear',
+                                  'Ga': 'gigayear',
                                   'T_s': 'Ts'})
         elif unit_dimensions['[temperature]'] == 1:
             dict_pretty = bidict({'K': 'K', 'degC': '°C', 'degF': '°F'})

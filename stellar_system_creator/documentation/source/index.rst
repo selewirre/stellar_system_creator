@@ -14,6 +14,7 @@ Welcome to Stellar System Creator!
    celestial_systems/celestial_systems
    quantities/quantities
    gui/gui
+   attributions/attributions
 
 .. Indices and tables
    ==================

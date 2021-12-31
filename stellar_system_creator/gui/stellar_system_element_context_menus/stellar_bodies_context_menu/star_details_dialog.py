@@ -194,8 +194,9 @@ class StarDetailsDialog(BasicDetailsDialog):
         keys = ['Tidal Locking Radius', 'Rough Inner Orbit Limit', 'Dense Roche Limit', 'Inner Orbit Limit',
                 'Rough Outer Orbit Limit', 'Hill Sphere', 'S-Type Critical Orbit', 'Outer Orbit Limit']
         tooltip_dirs = [f'quantities/children_orbit_limits/{s}.html'
-                        for s in ['tidal_locking_radius', None, 'dense_roche_limit', 'inner_orbit_limit',
-                                  None, 'hill_sphere', 's_type_critical_orbit', 'outer_orbit_limit']]
+                        for s in ['tidal_locking_radius', 'rough_inner_orbit_limit', 'dense_roche_limit',
+                                  'inner_orbit_limit', 'rough_outer_orbit_limit', 'hill_sphere',
+                                  's_type_critical_orbit', 'outer_orbit_limit']]
         self.add_keys_to_layout(basic_limits_box_layout, self.ulabels, keys, tooltip_dirs)
 
         # setting Rock Line group box

@@ -643,12 +643,12 @@ def calculate_max_satellite_mass(parent_mass: Q_, parent_radius: Q_, satellite_s
     return upper_mass_limit.to(parent_mass.units)
 
 
-def calculate_synodic_period(period1: Q_, periond2: Q_) -> Q_:
+def calculate_synodic_period(period1: Q_, period2: Q_) -> Q_:
     """
     Synodic period is the period of time it takes for an object (sun) to appear at the same spot on another object's
     sky.
 
     More info on: https://en.wikipedia.org/wiki/Synodic_day
     """
-    return abs(1 / (1 / period1 - 1 / periond2)).to('days')
+    return abs(1 / (1 / period1 - 1 / period2)).to('days')
 

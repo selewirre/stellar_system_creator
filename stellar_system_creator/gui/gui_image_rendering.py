@@ -356,6 +356,8 @@ class RenderingSettingsDialog(QDialog):
     def update_available_systems_drop_down(self, child_item: TreeViewItemFromStellarSystemElement, old_child_name):
         tree_view: ProjectTreeView = child_item.model().parent()
         ssc_obj = child_item.ssc_object
+        if not isinstance(ssc_obj, (PlanetarySystem, StellarSystem, MultiStellarSystemSType)):
+            return
         text = ssc_obj.name
         old_text = old_child_name
         while ssc_obj.parent is not None:
@@ -368,7 +370,7 @@ class RenderingSettingsDialog(QDialog):
                     old_text = f'{ssc_obj.parent.name}/{old_text}'
             ssc_obj = ssc_obj.parent
         old_text_index = self.available_systems_drop_down.findText(old_text)
-        if old_text_index > 0:
+        if old_text_index >= 0:
             self.available_systems_drop_down.setItemText(old_text_index, text)
         else:
             self.available_systems_drop_down.addItem(text)
@@ -405,7 +407,17 @@ class ImageRenderingProcess(QThread):
         loading_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/gui_icons/loading.svg')
         self.render_button.setIcon(QIcon(loading_dir))
         self.render_button.setDisabled(True)
-        self.rendering_widget.render_image(self.ssc_object)
+        try:
+            self.rendering_widget.render_image(self.ssc_object)
+        except Exception as e:
+            message_box = QMessageBox()
+            message_box.setIcon(QMessageBox.Information)
+            message_box.setWindowTitle("'Rendering' has failed...")
+            message_box.setText(f"Error message: {e}")
+            message_box.exec()
+        self.ssc_object.fig = None
+        self.ssc_object.ax = None
+
         self.render_button.setEnabled(True)
         self.render_button.setIcon(button_icon)
 

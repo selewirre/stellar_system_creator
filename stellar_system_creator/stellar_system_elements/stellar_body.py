@@ -685,12 +685,14 @@ class Planet(StellarBody):
 
     def get_image_array(self) -> np.ndarray:
         if self.composition != '':
-            if self.habitability:
+            if self.habitability and not self.composition.startswith('Waterworld'):
                 image = stellar_body_marker_dict['habitableworld'].copy()
             else:
                 image = stellar_body_marker_dict[image_composition_dict[self.composition]].copy()
             if self.composition == 'Gasgiant' and self.is_gasgiant_hot():
                 image = stellar_body_marker_dict['hotgasgiant'].copy()
+            if self.composition.startswith('Waterworld') and self.temperature.m < 250:
+                image = stellar_body_marker_dict['cold_waterworld'].copy()
             return image
         else:
             return np.nan
@@ -997,9 +999,9 @@ class Planet(StellarBody):
                     stability_violation.append('Semi-major axis is closer to the parent than the Rocky/Iron-planet '
                                                'formation line.')
 
-            if self.apoapsis > self.semi_major_axis_maximum_limit:
+            if self.semi_major_axis > self.semi_major_axis_maximum_limit:
                 stability = False
-                stability_violation.append('Apoapsis is farther from the parent than the outer orbit limit.')
+                stability_violation.append('Semi-major axis is farther from the parent than the outer orbit limit.')
 
         if not len(stability_violation):
             stability_violation.append('None')

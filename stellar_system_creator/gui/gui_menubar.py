@@ -191,13 +191,24 @@ class HelpMenu(QMenu):
 
     def _create_menu(self):
         self.addAction(self.documentation_action)
+        self.addAction(self.documentation_in_browser_action)
+        self.addAction(self.documentation_pdf_action)
 
     def _connect_actions(self):
         # self.documentation_action.triggered.connect(open_documentation)
         self.documentation_action.triggered.connect(self.open_documentation_process)
+        self.documentation_in_browser_action.triggered.connect(open_documentation_in_browser)
+        self.documentation_pdf_action.triggered.connect(open_documentation_pdf)
 
     def _create_menu_actions(self, menubar):
         self.documentation_action = QAction("&Documentation", menubar)
+        self.documentation_action.setShortcut('F1')
+
+        self.documentation_in_browser_action = QAction("&Open Documentation in Browser", menubar)
+        self.documentation_in_browser_action.setShortcut('Ctrl+F1')
+
+        self.documentation_pdf_action = QAction("&Open Documentation PDF", menubar)
+        self.documentation_pdf_action.setShortcut('Ctrl+Shift+F1')
 
     def open_documentation_process(self, page_directory=None):
         if page_directory is not None:
@@ -317,7 +328,8 @@ def open_project(parent):
     filename = QFileDialog.getOpenFileName(parent, 'Open Project(s)', '', "All Files (*);;Python Files (*.ssc)")[0]
     try:
         central_widget.add_new_tab(filename)
-    except Exception:
+    except Exception as e:
+        print(e)
         message_box = QMessageBox()
         message_box.setIcon(QMessageBox.Information)
         message_box.setWindowTitle("'Open Project' has failed...")
@@ -355,11 +367,24 @@ def exit_application(parent):
         sys.exit()
 
 
-def open_documentation():
+def open_documentation_in_browser():
     # filename = pkg_resources.resource_filename('stellar_system_creator',
     #                                            'documentation/build/latex/stellarsystemcreator.pdf')
     filename = pkg_resources.resource_filename('stellar_system_creator',
                                                'documentation/build/html/index.html')
+    import subprocess, os, platform
+    if platform.system() == 'Darwin':  # macOS
+        subprocess.call(('open', filename))
+    elif platform.system() == 'Windows':  # Windows
+        os.startfile(filename)
+        # subprocess.call(('start', filename), shell=True)
+    else:  # linux variants
+        subprocess.call(('xdg-open', filename))
+
+
+def open_documentation_pdf():
+    filename = pkg_resources.resource_filename('stellar_system_creator',
+                                               'documentation/build/latex/stellarsystemcreator.pdf')
     import subprocess, os, platform
     if platform.system() == 'Darwin':  # macOS
         subprocess.call(('open', filename))
