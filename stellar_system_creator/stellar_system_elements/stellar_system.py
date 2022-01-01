@@ -96,13 +96,20 @@ class StellarSystem:
         self.asteroid_belts = [asteroid_belt for asteroid_belt in self.asteroid_belts
                                if asteroid_belt != garbage_asteroid_belt]
 
-    def draw_stellar_system(self, save_fig=False, save_name=None, save_format='pdf', save_temp_file=None):
+    def set_fig_and_ax(self):
         if self.fig is None:
             self.fig: plt.Figure = plt.figure(figsize=(11, 3))
         else:
             plt.figure(self.fig.number)
         if self.ax is None:
             self.ax: plt.Axes = plt.gca()
+
+    def clear_fig_and_ax(self):
+        self.fig = None
+        self.ax = None
+
+    def draw_stellar_system(self, save_fig=False, save_name=None, save_format='pdf', save_temp_file=None):
+        self.set_fig_and_ax()
 
         self.fig.set_facecolor('k')
         self.ax.patch.set_alpha(0)
@@ -300,16 +307,22 @@ class MultiStellarSystemSType:
     def remove_object(self, garbage_object):
         self.remove_child(garbage_object)
 
-    def draw_multi_stellar_system(self, save_fig=False, save_name=None, save_format='pdf', save_temp_file=None) -> None:
-        if self.fig is None and self.axs is None:
-            fig, axs = plt.subplots(self.size, 1, figsize=(11, 3*self.size))
-            self.fig: plt.Figure = fig
-            if isinstance(axs, plt.Axes):
-                self.axs: np.ndarray = np.array([axs])
-            else:
-                self.axs: np.ndarray = axs
+    def set_fig_and_ax(self):
+        if self.fig is None:
+            self.fig: plt.Figure = plt.figure(figsize=(11, 3*self.size))
         else:
             plt.figure(self.fig.number)
+        if self.ax is None:
+            self.ax: plt.Axes = plt.gca()
+
+    def clear_fig_and_ax(self):
+        self.fig = None
+        self.ax = None
+        for i in range(self.size):
+            self.children[i].clear_fig_and_ax()
+
+    def draw_multi_stellar_system(self, save_fig=False, save_name=None, save_format='pdf', save_temp_file=None) -> None:
+        self.set_fig_and_ax()
 
         for i in range(self.size):
             self.children[i].fig = self.fig

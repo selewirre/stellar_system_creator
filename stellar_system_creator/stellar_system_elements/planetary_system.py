@@ -84,13 +84,20 @@ class PlanetarySystem:
         self.trojans_list = [trojan for trojan in self.trojans_list
                              if trojan != garbage_trojan]
 
-    def draw_planetary_system(self, save_fig=False, save_name=None, save_format='pdf', save_temp_file=None):
+    def set_fig_and_ax(self):
         if self.fig is None:
             self.fig: plt.Figure = plt.figure(figsize=(11, 3))
         else:
             plt.figure(self.fig.number)
         if self.ax is None:
             self.ax: plt.Axes = plt.gca()
+
+    def clear_fig_and_ax(self):
+        self.fig = None
+        self.ax = None
+
+    def draw_planetary_system(self, save_fig=False, save_name=None, save_format='pdf', save_temp_file=None):
+        self.set_fig_and_ax()
 
         self.fig.set_facecolor('k')
         self.ax.patch.set_alpha(0)

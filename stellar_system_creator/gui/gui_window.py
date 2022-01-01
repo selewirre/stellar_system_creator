@@ -15,8 +15,9 @@
 # example on dialogbuttonbox with tabwidget https://codetorial.net/en/pyqt5/widget/qtabwidget_advanced.html
 # example on radiobutton https://pythonbasics.org/pyqt-radiobutton/
 # example on qthread https://stackoverflow.com/questions/6783194/background-thread-with-qthread-in-pyqt
-
+import glob
 import sys
+import os
 
 from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow
@@ -44,6 +45,10 @@ class Window(QMainWindow):
 
         self._create_central_widget()
         self._create_menubar()
+        temp_files_name = '~.tempfile*'
+        temp_file_names = glob.glob(temp_files_name)
+        for file_name in temp_file_names:
+            os.remove(file_name)
 
     def _create_central_widget(self):
         self.central_widget = CentralWidget()

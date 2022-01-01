@@ -62,9 +62,6 @@ class SystemRenderingWidget(QSvgWidget):
                     ssc_object.draw_planetary_system(save_fig=True, save_temp_file=fd, save_format=save_format)
                 fd.seek(0)
                 self.renderer().load(fd.name)
-                self.latest_fig = ssc_object.fig
-                ssc_object.fig = None
-                ssc_object.ax = None
                 self.renderer().setAspectRatioMode(Qt.KeepAspectRatio)
                 # self.setStyleSheet(self.graphics_view.styleSheet())
                 self.adjustSize()
@@ -188,13 +185,18 @@ class SystemImageWidget(QWidget):
         self.options_widget.setFixedSize(self.options_widget.sizeHint())
 
     def render_process(self):
+        ssc_object = self.target_treeview.ssc_object
+        ssc_object.set_fig_and_ax()
         self.system_rendering_widget.set_temp_file()
         self.render_thread = ImageRenderingProcess(self.target_treeview, self.system_rendering_widget, self.render_button)
         self.render_thread.finished.connect(self.thread_finished_process)
         self.render_thread.start()
 
     def thread_finished_process(self):
+        ssc_object = self.target_treeview.ssc_object
         self.system_rendering_widget.show()
+        self.system_rendering_widget.latest_fig = ssc_object.fig
+        ssc_object.clear_fig_and_ax()
         self.system_rendering_widget.delete_temp_file()
 
     def rendering_settings_process(self):
