@@ -103,12 +103,15 @@ class UnitLineEdit(QWidget):
 
     def change_text_action(self, process_change=True) -> None:
         if self.hasFocus() or self.line_edit.hasFocus():
-            self.sse.__dict__[self.value_name] = \
-                Q_(float(self.line_edit.text()), self.dict_pretty.inverse[self.unit_drop_menu.currentText()])
-            if process_change:
-                self.sse.__post_init__()
-                for key in self.influenced_labels:
-                    self.influenced_labels[key].update_text()
+            try:
+                self.sse.__dict__[self.value_name] = \
+                    Q_(float(self.line_edit.text()), self.dict_pretty.inverse[self.unit_drop_menu.currentText()])
+                if process_change:
+                    self.sse.__post_init__()
+                    for key in self.influenced_labels:
+                        self.influenced_labels[key].update_text()
+            except Exception:
+                self.keep_old_text_action()
 
     def keep_old_text_action(self) -> None:
         if self.hasFocus() or self.line_edit.hasFocus():
@@ -217,11 +220,15 @@ class LineEdit(QLineEdit):
                 value = float(text)
             except ValueError:
                 value = text
-            self.sse.__dict__[self.value_name] = value
-            if process_change:
-                self.sse.__post_init__()
-                for key in self.influenced_labels:
-                    self.influenced_labels[key].update_text()
+
+            if not isinstance(self.sse.__dict__[self.value_name], type(value)):
+                self.keep_old_text_action()
+            else:
+                self.sse.__dict__[self.value_name] = value
+                if process_change:
+                    self.sse.__post_init__()
+                    for key in self.influenced_labels:
+                        self.influenced_labels[key].update_text()
 
     def keep_old_text_action(self) -> None:
         if self.hasFocus():

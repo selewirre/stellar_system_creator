@@ -194,7 +194,13 @@ class StellarBody:
             previous_suggested_age = self.suggested_age
         else:
             previous_suggested_age = -999 * ureg.T_s
-        self.suggested_age = self.lifetime / 2
+        if self.part_of_binary:
+            if self.parent.primary_body.lifetime < self.parent.secondary_body.lifetime:
+                self.suggested_age = self.parent.primary_body.lifetime / 2
+            else:
+                self.suggested_age = self.parent.secondary_body.lifetime / 2
+        else:
+            self.suggested_age = self.lifetime / 2
         if np.isnan(self.age.m) or previous_suggested_age == self.age:
             self.age = self.suggested_age
 
@@ -718,8 +724,8 @@ class Planet(StellarBody):
                 else:
                     companion_body = self.parent.parent.secondary_body
                 incident_flux = incident_flux + calculate_companion_incident_flux_in_wide_binary(
-                    companion_body.luminosity, self.semi_major_axis, self.parent.mean_distance,
-                    self.orbital_eccentricity, self.parent.eccentricity, ecc_correction)
+                    companion_body.luminosity, self.semi_major_axis, self.parent.parent.mean_distance,
+                    self.orbital_eccentricity, self.parent.parent.eccentricity, ecc_correction)
         else:
             incident_flux = np.nan * ureg.S_s
 

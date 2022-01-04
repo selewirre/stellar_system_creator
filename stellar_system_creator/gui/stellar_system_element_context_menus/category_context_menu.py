@@ -42,8 +42,10 @@ def add_stellar_binary(name, tree_view_item):
 
     init_values_binary = category_add_element_init_values['Stellar Parent']['Stellar Binary']
     if tree_view_item.ssc_parent.parent is not None:
-        new_object = StellarBinary(name=name, parent=tree_view_item.ssc_parent.parent.parent, **init_values_binary,
+        new_object = StellarBinary(name=name, parent=None, **init_values_binary,
                                    primary_body=new_star1, secondary_body=new_star2)
+        new_object.parent = tree_view_item.ssc_parent.parent.parent
+        new_object.update_parent()
     else:
         new_object = StellarBinary(name=name, parent=None, **init_values_binary,
                                    primary_body=new_star1, secondary_body=new_star2)
