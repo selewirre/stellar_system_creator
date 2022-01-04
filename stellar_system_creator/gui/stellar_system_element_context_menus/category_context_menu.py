@@ -1,5 +1,6 @@
 from typing import Union
 
+import numpy as np
 from PyQt5.QtWidgets import QMenu, QAction, QDialog, QDialogButtonBox, QVBoxLayout, QWidget, QLineEdit, QFormLayout, \
     QComboBox, QHBoxLayout, QRadioButton, QSizePolicy, QMessageBox
 from PyQt5.Qt import QStandardItem
@@ -45,6 +46,10 @@ def add_stellar_binary(name, tree_view_item):
         new_object = StellarBinary(name=name, parent=None, **init_values_binary,
                                    primary_body=new_star1, secondary_body=new_star2)
         new_object.parent = tree_view_item.ssc_parent.parent.parent
+        if tree_view_item.ssc_parent.parent.parent.primary_body == tree_view_item.ssc_parent.parent:
+            tree_view_item.ssc_parent.parent.parent.primary_body = new_object
+        else:
+            tree_view_item.ssc_parent.parent.parent.secondary_body = new_object
         new_object.update_parent()
     else:
         new_object = StellarBinary(name=name, parent=None, **init_values_binary,
@@ -62,6 +67,10 @@ def add_stellar_binary(name, tree_view_item):
     new_tree_view_item.appendRow(new_star1_tree_view_item)
     new_tree_view_item.appendRow(new_star2_tree_view_item)
 
+    from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
+    tree_view: ProjectTreeView = new_tree_view_item.model().parent()
+    tree_view.expandRecursively(new_tree_view_item.index())
+
 
 def add_star(name, tree_view_item):
     from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
@@ -71,6 +80,11 @@ def add_star(name, tree_view_item):
     init_values = category_add_element_init_values['Stellar Parent']['Star']
     if tree_view_item.ssc_parent.parent is not None:
         new_object = MainSequenceStar(name=name, parent=tree_view_item.ssc_parent.parent.parent, **init_values)
+        if tree_view_item.ssc_parent.parent.parent.primary_body == tree_view_item.ssc_parent.parent:
+            tree_view_item.ssc_parent.parent.parent.primary_body = new_object
+        else:
+            tree_view_item.ssc_parent.parent.parent.secondary_body = new_object
+        new_object.update_parent()
     else:
         new_object = MainSequenceStar(name=name, parent=None, **init_values)
 
@@ -116,6 +130,10 @@ def add_stellar_system(name, tree_view_item):
     new_planet_tree_view_item = tvifsse(new_object)
     stellar_parent_treeview.appendRow(new_planet_tree_view_item)
 
+    from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
+    tree_view: ProjectTreeView = new_tree_view_item.model().parent()
+    tree_view.expandRecursively(new_tree_view_item.index())
+
 
 def add_planetary_system(name, tree_view_item):
     from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
@@ -123,6 +141,11 @@ def add_planetary_system(name, tree_view_item):
     tree_view_item: TreeViewItemFromString
 
     init_values = category_add_element_init_values['Planetary Parent']['Planet']
+    if tree_view_item.ssc_parent.parent is not None:
+        dout = tree_view_item.ssc_parent.parent.outer_orbit_limit
+        din = tree_view_item.ssc_parent.parent.inner_orbit_limit.to(dout.u)
+        distance = np.exp((np.log10(din.m) + np.log10(dout.m)) / 2) * dout.u
+        init_values['semi_major_axis'] = distance
     new_object = Planet(name=name, parent=tree_view_item.ssc_parent.parent, **init_values)
     new_object_system = PlanetarySystem(name, new_object)
     tree_view_item.ssc_parent.add_planetary_system(new_object_system)
@@ -141,6 +164,10 @@ def add_planetary_system(name, tree_view_item):
     new_planet_tree_view_item = tvifsse(new_object)
     planetary_parent_treeview.appendRow(new_planet_tree_view_item)
 
+    from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
+    tree_view: ProjectTreeView = new_tree_view_item.model().parent()
+    tree_view.expandRecursively(new_tree_view_item.index())
+
 
 def add_planet(name, tree_view_item):
     from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
@@ -148,6 +175,11 @@ def add_planet(name, tree_view_item):
     tree_view_item: TreeViewItemFromString
 
     init_values = category_add_element_init_values['Planetary Parent']['Planet']
+    if tree_view_item.ssc_parent.parent.parent is not None:
+        dout = tree_view_item.ssc_parent.parent.parent.outer_orbit_limit
+        din = tree_view_item.ssc_parent.parent.parent.inner_orbit_limit.to(dout.u)
+        distance = np.exp((np.log10(din.m) + np.log10(dout.m)) / 2) * dout.u
+        init_values['semi_major_axis'] = distance
     new_object = Planet(name=name, parent=tree_view_item.ssc_parent.parent.parent, **init_values)
 
     if tree_view_item.rowCount():

@@ -65,7 +65,9 @@ if __name__ == "__main__":
     app.setPalette(get_dark_theme_pallet())
     win = Window()
     # import pkg_resources
-    filename = '../examples/output_files/TrakunaStellarSystem.ssc'
+    # filename = '../examples/output_files/TrakunaStellarSystem.ssc'
+    # filename = '../../../stellar_system_creator_linux_file/my_system.ssc'
+    filename = '../../patata.ssc'
     # filename = '../examples/output_files/QuezuliferhQuaternaryMultiStellarSystem.ssc'
     # win.central_widget.add_new_tab(filename)
     win.show()

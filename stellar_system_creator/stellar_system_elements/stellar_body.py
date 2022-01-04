@@ -321,114 +321,6 @@ class Star(StellarBody):
         print(f'The luminosity identification class for {self.name} was not defined')
         return ''
 
-    def _set_insolation_model(self, model_name=None):
-        if 'insolation_model' not in self.__dict__:
-            if model_name is None:
-                self.insolation_model = InsolationByKopparapu(self.temperature, self.luminosity)
-            elif model_name == 'Kopparapu':
-                self.insolation_model = InsolationByKopparapu(self.temperature, self.luminosity)
-            else:
-                self.insolation_model = InsolationBySelsis(self.temperature, self.luminosity)
-        elif model_name is not None:
-            if model_name != self.insolation_model.name:
-                if model_name == 'Kopparapu':
-                    self.insolation_model = InsolationByKopparapu(self.temperature, self.luminosity)
-                else:
-                    self.insolation_model = InsolationBySelsis(self.temperature, self.luminosity)
-        elif self.temperature != self.insolation_model.star_temperature \
-                or self.luminosity != self.insolation_model.star_luminosity:
-            if self.insolation_model.name == 'Kopparapu':
-                self.insolation_model = InsolationByKopparapu(self.temperature, self.luminosity)
-            else:
-                self.insolation_model = InsolationBySelsis(self.temperature, self.luminosity)
-
-    def set_habitable_zone(self, zone_type: str, binary_companion=None):
-        model = self.insolation_model
-        comp_model_swl = None
-        if binary_companion is not None:
-            comp_model = binary_companion.insolation_model
-            comp_model_swl = comp_model.swl
-            from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
-            if isinstance(binary_companion, StellarBinary):
-                comp_model_swl = comp_model_swl[f'ptype{zone_type}']
-
-        if zone_type == 'SSHZ':
-            self.habitable_zone_limits['SSHZ'] = {name: calculate_single_star_habitable_orbital_threshold(
-                model.swl[name]) for name in model.names}
-        elif zone_type == 'RHZ' and binary_companion is not None:
-            mean_distance = self.parent.mean_distance
-            self.habitable_zone_limits['RHZ'] = {name: calculate_stype_radiative_habitable_limit(
-                model.swl[name], comp_model_swl[name], mean_distance, model.threshold_types[name])
-                for name in model.names}
-        elif zone_type == 'PHZ' and binary_companion is not None:
-            mean_distance = self.parent.mean_distance
-            eccentricity = self.parent.eccentricity
-            self.habitable_zone_limits['PHZ'] = {name: calculate_stype_permanent_habitable_limit(
-                model.swl[name], comp_model_swl[name], mean_distance, eccentricity, model.threshold_types[name])
-                for name in model.names}
-        elif zone_type == 'AHZ' and binary_companion is not None:
-            mean_distance = self.parent.mean_distance
-            eccentricity = self.parent.eccentricity
-            self.habitable_zone_limits['AHZ'] = {name: calculate_stype_average_habitable_limit(
-                model.swl[name], comp_model_swl[name], mean_distance, eccentricity) for name in model.names}
-
-        if zone_type in self.habitable_zone_limits:
-            if self.habitable_zone_limits[zone_type][model.earth_equivalent] > \
-                    self.habitable_zone_limits[zone_type][model.conservative_max_name]:
-                self.habitable_zone_limits[zone_type] = {name: np.nan * ureg.au for name in model.names}
-
-    def set_habitable_zones(self) -> None:
-        self.set_habitable_zone('SSHZ')
-        from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
-        if isinstance(self.parent, StellarBinary):
-            if self.parent.primary_body == self:
-                companion_body = self.parent.secondary_body
-            else:
-                companion_body = self.parent.primary_body
-            self.set_habitable_zone('RHZ', companion_body)
-            self.set_habitable_zone('PHZ', companion_body)
-            self.set_habitable_zone('AHZ', companion_body)
-            model = self.insolation_model
-            if np.isnan(self.habitable_zone_limits['RHZ'][model.earth_equivalent].m):
-                self.habitable_zone_limits['PHZ'] = {name: np.nan * ureg.au for name in model.names}
-                self.habitable_zone_limits['AHZ'] = {name: np.nan * ureg.au for name in model.names}
-
-    def check_habitability(self) -> Tuple[bool, str]:
-        habitability = True
-        habitability_violations = []
-
-        if 'AHZ' in self.habitable_zone_limits.keys():
-            relevant_zone_type = 'AHZ'
-        elif 'PHZ' in self.habitable_zone_limits.keys():
-            relevant_zone_type = 'PHZ'
-        elif 'RHZ' in self.habitable_zone_limits.keys():
-            relevant_zone_type = 'RHZ'
-        else:
-            relevant_zone_type = 'SSHZ'
-
-        model = self.insolation_model
-        if self.habitable_zone_limits[relevant_zone_type][model.relaxed_max_name] \
-                < self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name] or \
-                np.isnan(self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name]):
-            habitability = False
-            habitability_violations.append('There are no habitable zones in this system.')
-        elif self.inner_orbit_limit > self.habitable_zone_limits[relevant_zone_type][model.relaxed_max_name] \
-                or self.outer_orbit_limit < self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name]:
-            habitability = False
-            habitability_violations.append('No overlap between the relaxed habitable zone and the orbit'
-                                           ' boundaries.')
-
-        # from https://link.springer.com/article/10.1007/BF00160399
-        if self.lifetime < 1 * ureg.gigayears:
-            habitability = False
-            habitability_violations.append('Star lifetime is smaller than 1 billion years, making the development'
-                                           ' of life unlikely.')
-
-        if not len(habitability_violations):
-            habitability_violations.append('None.')
-
-        return habitability, ' '.join(habitability_violations)
-
     def calculate_water_frost_lines(self):
         # setting single star frost zone
         model = InsolationForWaterFrostline(self.temperature, self.luminosity)
@@ -547,25 +439,142 @@ class Star(StellarBody):
         self.appearance_frequency = self.get_frequency()
         self.temperature = self.calculate_temperature()
         self.peak_wavelength = self.calculate_spectrum_peak_wavelength()
-        self._set_insolation_model_and_habitable_zones()
+        self.reset_insolation_model_and_habitability()
 
-    def _set_insolation_model_and_habitable_zones(self):
-        self._set_insolation_model()
-        self.habitable_zone_limits = {}
-        self.set_habitable_zones()
+    def _set_insolation_model(self, model_name=None):
+        if 'insolation_model' not in self.__dict__:
+            if model_name is None:
+                self.insolation_model = InsolationByKopparapu(self.temperature, self.luminosity)
+            elif model_name == 'Kopparapu':
+                self.insolation_model = InsolationByKopparapu(self.temperature, self.luminosity)
+            else:
+                self.insolation_model = InsolationBySelsis(self.temperature, self.luminosity)
+        elif model_name is not None:
+            if model_name != self.insolation_model.name:
+                if model_name == 'Kopparapu':
+                    self.insolation_model = InsolationByKopparapu(self.temperature, self.luminosity)
+                else:
+                    self.insolation_model = InsolationBySelsis(self.temperature, self.luminosity)
+        elif self.temperature != self.insolation_model.star_temperature \
+                or self.luminosity != self.insolation_model.star_luminosity:
+            if self.insolation_model.name == 'Kopparapu':
+                self.insolation_model = InsolationByKopparapu(self.temperature, self.luminosity)
+            else:
+                self.insolation_model = InsolationBySelsis(self.temperature, self.luminosity)
+
+    def set_habitable_zone(self, zone_type: str, binary_companion=None):
+        model = self.insolation_model
+        comp_model_swl = None
+        if binary_companion is not None:
+            comp_model = binary_companion.insolation_model
+            comp_model_swl = comp_model.swl
+            from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
+            if isinstance(binary_companion, StellarBinary):
+                comp_model_swl = comp_model_swl[f'ptype{zone_type}']
+
+        if zone_type == 'SSHZ':
+            self.habitable_zone_limits['SSHZ'] = {name: calculate_single_star_habitable_orbital_threshold(
+                model.swl[name]) for name in model.names}
+        elif zone_type == 'RHZ' and binary_companion is not None:
+            mean_distance = self.parent.mean_distance
+            self.habitable_zone_limits['RHZ'] = {name: calculate_stype_radiative_habitable_limit(
+                model.swl[name], comp_model_swl[name], mean_distance, model.threshold_types[name])
+                for name in model.names}
+        elif zone_type == 'PHZ' and binary_companion is not None:
+            mean_distance = self.parent.mean_distance
+            eccentricity = self.parent.eccentricity
+            self.habitable_zone_limits['PHZ'] = {name: calculate_stype_permanent_habitable_limit(
+                model.swl[name], comp_model_swl[name], mean_distance, eccentricity, model.threshold_types[name])
+                for name in model.names}
+        elif zone_type == 'AHZ' and binary_companion is not None:
+            mean_distance = self.parent.mean_distance
+            eccentricity = self.parent.eccentricity
+            self.habitable_zone_limits['AHZ'] = {name: calculate_stype_average_habitable_limit(
+                model.swl[name], comp_model_swl[name], mean_distance, eccentricity) for name in model.names}
+
+        if zone_type in self.habitable_zone_limits:
+            if self.habitable_zone_limits[zone_type][model.earth_equivalent] > \
+                    self.habitable_zone_limits[zone_type][model.conservative_max_name]:
+                self.habitable_zone_limits[zone_type] = {name: np.nan * ureg.au for name in model.names}
+
+    def set_solo_habitable_zones(self):
+        self.set_habitable_zone('SSHZ')
+
+    def set_dual_habitable_zones(self):
+        from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
+        if isinstance(self.parent, StellarBinary):
+            if self.parent.primary_body == self:
+                companion_body = self.parent.secondary_body
+            else:
+                companion_body = self.parent.primary_body
+            self.set_habitable_zone('RHZ', companion_body)
+            self.set_habitable_zone('PHZ', companion_body)
+            self.set_habitable_zone('AHZ', companion_body)
+            model = self.insolation_model
+            if np.isnan(self.habitable_zone_limits['RHZ'][model.earth_equivalent].m):
+                self.habitable_zone_limits['PHZ'] = {name: np.nan * ureg.au for name in model.names}
+                self.habitable_zone_limits['AHZ'] = {name: np.nan * ureg.au for name in model.names}
+
+    def set_habitable_zones(self) -> None:
+        self.set_solo_habitable_zones()
+        self.set_dual_habitable_zones()
+
+    def check_habitability(self) -> Tuple[bool, str]:
+        habitability = True
+        habitability_violations = []
+
+        if 'AHZ' in self.habitable_zone_limits.keys():
+            relevant_zone_type = 'AHZ'
+        elif 'PHZ' in self.habitable_zone_limits.keys():
+            relevant_zone_type = 'PHZ'
+        elif 'RHZ' in self.habitable_zone_limits.keys():
+            relevant_zone_type = 'RHZ'
+        else:
+            relevant_zone_type = 'SSHZ'
+
+        model = self.insolation_model
+        if self.habitable_zone_limits[relevant_zone_type][model.relaxed_max_name] \
+                < self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name] or \
+                np.isnan(self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name]):
+            habitability = False
+            habitability_violations.append('There are no habitable zones in this system.')
+        elif self.inner_orbit_limit > self.habitable_zone_limits[relevant_zone_type][model.relaxed_max_name] \
+                or self.outer_orbit_limit < self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name]:
+            habitability = False
+            habitability_violations.append('No overlap between the relaxed habitable zone and the orbit'
+                                           ' boundaries.')
+
+        # from https://link.springer.com/article/10.1007/BF00160399
+        if self.lifetime < 1 * ureg.gigayears:
+            habitability = False
+            habitability_violations.append('Star lifetime is smaller than 1 billion years, making the development'
+                                           ' of life unlikely.')
+
+        if not len(habitability_violations):
+            habitability_violations.append('None.')
+
+        return habitability, ' '.join(habitability_violations)
 
     def reset_insolation_model(self, model_name='Kopparapu'):
         self._set_insolation_model(model_name)
         self._set_orbit_values()  # here for cause the frost lines also depend on the binary
 
-    def reset_habitability(self):
+    def reset_solo_habitability(self):
         self.habitable_zone_limits = {}
-        self.set_habitable_zones()
+        self.set_solo_habitable_zones()
+        self.do_habitability_check()
+
+    def do_habitability_check(self):
         self.habitability, self.habitability_violations = self.check_habitability()
 
     def reset_insolation_model_and_habitability(self, model_name='Kopparapu'):
         self.reset_insolation_model(model_name)
-        self.reset_habitability()
+        self.reset_solo_habitability()
+        try:
+            self.set_dual_habitable_zones()
+            self.do_habitability_check()
+        except Exception:
+            pass
 
 
 class MainSequenceStar(Star):

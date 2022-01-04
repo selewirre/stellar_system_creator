@@ -18,11 +18,11 @@ sys.path.insert(0, os.path.abspath('.'))
 import pkg_resources
 
 project = 'Stellar System Creator'
-copyright = '2021, Selewirre Iskvary'
+copyright = '2022, Selewirre Iskvary'
 author = 'Selewirre Iskvary'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1.0.4'
+release = '0.1.1.0'
 
 
 # -- General configuration ---------------------------------------------------

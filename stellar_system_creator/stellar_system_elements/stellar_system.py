@@ -308,16 +308,19 @@ class MultiStellarSystemSType:
         self.remove_child(garbage_object)
 
     def set_fig_and_ax(self):
-        if self.fig is None:
-            self.fig: plt.Figure = plt.figure(figsize=(11, 3*self.size))
+        if self.fig is None and self.axs is None:
+            fig, axs = plt.subplots(self.size, 1, figsize=(11, 3*self.size))
+            self.fig: plt.Figure = fig
+            if isinstance(axs, plt.Axes):
+                self.axs: np.ndarray = np.array([axs])
+            else:
+                self.axs: np.ndarray = axs
         else:
             plt.figure(self.fig.number)
-        if self.ax is None:
-            self.ax: plt.Axes = plt.gca()
 
     def clear_fig_and_ax(self):
         self.fig = None
-        self.ax = None
+        self.axs: plt.Axes = None
         for i in range(self.size):
             self.children[i].clear_fig_and_ax()
 

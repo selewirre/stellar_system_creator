@@ -89,8 +89,8 @@ class InsolationTab(Tab):
 
     def change_insolation_model(self, button: QRadioButton):
         if button.isChecked():
-            if isinstance(self.sse.parent, StellarBinary):
-                self.sse.parent.reset_insolation_model_and_habitability(button.text())
+            if self.sse.parent is not None:
+                self.sse.farthest_parent.reset_insolation_model_and_habitability(button.text())
             else:
                 self.sse.reset_insolation_model_and_habitability(button.text())
             layouts = [self.common_habitability_limits_group_box.layout(), self.threshold_equivalent_group_box.layout()]

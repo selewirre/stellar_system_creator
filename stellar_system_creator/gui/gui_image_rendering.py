@@ -388,6 +388,10 @@ class RenderingSettingsDialog(QDialog):
         old_text_index = self.available_systems_drop_down.findText(old_text)
         if old_text_index >= 0:
             self.available_systems_drop_down.setItemText(old_text_index, text)
+            for index in range(self.available_systems_drop_down.count()):
+                if self.available_systems_drop_down.itemText(index).startswith(old_text):
+                    new_index_text = self.available_systems_drop_down.itemText(index).replace(old_text, text)
+                    self.available_systems_drop_down.setItemText(index, new_index_text)
         else:
             self.available_systems_drop_down.addItem(text)
         self.available_systems_drop_down.model().sort(0)
