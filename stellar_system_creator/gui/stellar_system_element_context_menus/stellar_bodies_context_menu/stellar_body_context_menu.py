@@ -1,6 +1,10 @@
+from functools import partial
+
 from PyQt5.QtGui import QStandardItem
 from PyQt5.QtWidgets import QMenu, QAction, QMessageBox
 
+from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
+from stellar_system_creator.stellar_system_elements.stellar_body import Star, Planet
 from .stellar_body_details_dialog import StellarBodyDetailsDialog
 
 
@@ -19,11 +23,14 @@ class StellarBodyTreeViewItemContextMenu(QMenu):
         self.addSection(self.parent_item.text())
         self.addAction(self.details_action)
         self.addSeparator()
-        self.addAction(self.delete_permanently_action)
+        if not isinstance(self.parent_item.ssc_object, Star) and \
+                not isinstance(self.parent_item.ssc_object, StellarBinary) and \
+                not self.parent_item.ssc_object.__class__ == Planet:
+            self.addAction(self.delete_permanently_action)
 
     def _connect_actions(self):
         self.details_action.triggered.connect(self.details_action_process)
-        self.delete_permanently_action.triggered.connect(self.delete_permanently_process)
+        self.delete_permanently_action.triggered.connect(partial(self.delete_permanently_process, True))
 
     def _create_menu_actions(self):
         self.details_action = QAction("&Details...", self)
@@ -37,7 +44,7 @@ class StellarBodyTreeViewItemContextMenu(QMenu):
         parent: TreeViewItemFromString = self.parent_item.parent()
         if ask_question:
             question = QMessageBox.question(self, 'Delete permanently?', f"Are you sure you want to permanently delete "
-                                                                         f"{self.parent_item.ssc_object.name}",
+                                                                         f"{self.parent_item.ssc_object.name}?",
                                             QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
             if question == QMessageBox.No:
                 return

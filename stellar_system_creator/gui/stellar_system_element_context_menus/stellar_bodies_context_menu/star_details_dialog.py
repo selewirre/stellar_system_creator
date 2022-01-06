@@ -106,7 +106,7 @@ class StarDetailsDialog(BasicDetailsDialog):
         classifications_box_layout = QFormLayout()
         self.classifications_group_box.setLayout(classifications_box_layout)
         self.add_keys_to_layout(classifications_box_layout, self.labels,
-                                ['Mass Class', 'Luminosity Class', 'Appearance Frequency'])
+                                ['Mass Class', 'Luminosity Class'])  # , 'Appearance Frequency'])
 
         tab_layout.addWidget(self.designations_group_box)
         tab_layout.addWidget(self.classifications_group_box)
@@ -257,3 +257,8 @@ class StarDetailsDialog(BasicDetailsDialog):
         self.other_edit_init_values['Insolation Model Radio Button'] = \
             self.parent_item.ssc_object.insolation_model.name
 
+    def return_texts_to_initial_values(self, update_parent=True):
+        super().return_texts_to_initial_values(update_parent)
+
+    def confirm_text_changes(self, update_parent=True):
+        super().confirm_text_changes(update_parent)

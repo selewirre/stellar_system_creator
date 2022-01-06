@@ -7,13 +7,14 @@ from PyQt5.Qt import QStandardItem
 
 from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
 from stellar_system_creator.stellar_system_elements.stellar_body import MainSequenceStar, Planet, AsteroidBelt, \
-    Satellite, Trojan, TrojanSatellite
+    Satellite, Trojan, TrojanSatellite, BlackHole
 from stellar_system_creator.astrothings.units import ureg
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
 from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem
 
 category_add_element_init_values = {
     'Stellar Parent': {'Star': {'mass': 1 * ureg.M_s},
+                       'Black Hole': {'mass': 1 * ureg.M_s},
                        'Stellar Binary': {'mean_distance': 0.1 * ureg.au, 'eccentricity': 0.2}},
     'Planetary Parent': {'Planet': {'mass': 1 * ureg.M_e}},
     'Asteroid Belt': {},
@@ -42,7 +43,7 @@ def add_stellar_binary(name, tree_view_item):
     new_star2 = MainSequenceStar('Star2', **init_values_star)
 
     init_values_binary = category_add_element_init_values['Stellar Parent']['Stellar Binary']
-    if tree_view_item.ssc_parent.parent is not None:
+    if tree_view_item.ssc_parent.parent.parent is not None:
         new_object = StellarBinary(name=name, parent=None, **init_values_binary,
                                    primary_body=new_star1, secondary_body=new_star2)
         new_object.parent = tree_view_item.ssc_parent.parent.parent
@@ -56,7 +57,7 @@ def add_stellar_binary(name, tree_view_item):
                                    primary_body=new_star1, secondary_body=new_star2)
 
     if tree_view_item.rowCount():
-        tree_view_item.child(0).context_menu.delete_permanently_process()
+        tree_view_item.child(0).context_menu.delete_permanently_process(False)
 
     tree_view_item.ssc_parent.replace_parent(new_object)
     new_tree_view_item = tvifsse(new_object)
@@ -72,12 +73,13 @@ def add_stellar_binary(name, tree_view_item):
     tree_view.expandRecursively(new_tree_view_item.index())
 
 
-def add_star(name, tree_view_item):
+def add_star(name, tree_view_item, init_values=None):
     from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
         import TreeViewItemFromStellarSystemElement as tvifsse, TreeViewItemFromString
     tree_view_item: TreeViewItemFromString
 
-    init_values = category_add_element_init_values['Stellar Parent']['Star']
+    if init_values is None:
+        init_values = category_add_element_init_values['Stellar Parent']['Star']
     if tree_view_item.ssc_parent.parent is not None:
         new_object = MainSequenceStar(name=name, parent=tree_view_item.ssc_parent.parent.parent, **init_values)
         if tree_view_item.ssc_parent.parent.parent.primary_body == tree_view_item.ssc_parent.parent:
@@ -89,11 +91,82 @@ def add_star(name, tree_view_item):
         new_object = MainSequenceStar(name=name, parent=None, **init_values)
 
     if tree_view_item.rowCount():
-        tree_view_item.child(0).context_menu.delete_permanently_process()
+        tree_view_item.child(0).context_menu.delete_permanently_process(False)
 
     tree_view_item.ssc_parent.replace_parent(new_object)
     new_tree_view_item = tvifsse(new_object)
     tree_view_item.appendRow(new_tree_view_item)
+
+
+def add_blackhole(name, tree_view_item, init_values=None):
+    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
+        import TreeViewItemFromStellarSystemElement as tvifsse, TreeViewItemFromString
+    tree_view_item: TreeViewItemFromString
+
+    if init_values is None:
+        init_values = category_add_element_init_values['Stellar Parent']['Black Hole']
+    if tree_view_item.ssc_parent.parent is not None:
+        new_object = BlackHole(name=name, parent=tree_view_item.ssc_parent.parent.parent, **init_values)
+        if tree_view_item.ssc_parent.parent.parent.primary_body == tree_view_item.ssc_parent.parent:
+            tree_view_item.ssc_parent.parent.parent.primary_body = new_object
+        else:
+            tree_view_item.ssc_parent.parent.parent.secondary_body = new_object
+        new_object.update_parent()
+    else:
+        new_object = BlackHole(name=name, parent=None, **init_values)
+
+    if tree_view_item.rowCount():
+        tree_view_item.child(0).context_menu.delete_permanently_process(False)
+
+    tree_view_item.ssc_parent.replace_parent(new_object)
+    new_tree_view_item = tvifsse(new_object)
+    tree_view_item.appendRow(new_tree_view_item)
+
+
+def replace_in_solo_star(name, tree_view_item, init_values=None, replacing_class=MainSequenceStar):
+    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
+        import TreeViewItemFromStellarSystemElement as tvifsse
+    tree_view_item: tvifsse
+    print(tree_view_item.ssc_object.name)
+    if init_values is None:
+        init_values = category_add_element_init_values['Stellar Parent']['Star']
+    new_object = replacing_class(name=name, parent=tree_view_item.ssc_object.parent, **init_values)
+    if tree_view_item.ssc_object.parent is not None:
+        if tree_view_item.ssc_object.parent.primary_body == tree_view_item.ssc_object:
+            tree_view_item.ssc_object.parent.primary_body = new_object
+        else:
+            tree_view_item.ssc_object.parent.secondary_body = new_object
+        tree_view_item.ssc_object.parent.remove_child(tree_view_item.ssc_object)
+        new_object.update_parent()
+
+    tree_view_item.ssc_object = new_object
+    tree_view_item.update_text()
+    tree_view_item.update_context_menu()
+    tree_view_item.set_stellar_system_element_icon()
+    tree_view_item.parent().ssc_parent.replace_parent(new_object)
+
+
+def replace_in_stellar_binary(name, tree_view_item, init_values=None, replacing_class=MainSequenceStar):
+    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
+        import TreeViewItemFromStellarSystemElement as tvifsse, TreeViewItemFromString
+    tree_view_item: tvifsse
+    if init_values is None:
+        init_values = category_add_element_init_values['Stellar Parent']['Star']
+    new_object = replacing_class(name=name, parent=tree_view_item.ssc_object.parent, **init_values)
+    if tree_view_item.ssc_object.parent.primary_body == tree_view_item.ssc_object:
+        tree_view_item.ssc_object.parent.primary_body = new_object
+    else:
+        tree_view_item.ssc_object.parent.secondary_body = new_object
+    tree_view_item.ssc_object.parent.remove_child(tree_view_item.ssc_object)
+    new_object.update_parent()
+
+    tree_view_item.ssc_object = new_object
+    tree_view_item.update_text()
+    tree_view_item.update_context_menu()
+    tree_view_item.set_stellar_system_element_icon()
+
+    if isinstance(tree_view_item.parent(), TreeViewItemFromString):
+        tree_view_item.parent().ssc_parent.replace_parent(new_object)
 
 
 def add_stellar_system(name, tree_view_item):
@@ -183,7 +256,7 @@ def add_planet(name, tree_view_item):
     new_object = Planet(name=name, parent=tree_view_item.ssc_parent.parent.parent, **init_values)
 
     if tree_view_item.rowCount():
-        tree_view_item.child(0).context_menu.delete_permanently_process()
+        tree_view_item.child(0).context_menu.delete_permanently_process(False)
 
     tree_view_item.ssc_parent.replace_parent(new_object)
     new_tree_view_item = tvifsse(new_object)

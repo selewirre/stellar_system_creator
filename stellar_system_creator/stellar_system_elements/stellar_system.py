@@ -8,7 +8,7 @@ from stellar_system_creator.stellar_system_elements.binary_system import BinaryS
 from stellar_system_creator.visualization.drawing_systems import draw_orbit, draw_filled_orbit, draw_planet, \
     draw_asteroids, draw_satellite, draw_trojan_satellite
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
-from stellar_system_creator.stellar_system_elements.stellar_body import Star, AsteroidBelt, TrojanSatellite
+from stellar_system_creator.stellar_system_elements.stellar_body import Star, AsteroidBelt, TrojanSatellite, BlackHole
 
 
 class StellarSystem:
@@ -210,15 +210,24 @@ class StellarSystem:
 
     def draw_star(self):
         if isinstance(self.parent, Star):
+            with_inset = False
+            if isinstance(self.parent, BlackHole):
+                with_inset = True
             draw_planet(self.parent.radius.to('R_e').m, self.min_drawing_orbit.to('au').m,
-                        self.parent.image_array, self.ax)
+                        self.parent.image_array, self.ax, with_inset=with_inset)
         elif isinstance(self.parent, BinarySystem):
+            with_inset = False
+            if isinstance(self.parent.primary_body, BlackHole):
+                with_inset = True
             draw_planet(self.parent.primary_body.radius.to('R_e').m,
                         self.min_drawing_orbit.to('au').m,
-                        self.parent.primary_body.image_array, self.ax, y0=0.2)
+                        self.parent.primary_body.image_array, self.ax, y0=0.2, with_inset=with_inset)
+            with_inset = False
+            if isinstance(self.parent.secondary_body, BlackHole):
+                with_inset = True
             draw_planet(self.parent.secondary_body.radius.to('R_e').m,
                         self.min_drawing_orbit.to('au').m,
-                        self.parent.secondary_body.image_array, self.ax, y0=-0.2)
+                        self.parent.secondary_body.image_array, self.ax, y0=-0.2, with_inset=with_inset)
 
     def draw_planets(self):
         for planetary_system in self.planetary_systems:

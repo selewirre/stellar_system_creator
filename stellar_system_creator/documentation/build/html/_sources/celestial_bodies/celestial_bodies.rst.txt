@@ -9,6 +9,7 @@ They can be bright or dim.
 
 .. toctree::
     star
+    black_hole
     planet
     asteroid_belt
     satellite

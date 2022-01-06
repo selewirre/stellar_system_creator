@@ -60,8 +60,8 @@
 
 
 \title{Stellar System Creator}
-\date{Jan 03, 2022}
-\release{0.1.1.0}
+\date{Jan 05, 2022}
+\release{0.1.2.0}
 \author{Selewirre Iskvary}
 \newcommand{\sphinxlogo}{\vbox{}}
 \renewcommand{\releasename}{Release}
@@ -110,6 +110,51 @@ and \(1.4 \, {\rm M_s}\).
 \sphinxAtStartPar
 Stars can form {\hyperref[\detokenize{celestial_systems/binary_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stellar binaries}}}} and host {\hyperref[\detokenize{celestial_bodies/planet:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{planets}}}}
 and {\hyperref[\detokenize{celestial_bodies/asteroid_belt:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{asteroid belts}}}}, either together or separately from their companion star (or both).
+
+
+\section{Black Hole}
+\label{\detokenize{celestial_bodies/black_hole:black-hole}}\label{\detokenize{celestial_bodies/black_hole::doc}}\phantomsection\label{\detokenize{celestial_bodies/black_hole:id1}}
+\sphinxAtStartPar
+A black hole is an object from which nothing can escape due to the immense gravity on its “surface” (called
+the event horizon). The {\hyperref[\detokenize{quantities/geometric/radius:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{radius}}}} of a black hole the same mass as our sun is a bit shy
+of 3 \(\rm km\) (very tiny!!!). For this reason, this program renders the black hole and shows a magnified version
+in an inset.
+
+\sphinxAtStartPar
+In the concept we are examining, a black hole could have occurred due to the collapse of a large star.
+After millions to billions of years, the dust around the black hole is concentrated in bodies that constitute a
+{\hyperref[\detokenize{celestial_systems/stellar_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stellar system}}}}. Of course, there can still be dust around the blackhole
+but after a long time, most of is assumed to have be consumed, scattered or accumulated by other objects.
+A single black hole system would be barren of life. However, a {\hyperref[\detokenize{celestial_systems/binary_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{P\sphinxhyphen{}type stellar binary system}}}}
+(two {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stars}}}} orbiting around each other with a distance small enough that other objects rotate around
+both at the same time) of a {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{star}}}} and a black hole could potentially harbor life.
+
+\sphinxAtStartPar
+It must be noted that black holes with visible accretion disks (depicted as a dark mass in the center and
+two redish/yellowish rings around it, one ring vertical and one horizontal) are black holes that:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+are in {\hyperref[\detokenize{quantities/orbital/contact:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{contact}}}} with a star and they are stealing its mass.
+
+\item {} 
+\sphinxAtStartPar
+There is material scattered around the black hole, and they slowing get swallowed by the black hole.
+
+\end{enumerate}
+
+\sphinxAtStartPar
+In both cases, this depiction is relatively temporary, and the lifetime of such a picture depends
+on the mass and the distance profile of the swallowed object/dust.
+Since I was unsure of the timeline, I chose to depict black holes as black spheres with a small white outline.
+However, if the accretion disk is massive and moves fast, it could potentially emit enough radiation to harbor
+life by itself. I have not explored the physics of this scenario yet.
+
+\sphinxAtStartPar
+Keep these in mind if you want to change my boring picture with the much cooler looking one.
+I am sure a black hole with(out) an accretion disk can make a lot of interesting and scientifically plausible
+stories!
 
 
 \section{Planet}
@@ -1909,6 +1954,11 @@ and an eccentric orbit of 0.6 {\hyperref[\detokenize{quantities/orbital/eccentri
 You can find information about the  {\hyperref[\detokenize{celestial_systems/binary_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{binary system}}}} if you right\sphinxhyphen{}click on the binary,
 and select Details from the context menu. Similarly, information on the {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stars}}}} can be
 found in the Details context menu item.
+To create a {\hyperref[\detokenize{celestial_systems/binary_system:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{P\sphinxhyphen{}type stellar binary system}}}}
+(two {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{stars}}}} orbiting around each other with a distance small enough that other objects rotate around
+both at the same time), you may “Replace” (see below) the parent of a stellar system, and choose “Stellar Binary”
+on the prompt. To convert a {\hyperref[\detokenize{celestial_bodies/star:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{star}}}} into a {\hyperref[\detokenize{celestial_bodies/black_hole:id1}]{\sphinxcrossref{\DUrole{std,std-ref}{black hole}}}} and vice versa,
+simply right\sphinxhyphen{}click on the object you want to convert and choose “Convert to ..”.
 
 \sphinxAtStartPar
 To add elements in a given system, right\sphinxhyphen{}click on the list of the elements you want

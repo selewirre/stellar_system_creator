@@ -7,12 +7,13 @@ from pint import UnitStrippedWarning
 from stellar_system_creator.astrothings.astromechanical_calculations import *
 from stellar_system_creator.astrothings.habitability_calculations import *
 from stellar_system_creator.astrothings.find_mass_class import get_star_mass_class, get_star_appearance_frequency, get_planetary_mass_class
-from stellar_system_creator.astrothings.luminosity_models.solar_luminosity_model import calculate_main_sequence_luminosity
+from stellar_system_creator.astrothings.luminosity_models.solar_luminosity_model import \
+    calculate_main_sequence_luminosity, calculate_blackhole_luminosity
 from stellar_system_creator.astrothings.luminosity_models.planetary_luminosity_model import calculate_planetary_luminosity
 from stellar_system_creator.astrothings.radius_models.hot_gasgiant_radius_model import is_gasgiant_hot, get_hot_gas_giant_mass_class
 from stellar_system_creator.astrothings.radius_models.planetary_radius_model import calculate_planet_radius, image_composition_dict, \
     planet_chemical_abundance_ratios
-from stellar_system_creator.astrothings.radius_models.solar_radius_model import calculate_main_sequence_radius
+from stellar_system_creator.astrothings.radius_models.solar_radius_model import calculate_main_sequence_radius, calculate_blackhole_radius
 from stellar_system_creator.astrothings.rotation_models.planetary_rotation_model import calculate_planetary_rotation_period
 from stellar_system_creator.astrothings.insolation_models.insolation_models import InsolationByKopparapu, \
     InsolationBySelsis, InsolationForWaterFrostline, BinaryInsolationForWaterFrostLine, InsolationForRockLine, \
@@ -603,6 +604,31 @@ class MainSequenceStar(Star):
         return image_array
 
 
+class BlackHole(Star):
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+    def get_luminosity_class(self) -> str:
+        return 'Black hole'
+
+    def calculate_suggested_radius(self) -> Q_:
+        return calculate_blackhole_radius(self.mass)
+
+    def calculate_suggested_spin_period(self) -> Q_:
+        return np.nan * ureg.hours
+
+    def calculate_suggested_luminosity(self) -> Q_:
+        return calculate_blackhole_luminosity(self.mass)
+
+    def calculate_lifetime(self) -> Q_:
+        return calculate_blackhole_lifetime(self.mass)
+
+    def get_image_array(self) -> np.ndarray:
+        image_array = stellar_body_marker_dict['blackhole'].copy()
+        return image_array
+
+
 class Planet(StellarBody):
 
     def __init__(self, name, mass: Q_, radius: Q_ = np.nan * ureg.R_e, parent=None,
@@ -1166,7 +1192,10 @@ class Trojan(Planet):
                                        ** (1 / 3)
 
     def calculate_suggested_orbital_eccentricity(self) -> float:
-        return self.parent.suggested_orbital_eccentricity
+        if self.parent is not None:
+            return self.parent.suggested_orbital_eccentricity
+        else:
+            return 0
 
     def calculate_suggested_luminosity(self) -> Q_:
         return 0 * ureg.L_s

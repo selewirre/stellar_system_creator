@@ -26,11 +26,10 @@
      6. Start with terran atmosphere. add terran atm mods, carry on with mars atmosphere etc.
 9. Modify HZ for A-type stars: https://iopscience.iop.org/article/10.3847/1538-4357/aab8fa/pdf pg. 6, table 2
 10. Add other types of stars -> probably not, because they are not long-lasting.
-11. Add black holes https://arxiv.org/pdf/1909.06748.pdf (it would only be around AGNs, and it is tricky)
+11. Add AGN black holes https://arxiv.org/pdf/1909.06748.pdf (it is tricky)
 12. add dwarfs?
 
 # Plotting:
-0. plotting of trinaries/quaternaries
 1. try to plot in processing instead of matplotlib? (supposed to be faster)
     - https://github.com/jdf/processing-py-site
     - https://py.processing.org/

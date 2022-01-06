@@ -26,6 +26,11 @@ and an eccentric orbit of 0.6 :ref:`eccentricity <eccentricity>`.
 You can find information about the  :ref:`binary system <binary_system>` if you right-click on the binary,
 and select Details from the context menu. Similarly, information on the :ref:`stars <star>` can be
 found in the Details context menu item.
+To create a :ref:`P-type stellar binary system <binary_system>`
+(two :ref:`stars <star>` orbiting around each other with a distance small enough that other objects rotate around
+both at the same time), you may "Replace" (see below) the parent of a stellar system, and choose "Stellar Binary"
+on the prompt. To convert a :ref:`star <star>` into a :ref:`black hole <black_hole>` and vice versa,
+simply right-click on the object you want to convert and choose "Convert to ..".
 
 To add elements in a given system, right-click on the list of the elements you want
 to add on, and choose the Add <element of choice> option. For example, to add new

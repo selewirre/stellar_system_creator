@@ -175,11 +175,13 @@ class BasicDetailsDialog(QDialog):
         qobj.change_text_action(process_change)
         qobj.clearFocus()
 
-    def confirm_text_changes(self) -> None:
+    def confirm_text_changes(self, update_parent=False) -> None:
         self.confirm_line_edit_changes()
         self.confirm_unit_line_edit_changes()
         self.confirm_other_edit_changes()
         self.parent_item.ssc_object.update_children()
+        if update_parent:
+            self.parent_item.ssc_object.update_parent()
 
     def confirm_line_edit_changes(self) -> None:
         for key in self.le:
@@ -192,11 +194,11 @@ class BasicDetailsDialog(QDialog):
     def confirm_other_edit_changes(self) -> None:
         pass
 
-    def return_texts_to_initial_values(self) -> None:
+    def return_texts_to_initial_values(self, update_parent=False) -> None:
         self.return_line_edits_to_initial_values()
         self.return_unit_line_edits_to_initial_values()
         self.return_other_edits_to_initial_values()
-        self.parent_item.ssc_object.__post_init__()
+        self.parent_item.ssc_object.__post_init__(update_parent)
 
     def return_line_edits_to_initial_values(self) -> None:
         for key in self.le:

@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from matplotlib.path import Path
-from matplotlib.patches import PathPatch
+from matplotlib.patches import PathPatch, ConnectionPatch
 
 
 def draw_orbit(orbit, ax, min_draw_orbit, color, ploting=True, orbit_label=True, text_top=True, text_color='white',
@@ -56,13 +56,68 @@ def draw_filled_orbit(orbit_min, orbit_max, ax, min_draw_orbit, color, plotting=
     return x_orbit_min, y_orbit_min, x_orbit_max, y_orbit_max
 
 
-def draw_planet(planet_relative_radius, planet_orbit_radius, planet_image, main_axis, normalization_factor=10, y0=0.):
+def draw_planet(planet_relative_radius, planet_orbit_radius, planet_image, main_axis: plt.Axes, normalization_factor=10,
+                y0=0., with_inset=False):
+    inset_zoom = 1000
     normalization = planet_image.shape[0]
     relative_zoom = normalization_factor / normalization * 2.5 ** np.log10(planet_relative_radius * 10)
+    if relative_zoom > normalization_factor / normalization * 2.5 ** np.log10(0.1 * 10):
+        with_inset = False
+    elif relative_zoom > normalization_factor / normalization * 2.5 ** np.log10(0.03 * 10):
+        inset_zoom = 10
+    elif relative_zoom > normalization_factor / normalization * 2.5 ** np.log10(0.005 * 10):
+        inset_zoom = 100
+
     offset_image = OffsetImage(planet_image, zoom=relative_zoom)
     main_axis.scatter(planet_orbit_radius, y0, alpha=0)
-    ab = AnnotationBbox(offset_image, (planet_orbit_radius, y0), frameon=False)
+
+    linewidth = 0.3
+    ab = AnnotationBbox(offset_image, (planet_orbit_radius, y0), frameon=with_inset, pad=1.5*linewidth+linewidth/2,
+                        fontsize=linewidth)
+
+    if with_inset:
+        ab.patch.set_fill(False)
+        ab.patch.set_edgecolor('white')
+        ab.patch.set_linewidth(linewidth)
+
     main_axis.add_artist(ab)
+
+    if with_inset:
+        relative_zoom2 = normalization_factor / normalization * 2.5 ** np.log10(planet_relative_radius
+                                                                                * 10 * inset_zoom)
+        offset_image = OffsetImage(planet_image, zoom=relative_zoom2)
+        ab2 = AnnotationBbox(offset_image, (planet_orbit_radius, y0), (1.6*planet_orbit_radius, 1.3*y0), frameon=True,
+                             pad=1.5*linewidth+linewidth/2*relative_zoom/relative_zoom2,
+                             fontsize=linewidth*relative_zoom2/relative_zoom)
+        ab2.patch.set_fill(False)  # the frame background is not filled with any color
+        ab2.patch.set_edgecolor('white')  # the frame line is white
+        ab2.patch.set_linewidth(linewidth)
+        main_axis.add_artist(ab2)
+        main_axis.figure.canvas.draw()
+
+        coords1 = ab.patch.get_extents()
+        coords1 = main_axis.transData.inverted().transform(coords1)
+        coords2 = ab2.patch.get_extents()
+        coords2 = main_axis.transData.inverted().transform(coords2)
+
+        top_right1 = tuple(coords1[1])
+        bottom_right1 = tuple([coords1[1][0], coords1[0][1]])
+        bottom_left2 = tuple(coords2[0])
+        top_left2 = tuple([coords2[0][0], coords2[1][1]])
+        # print(top_right1)
+        # print(top_left2)
+        # print(planet_orbit_radius)
+        # print(y0)
+        cp1 = ConnectionPatch(top_left2, top_right1, 'data', color='white',
+                              linewidth=linewidth)
+        cp2 = ConnectionPatch(bottom_left2, bottom_right1, 'data', color='white',
+                              linewidth=linewidth)
+        main_axis.add_artist(cp1)
+        main_axis.add_artist(cp2)
+        zoom_factor = str(int(np.log10(inset_zoom)))
+        main_axis.text(coords2[0][0], coords2[1][1], f'$x10^{zoom_factor}$', ha='left', va='bottom', color='white')
+        main_axis.figure.canvas.draw()
+
     return None
 
 

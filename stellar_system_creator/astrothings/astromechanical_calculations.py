@@ -1,6 +1,6 @@
 import numpy as np
 
-from stellar_system_creator.astrothings.units import ureg, Q_, gravitational_constant
+from stellar_system_creator.astrothings.units import ureg, Q_, gravitational_constant, h_bar_constant, speed_of_light
 
 
 def calculate_rough_inner_orbit_limit(mass: Q_) -> Q_:
@@ -652,3 +652,13 @@ def calculate_synodic_period(period1: Q_, period2: Q_) -> Q_:
     """
     return abs(1 / (1 / period1 - 1 / period2)).to('days')
 
+
+def calculate_blackhole_lifetime(mass: Q_) -> Q_:
+    """
+    The life time of a Schwarzschild blackhole (no momentum, no charge) depends on its mass.
+
+    More info on: https://www.vttoth.com/CMS/physics-notes/311-hawking-radiation-calculator
+    """
+
+    lifetime = mass ** 3 * 5120 * np.pi * gravitational_constant ** 2 / (1.8083 * h_bar_constant * speed_of_light ** 4)
+    return lifetime.to_reduced_units().to(ureg.T_s)
