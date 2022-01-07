@@ -1512,3 +1512,27 @@ class TrojanSatellite(Satellite, Trojan):
             return calculate_three_body_lagrange_point_smallest_body_mass_limit(self.parent.parent.mass, self.parent.mass)
         else:
             return np.nan * self.mass.u
+
+
+class Ring:
+
+    def __init__(self, parent: Planet):
+        self.parent = parent
+        self.__post_init__()
+
+    def __post_init__(self, want_to_update_parent=False):
+        self.inner_radius = self.get_inner_radius()
+        self.outer_radius = self.get_outer_radius()
+
+        if want_to_update_parent:
+            self.update_parent()
+
+    def get_inner_radius(self):
+        return 1.1 * self.parent.radius
+
+    def get_outer_radius(self):
+        return self.parent.dense_roche_limit
+
+    def update_parent(self):
+        pass
+

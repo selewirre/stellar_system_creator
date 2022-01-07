@@ -152,11 +152,13 @@ class SystemImageWidget(QWidget):
         layout = QHBoxLayout()
 
         self.render_button = QPushButton(parent=self)
+        self.render_button.setShortcut('Ctrl+R')
         render_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/logo.ico')
         self.render_button.setIcon(QIcon(render_dir))
         self.render_button.setStyleSheet("padding: 1px;")
         self.render_button.adjustSize()
-        self.render_button.setToolTip('Press to render image.')
+        shortcut_string = self.render_button.shortcut().toString()
+        self.render_button.setToolTip(f'({shortcut_string}): Press to render image.')
         self.render_button.pressed.connect(self.render_process)
         self.render_thread = None
 

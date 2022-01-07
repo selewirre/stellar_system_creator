@@ -5,8 +5,10 @@ Black Hole
 
 A black hole is an object from which nothing can escape due to the immense gravity on its "surface" (called
 the event horizon). The :ref:`radius <radius>` of a black hole the same mass as our sun is a bit shy
-of 3 :math:`\rm km` (very tiny!!!). For this reason, this program renders the black hole and shows a magnified version
+of :math:`3 \, {\rm km}` (very tiny!!!). For this reason, this program renders the black hole and shows a magnified version
 in an inset.
+
+The suggested minimum mass for a black hole of this type would be approximately :math:`3.3 \, {\rm M_s}`.
 
 In the concept we are examining, a black hole could have occurred due to the collapse of a large star.
 After millions to billions of years, the dust around the black hole is concentrated in bodies that constitute a

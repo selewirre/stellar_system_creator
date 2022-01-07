@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2021.10.24)  5 JAN 2022 19:39
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2021.10.24)  6 JAN 2022 22:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -797,23 +797,23 @@ Chapter 5.
 [29] [30]
 Chapter 6.
 LaTeX Font Info:    Trying to load font information for TS1+qtm on input line 2
-055.
+058.
 (/usr/share/texmf/tex/latex/tex-gyre/ts1qtm.fd
 File: ts1qtm.fd 2009/09/25 v1.2 font definition file for TS1/qtm
 ) (./stellarsystemcreator.ind)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2065.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2068.
 
 [31
 
 ]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 2065.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 2068.
  (./stellarsystemcreator.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2065.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2065.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2068.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2068.
 
 Package rerunfilecheck Info: File `stellarsystemcreator.out' has not changed.
 (rerunfilecheck)             Checksum: 34B040CA4DF73485E45F6FCD6DAC614E;16011.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2065.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2068.
  ) 
 Here is how much of TeX's memory you used:
  14471 strings out of 483140
@@ -837,7 +837,7 @@ ic/tex-gyre/qhvb.pfb></usr/share/texmf/fonts/type1/public/tex-gyre/qhvbi.pfb></
 usr/share/texmf/fonts/type1/public/tex-gyre/qtmb.pfb></usr/share/texmf/fonts/ty
 pe1/public/tex-gyre/qtmr.pfb></usr/share/texmf/fonts/type1/public/tex-gyre/qtmr
 i.pfb>
-Output written on stellarsystemcreator.pdf (35 pages, 336144 bytes).
+Output written on stellarsystemcreator.pdf (35 pages, 336304 bytes).
 PDF statistics:
  1537 PDF objects out of 1728 (max. 8388607)
  1466 compressed objects within 15 object streams
