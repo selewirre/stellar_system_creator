@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2021.10.24)  6 JAN 2022 22:28
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2021.10.24)  18 JAN 2022 00:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -797,29 +797,29 @@ Chapter 5.
 [29] [30]
 Chapter 6.
 LaTeX Font Info:    Trying to load font information for TS1+qtm on input line 2
-058.
+128.
 (/usr/share/texmf/tex/latex/tex-gyre/ts1qtm.fd
 File: ts1qtm.fd 2009/09/25 v1.2 font definition file for TS1/qtm
 ) (./stellarsystemcreator.ind)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2068.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2138.
 
 [31
 
 ]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 2068.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 2138.
  (./stellarsystemcreator.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2068.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2068.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2138.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2138.
 
 Package rerunfilecheck Info: File `stellarsystemcreator.out' has not changed.
-(rerunfilecheck)             Checksum: 34B040CA4DF73485E45F6FCD6DAC614E;16011.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2068.
+(rerunfilecheck)             Checksum: 8B37197E5A10CBAE242B2055AFF512B4;16112.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2138.
  ) 
 Here is how much of TeX's memory you used:
- 14471 strings out of 483140
- 217033 string characters out of 5965150
- 488799 words of memory out of 5000000
- 28776 multiletter control sequences out of 15000+600000
+ 14474 strings out of 483140
+ 217076 string characters out of 5965150
+ 488836 words of memory out of 5000000
+ 28778 multiletter control sequences out of 15000+600000
  582251 words of font info for 61 fonts, out of 8000000 for 9000
  37 hyphenation exceptions out of 8191
  38i,11n,51p,673b,444s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -837,10 +837,10 @@ ic/tex-gyre/qhvb.pfb></usr/share/texmf/fonts/type1/public/tex-gyre/qhvbi.pfb></
 usr/share/texmf/fonts/type1/public/tex-gyre/qtmb.pfb></usr/share/texmf/fonts/ty
 pe1/public/tex-gyre/qtmr.pfb></usr/share/texmf/fonts/type1/public/tex-gyre/qtmr
 i.pfb>
-Output written on stellarsystemcreator.pdf (35 pages, 336304 bytes).
+Output written on stellarsystemcreator.pdf (35 pages, 340582 bytes).
 PDF statistics:
- 1537 PDF objects out of 1728 (max. 8388607)
- 1466 compressed objects within 15 object streams
- 367 named destinations out of 1000 (max. 500000)
- 941 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1558 PDF objects out of 1728 (max. 8388607)
+ 1487 compressed objects within 15 object streams
+ 368 named destinations out of 1000 (max. 500000)
+ 949 words of extra memory for PDF output out of 10000 (max. 10000000)
 

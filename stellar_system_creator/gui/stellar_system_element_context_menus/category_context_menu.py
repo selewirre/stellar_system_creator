@@ -127,7 +127,6 @@ def replace_in_solo_star(name, tree_view_item, init_values=None, replacing_class
     from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
         import TreeViewItemFromStellarSystemElement as tvifsse
     tree_view_item: tvifsse
-    print(tree_view_item.ssc_object.name)
     if init_values is None:
         init_values = category_add_element_init_values['Stellar Parent']['Star']
     new_object = replacing_class(name=name, parent=tree_view_item.ssc_object.parent, **init_values)
@@ -217,7 +216,7 @@ def add_planetary_system(name, tree_view_item):
     if tree_view_item.ssc_parent.parent is not None:
         dout = tree_view_item.ssc_parent.parent.outer_orbit_limit
         din = tree_view_item.ssc_parent.parent.inner_orbit_limit.to(dout.u)
-        distance = np.exp((np.log10(din.m) + np.log10(dout.m)) / 2) * dout.u
+        distance = 10 ** ((np.log10(din.m) + np.log10(dout.m)) / 2) * dout.u
         init_values['semi_major_axis'] = distance
     new_object = Planet(name=name, parent=tree_view_item.ssc_parent.parent, **init_values)
     new_object_system = PlanetarySystem(name, new_object)
@@ -251,7 +250,7 @@ def add_planet(name, tree_view_item):
     if tree_view_item.ssc_parent.parent.parent is not None:
         dout = tree_view_item.ssc_parent.parent.parent.outer_orbit_limit
         din = tree_view_item.ssc_parent.parent.parent.inner_orbit_limit.to(dout.u)
-        distance = np.exp((np.log10(din.m) + np.log10(dout.m)) / 2) * dout.u
+        distance = 10 ** ((np.log10(din.m) + np.log10(dout.m)) / 2) * dout.u
         init_values['semi_major_axis'] = distance
     new_object = Planet(name=name, parent=tree_view_item.ssc_parent.parent.parent, **init_values)
 
@@ -269,6 +268,11 @@ def add_asteroid_belt(name, tree_view_item):
     tree_view_item: TreeViewItemFromString
 
     init_values = category_add_element_init_values['Asteroid Belt']
+    if tree_view_item.ssc_parent.parent is not None:
+        dout = tree_view_item.ssc_parent.parent.water_frost_lines['Sol Equivalent']
+        din = tree_view_item.ssc_parent.parent.water_frost_lines['Inner Limit'].to(dout.u)
+        distance = 10 ** ((np.log10(din.m) + np.log10(dout.m)) / 2) * dout.u
+        init_values['semi_major_axis'] = distance
     new_object = AsteroidBelt(name=name, parent=tree_view_item.ssc_parent.parent, **init_values)
     tree_view_item.ssc_parent.add_asteroid_belt(new_object)
 
@@ -282,6 +286,11 @@ def add_satellite(name, tree_view_item):
     tree_view_item: TreeViewItemFromString
 
     init_values = category_add_element_init_values['Satellite']
+    if tree_view_item.ssc_parent.parent is not None:
+        dout = tree_view_item.ssc_parent.parent.outer_orbit_limit
+        din = tree_view_item.ssc_parent.parent.inner_orbit_limit.to(dout.u)
+        distance = 10 ** ((np.log10(din.m) + np.log10(dout.m)) / 2) * dout.u
+        init_values['semi_major_axis'] = distance
     new_object = Satellite(name=name, parent=tree_view_item.ssc_parent.parent, **init_values)
     tree_view_item.ssc_parent.add_satellite(new_object)
 

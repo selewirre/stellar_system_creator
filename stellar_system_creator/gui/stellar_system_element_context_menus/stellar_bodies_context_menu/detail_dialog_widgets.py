@@ -1,5 +1,7 @@
+from functools import partial
 from typing import Union, Dict, List
 
+import cairo
 import pkg_resources
 from PyQt5.QtGui import QPixmap
 from bs4 import BeautifulSoup
@@ -18,7 +20,10 @@ from bidict import bidict
 
 from stellar_system_creator.astrothings.insolation_models.insolation_models import InsolationThresholdModel
 from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
-from stellar_system_creator.stellar_system_elements.stellar_body import StellarBody, Star, Planet, Satellite
+from stellar_system_creator.stellar_system_elements.stellar_body import StellarBody, Star, Planet, Satellite, Ring
+from stellar_system_creator.visualization.drawing_tools import GradientColor
+from stellar_system_creator.visualization.system_plot import add_ring_path_part, get_ndarray_from_cairo_image_surface
+
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)  # enable highdpi scaling
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)  # use highdpi icons
 
@@ -395,6 +400,8 @@ class InsolationModelRadioButtons(QWidget):
         self.setLayout(layout)
         self.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
         self.setFixedWidth(200)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
 
         kopparapu_button = QRadioButton("Kopparapu")
         layout.addWidget(kopparapu_button)
@@ -406,6 +413,210 @@ class InsolationModelRadioButtons(QWidget):
             kopparapu_button.setChecked(True)
         else:
             selsis_button.setChecked(True)
+
+
+class RingRadioButtons(QWidget):
+
+    def __init__(self, sse: Planet, influenced_labels: Dict, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.sse = sse
+        self.influenced_labels = influenced_labels
+        layout = QHBoxLayout()
+        self.setLayout(layout)
+        self.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
+        self.setFixedWidth(200)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        yes_button = QRadioButton("Yes")
+        layout.addWidget(yes_button)
+        no_button = QRadioButton("No")
+        layout.addWidget(no_button)
+        self.radio_buttons = {'Yes': yes_button, 'No': no_button}
+
+        if self.sse.has_ring:
+            yes_button.setChecked(True)
+        else:
+            no_button.setChecked(True)
+
+
+class GradientColorWidget(QWidget):
+
+    def __init__(self, gradient_color: GradientColor, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.gradient_color = gradient_color
+        layout = QHBoxLayout()
+
+        self.remove_button = QPushButton('-')
+        self.remove_button.setContentsMargins(0, 0, 0, 0)
+        self.remove_button.setFixedWidth(30)
+        self.remove_button.pressed.connect(self.press_remove_button_process)
+
+        self.pos_label = QLabel(' Position: ')
+        self.pos_line_edit = QLineEdit(str(self.gradient_color.pos))
+        self.pos_line_edit.editingFinished.connect(self.pos_line_edit_process)
+        self.pos_line_edit.setFixedWidth(50)
+
+        self.red_label = QLabel(' Red: ')
+        self.red_line_edit = QLineEdit(str(255 * self.gradient_color.red))
+        self.red_line_edit.editingFinished.connect(partial(self.color_line_edit_process, 'red'))
+        self.red_line_edit.setFixedWidth(50)
+
+        self.green_label = QLabel(' Green: ')
+        self.green_line_edit = QLineEdit(str(255 * self.gradient_color.green))
+        self.green_line_edit.editingFinished.connect(partial(self.color_line_edit_process, 'green'))
+        self.green_line_edit.setFixedWidth(50)
+
+        self.blue_label = QLabel(' Blue: ')
+        self.blue_line_edit = QLineEdit(str(255 * self.gradient_color.blue))
+        self.blue_line_edit.editingFinished.connect(partial(self.color_line_edit_process, 'blue'))
+        self.blue_line_edit.setFixedWidth(50)
+
+        self.alpha_label = QLabel(' Alpha: ')
+        self.alpha_line_edit = QLineEdit(str(255 * self.gradient_color.alpha))
+        self.alpha_line_edit.editingFinished.connect(partial(self.color_line_edit_process, 'alpha'))
+        self.alpha_line_edit.setFixedWidth(50)
+
+        self.line_edits = {'red': self.red_line_edit,
+                           'green': self.green_line_edit,
+                           'blue': self.blue_line_edit,
+                           'alpha': self.alpha_line_edit, }
+
+        layout.addWidget(self.remove_button)
+
+        layout.addWidget(self.pos_label)
+        layout.addWidget(self.pos_line_edit)
+
+        layout.addWidget(self.red_label)
+        layout.addWidget(self.red_line_edit)
+
+        layout.addWidget(self.green_label)
+        layout.addWidget(self.green_line_edit)
+
+        layout.addWidget(self.blue_label)
+        layout.addWidget(self.blue_line_edit)
+
+        layout.addWidget(self.alpha_label)
+        layout.addWidget(self.alpha_line_edit)
+
+        layout.addStretch()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        self.setLayout(layout)
+
+    def press_remove_button_process(self):
+        self.parent().remove_gradient(self)
+
+    def pos_line_edit_process(self):
+        try:
+            value = float(self.pos_line_edit.text())
+            if 0 <= value <= 1:
+                self.gradient_color.pos = value
+            else:
+                self.pos_line_edit.setText(str(self.gradient_color.pos))
+        except ValueError:
+            self.pos_line_edit.setText(str(self.gradient_color.pos))
+        self.parent().update_ssc_object()
+
+    def color_line_edit_process(self, color):
+        try:
+            value = float(self.line_edits[color].text())
+            if 0 <= value <= 255:
+                if color == 'red':
+                    self.gradient_color.red = value / 255.
+                elif color == 'green':
+                    self.gradient_color.green = value / 255.
+                elif color == 'blue':
+                    self.gradient_color.blue = value / 255.
+                elif color == 'alpha':
+                    self.gradient_color.alpha = value / 255.
+            else:
+                self.line_edits[color].setText(str(255 * self.gradient_color.__dict__[color]))
+        except ValueError:
+            self.line_edits[color].setText(str(255 * self.gradient_color.__dict__[color]))
+        self.parent().update_ssc_object()
+
+
+class RingImage(QLabel):
+
+    def __init__(self, sse: Planet, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.sse = sse
+        self.update_text()
+
+    def update_text(self):
+        self.setPixmap(self.get_image())
+
+    def get_image(self):
+        try:
+            surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500)
+            context = cairo.Context(surface)
+
+            units = self.sse.ring.outer_radius.u
+            add_ring_path_part(context, 250, 250,
+                               250 * (self.sse.ring.inner_radius / self.sse.ring.outer_radius).m, 250,
+                               250 * (np.array(self.sse.ring.forbidden_bands.to(units).m)) /
+                               self.sse.ring.outer_radius.to(units).m,
+                               self.sse.ring.ring_radial_gradient_colors, 0, 90, 'all')
+
+            image_array = get_ndarray_from_cairo_image_surface(surface)
+
+            # noinspection PyTypeChecker
+            image = QtGui.QImage(image_array, image_array.shape[1], image_array.shape[0],
+                                 image_array.shape[1] * 4, QtGui.QImage.Format_RGBA8888)
+
+            pix = QtGui.QPixmap(image)
+        except Exception:
+            pix = QtGui.QPixmap()
+
+        pix = pix.scaled(275, 275, QtCore.Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        return pix
+
+
+class RingColorsWidget(QWidget):
+
+    def __init__(self, sse: Planet, ring_image: RingImage, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.sse = sse
+        self.ring_image = ring_image
+        layout = QVBoxLayout()
+
+        if self.sse.has_ring:
+            self.add_gradient_color_button = QPushButton('+')
+            self.add_gradient_color_button.setContentsMargins(0, 0, 0, 0)
+            self.add_gradient_color_button.setFixedWidth(30)
+            self.add_gradient_color_button.pressed.connect(self.press_add_gradient_color_process)
+            layout.addWidget(self.add_gradient_color_button)
+
+            for gradient_color in self.sse.ring.ring_radial_gradient_colors:
+                layout.addWidget(GradientColorWidget(gradient_color))
+
+            layout.addStretch()
+
+        self.setLayout(layout)
+
+    def press_add_gradient_color_process(self):
+        self.layout().addWidget(GradientColorWidget(GradientColor(0.5, 1, 1, 1, 1)))
+        self.update_ssc_object()
+
+    def remove_gradient(self, widget: GradientColorWidget):
+        if len(self.findChildren(GradientColorWidget)) > 1:
+            self.layout().removeWidget(widget)
+            widget.deleteLater()
+            self.adjustSize()
+            self.update_ssc_object(widget)
+
+    def update_ssc_object(self, removed_child: Union[GradientColorWidget, None] = None):
+        if self.sse.has_ring:
+            gradient_color_list = []
+            for child in self.children():
+                if isinstance(child, GradientColorWidget) and child != removed_child:
+                    gradient_color_list.append(child.gradient_color)
+            self.sse.ring.change_ring_radial_gradient_colors(gradient_color_list)
+            self.ring_image.update_text()
 
 
 class ComboBox(QComboBox):

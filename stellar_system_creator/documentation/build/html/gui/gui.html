@@ -47,7 +47,7 @@
   
   
   
-    <title>GUI &#8212; Stellar System Creator 0.1.2.1 documentation</title>
+    <title>GUI &#8212; Stellar System Creator 0.2.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/rtd_sphinx_search.min.css" />
@@ -56,6 +56,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/js/rtd_sphinx_search.min.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Attributions" href="../attributions/attributions.html" />
@@ -83,11 +84,11 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex navheader">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="../index.html" title="Stellar System Creator 0.1.2.1 documentation"
+        <a href="../index.html" title="Stellar System Creator 0.2.0.0 documentation"
            class="md-header-nav__button md-logo">
           
               <img src="../_static/logo.ico" height="26"
-                   alt="Stellar System Creator 0.1.2.1 documentation logo">
+                   alt="Stellar System Creator 0.2.0.0 documentation logo">
           
         </a>
       </div>
@@ -153,7 +154,7 @@
   <nav class="md-tabs" data-md-component="tabs">
     <div class="md-tabs__inner md-grid">
       <ul class="md-tabs__list">
-          <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link">Stellar System Creator 0.1.2.1 documentation</a></li>
+          <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link">Stellar System Creator 0.2.0.0 documentation</a></li>
       </ul>
     </div>
   </nav>
@@ -165,13 +166,13 @@
               <div class="md-sidebar__inner">
                 <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href="../index.html" title="Stellar System Creator 0.1.2.1 documentation" class="md-nav__button md-logo">
+    <a href="../index.html" title="Stellar System Creator 0.2.0.0 documentation" class="md-nav__button md-logo">
       
         <img src="../_static/logo.ico" alt=" logo" width="48" height="48">
       
     </a>
     <a href="../index.html"
-       title="Stellar System Creator 0.1.2.1 documentation">Stellar System Creator</a>
+       title="Stellar System Creator 0.2.0.0 documentation">Stellar System Creator</a>
   </label>
   
 
@@ -222,6 +223,8 @@
         <li class="md-nav__item"><a href="#simple-example" class="md-nav__link">Simple example</a>
         </li>
         <li class="md-nav__item"><a href="#details-dialog" class="md-nav__link">Details Dialog</a>
+        </li>
+        <li class="md-nav__item"><a href="#rendering" class="md-nav__link">Rendering</a>
         </li></ul>
             </nav>
         </li>
@@ -239,6 +242,13 @@
     
     
       <a href="#details-dialog" class="md-nav__link">Details Dialog</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#rendering" class="md-nav__link">Rendering</a>
       
     
     </li></ul>
@@ -270,6 +280,8 @@
         <li class="md-nav__item"><a href="#simple-example" class="md-nav__link">Simple example</a>
         </li>
         <li class="md-nav__item"><a href="#details-dialog" class="md-nav__link">Details Dialog</a>
+        </li>
+        <li class="md-nav__item"><a href="#rendering" class="md-nav__link">Rendering</a>
         </li></ul>
             </nav>
         </li>
@@ -297,7 +309,7 @@ which includes one or more of the other systems.</p>
 <p>When you create a <a class="reference internal" href="../celestial_systems/multi_stellar_system.html#id1"><span class="std std-ref">multi-stellar system</span></a>,
 you create an <a class="reference internal" href="../celestial_systems/binary_system.html#id1"><span class="std std-ref">S-type stellar binary system</span></a>
 (two <a class="reference internal" href="../celestial_bodies/star.html#id1"><span class="std std-ref">stars</span></a> orbiting around each other with a distance big enough that other objects
-can orbit around each <a class="reference internal" href="../celestial_bodies/star.html#id1"><span class="std std-ref">stars</span></a> individually). By default, a <a class="reference internal" href="../celestial_systems/binary_system.html#id1"><span class="std std-ref">binary system</span></a>
+can orbit around each <a class="reference internal" href="../celestial_bodies/star.html#id1"><span class="std std-ref">star</span></a> individually). By default, a <a class="reference internal" href="../celestial_systems/binary_system.html#id1"><span class="std std-ref">binary system</span></a>
 with two <a class="reference internal" href="../celestial_bodies/star.html#id1"><span class="std std-ref">stars</span></a> of the same <a class="reference internal" href="../quantities/material/mass.html#id1"><span class="std std-ref">mass</span></a> as our sun are generated,
 with <a class="reference internal" href="../quantities/orbital/semi_major_axis.html#id1"><span class="std std-ref">mean distance</span></a> of 500 AU
 and an eccentric orbit of 0.6 <a class="reference internal" href="../quantities/orbital/eccentricity.html#id1"><span class="std std-ref">eccentricity</span></a>.
@@ -318,8 +330,8 @@ will pop up, where you choose the name of the the <a class="reference internal" 
 and the <a class="reference internal" href="../celestial_bodies/planet.html#id1"><span class="std std-ref">planet</span></a>.
 You can then open up the new <a class="reference internal" href="../celestial_systems/planetary_system.html#id1"><span class="std std-ref">planetary system</span></a> item,
 and find out the new <a class="reference internal" href="../celestial_bodies/planet.html#id1"><span class="std std-ref">planet</span></a>, as
-well as the empty items <a class="reference internal" href="../celestial_bodies/satellite.html#id1"><span class="std std-ref">satellites</span></a> and <a class="reference internal" href="../celestial_bodies/trojan.html#id1"><span class="std std-ref">Trojans</span></a>.
-You can add <a class="reference internal" href="../celestial_bodies/satellite.html#id1"><span class="std std-ref">satellites</span></a> and <a class="reference internal" href="../celestial_bodies/trojan.html#id1"><span class="std std-ref">Trojans</span></a> in
+well as the empty item lists <a class="reference internal" href="../celestial_bodies/satellite.html#id1"><span class="std std-ref">Satellites</span></a> and <a class="reference internal" href="../celestial_bodies/trojan.html#id1"><span class="std std-ref">Trojans</span></a>.
+You can add <a class="reference internal" href="../celestial_bodies/satellite.html#id1"><span class="std std-ref">Satellites</span></a> and <a class="reference internal" href="../celestial_bodies/trojan.html#id1"><span class="std std-ref">Trojans</span></a> in
 a similar way. To modify the <a class="reference internal" href="../celestial_bodies/planet.html#id1"><span class="std std-ref">planet</span></a>’s characteristics, open up the details menu of the
 <a class="reference internal" href="../celestial_bodies/planet.html#id1"><span class="std std-ref">planet</span></a>. To add an <a class="reference internal" href="../celestial_bodies/asteroid_belt.html#id1"><span class="std std-ref">asteroid belt</span></a> in the
 <a class="reference internal" href="../celestial_systems/stellar_system.html#id1"><span class="std std-ref">stellar system</span></a> of your choice, follow the same
@@ -335,14 +347,16 @@ images for every single element. The average <a class="reference internal" href=
 should be less than 100 MB.</p>
 <p>To open an existing project in a new tab, go to files -&gt; Open Project and
 select the project of your choice.</p>
-<p>To open the documentation through the GUI, go to Help -&gt; Documentation.</p>
+<p>To open the documentation through the GUI, go to menu option “Help”. There are three ways to open the
+documentation. One is within the gui itself (small window opening HTML files),
+another is as a PDF file, and the third one is as an HTML file on the default internet browser.</p>
 </section>
 <section id="details-dialog">
 <h2 id="details-dialog">Details Dialog<a class="headerlink" href="#details-dialog" title="Permalink to this headline">¶</a></h2>
 <p>Opening a detail dialog, depending on the element opened, there
 are multiple tabs and for each one there are many options to modify and explore.
 Each <a class="reference internal" href="../quantities/quantities.html#id1"><span class="std std-ref">quantity</span></a> you find in the tab that has the information
-symbol on the side, can be double clicked to displace the help menu entry on that
+symbol on the side, can be double clicked to display the help menu entry on that
 <a class="reference internal" href="../quantities/quantities.html#id1"><span class="std std-ref">quantity</span></a>.</p>
 <p>The main tab is Designations, a tab that contains general information,
 such as name and parents (which body they <a class="reference internal" href="../quantities/orbital/orbital.html#id1"><span class="std std-ref">orbit</span></a> or are part of),
@@ -354,9 +368,13 @@ For <a class="reference internal" href="../celestial_bodies/star.html#id1"><span
 <a class="reference internal" href="../quantities/orbital/eccentricity.html#id1"><span class="std std-ref">eccentricity</span></a>, <a class="reference internal" href="../quantities/orbital/semi_major_axis.html#id1"><span class="std std-ref">semi-major axis</span></a> etc.</p>
 <p>The <a class="reference internal" href="../quantities/children_orbit_limits/children_orbit_limits.html#id1"><span class="std std-ref">children orbit limit</span></a> tab contain different types of orbit
 limits for the bodies that orbit around the body for which the detail dialog is open.</p>
-<p>The <a class="reference internal" href="../quantities/surface/surface.html#id1"><span class="std std-ref">surface</span></a> dialog contains all potential surface related
+<p>The <a class="reference internal" href="../quantities/surface/surface.html#id1"><span class="std std-ref">surface</span></a> tab contains all potential surface related
 characteristics such as <a class="reference internal" href="../quantities/surface/emission/temperature.html#id1"><span class="std std-ref">temperature</span></a>, <a class="reference internal" href="../quantities/surface/gravity/surface_gravity.html#id1"><span class="std std-ref">gravitational acceleration</span></a>,
 <a class="reference internal" href="../quantities/surface/angular_diameter.html#id1"><span class="std std-ref">size of parent in the sky</span></a>, and <a class="reference internal" href="../quantities/surface/internal_heating/tectonic_activity.html#id1"><span class="std std-ref">tectonic activity</span></a>.</p>
+<p>The <a class="reference internal" href="../celestial_bodies/ring.html#id1"><span class="std std-ref">ring</span></a> tab allows the modification of the color of the potential ring of
+a given <a class="reference internal" href="../celestial_bodies/planet.html#id1"><span class="std std-ref">planet</span></a>. The addition of ring gaps happens automatically
+with the addition of ref:<cite>satellites &lt;satellite&gt;</cite>, or one can manually change the color gradient
+in such a way so as to imitate the ring-gap feeling.</p>
 <p>The <a class="reference internal" href="../quantities/insolation_models/insolation_models.html#id1"><span class="std std-ref">insolation</span></a> tab contains the two different <a class="reference internal" href="../quantities/insolation_models/insolation_models.html#id1"><span class="std std-ref">insolation models</span></a>
 that can be used to calculate the <a class="reference internal" href="../quantities/habitability/habitable_zones/habitable_zones.html#id1"><span class="std std-ref">habitable zone</span></a> around
 <a class="reference internal" href="../celestial_bodies/star.html#id1"><span class="std std-ref">stars</span></a> and <a class="reference internal" href="../celestial_systems/binary_system.html#id1"><span class="std std-ref">stellar binaries</span></a>.</p>
@@ -367,6 +385,34 @@ For <a class="reference internal" href="../celestial_bodies/planet.html#id1"><sp
 the <a class="reference internal" href="../quantities/habitability/habitability.html#id1"><span class="std std-ref">habitability</span></a> is dependent on multiple factors.
 Each one that is violated is portrayed on the habitability violations box.</p>
 <p>Finally, the image tab contains the default image, or a option for the user to add their own.</p>
+</section>
+<section id="rendering">
+<h2 id="rendering">Rendering<a class="headerlink" href="#rendering" title="Permalink to this headline">¶</a></h2>
+<p>One of the biggest advantages of this package is the ability to render images of the
+created systems. With a simple click of a button (same as the logo) and a few seconds
+of patience, the system is rendered.</p>
+<p>The user has a multitude of options to choose from, by clicking the “Rendering Settings”
+button. From the pop-up dialog, the user can choose which sub-system to render (via the
+top-most drop-down menu).
+The user can chose the resolution scale of the rendered system. The resolution with
+scale “s” corresponds to a png image of <span class="math notranslate nohighlight">\(1100 \cdot s\)</span> x <span class="math notranslate nohighlight">\(300 \cdot s\)</span>
+pixels. The lower the resolution, the faster the rendition process.
+Next there are three groups of options. The first one, called “Line/Area Options”,
+allows the user to choose which of the vector-lines/areas will be rendered, as
+well as their line-width.
+The second one, called “Label Options” allows the user to choose which of the labels
+of the distances and celestial objects’ names will be displayed as well as their font size.
+Lastly, there “Celestial Object Options” allows the user to choose which specific type of
+<a class="reference internal" href="../celestial_bodies/celestial_bodies.html#id1"><span class="std std-ref">celestial object</span></a> they want to render. The option
+“Satellite display vertical distance” refers to the distance between rendered <a class="reference internal" href="../celestial_bodies/satellite.html#id1"><span class="std std-ref">satellites</span></a>
+in <a class="reference internal" href="../celestial_systems/stellar_system.html#id1"><span class="std std-ref">stellar systems</span></a> (they are depicted on the
+left side of their parent <a class="reference internal" href="../celestial_bodies/planet.html#id1"><span class="std std-ref">planet</span></a>. This value is normalized to the total height of the displayed image,
+meaning that with the default value of 0.1, up to 9 satellites will be depicted on the rendered image.
+The user may choose to make this value smaller, to allow for more satellites to be displayed.
+However, I do find more than 15 satellites to make the rendered image a tad too crowded.</p>
+<p>Finally, the user can save the rendered image as a PNG file. I suggest working with a lower scale (resolution)
+until the rendered image is satisfying for speed purposes, and then re-rendering with a higher scale before
+saving the image.</p>
 </section>
 </section>
 

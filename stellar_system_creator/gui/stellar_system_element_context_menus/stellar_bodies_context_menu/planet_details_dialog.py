@@ -6,7 +6,7 @@ from stellar_system_creator.stellar_system_elements.stellar_body import Planet, 
 from .basic_details_dialog import BasicDetailsDialog
 from ..stellar_bodies_context_menu.detail_dialog_widgets import UnitLabel, \
     Label, GroupBox, TabWidget, Tab, ComboBox, LineEdit, UnitLineEdit, TextBrowser, CheckBox, DetailsLabel
-from .basic_details_tabs import InsolationTab, ParentHabitabilityTab, ImageTab, ChildHabitabilityTab
+from .basic_details_tabs import InsolationTab, ParentHabitabilityTab, ImageTab, ChildHabitabilityTab, RingTab
 
 
 class PlanetDetailsDialog(BasicDetailsDialog):
@@ -15,6 +15,7 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         self._set_tab_widget()
         self._initialize_habitability_tab()
         # self._initialize_insolation_tab()
+        self._initialize_ring_tab()
         super().__post_init__()
         self.setWindowTitle(f"{self.parent_item.text()} details")
         # self.setWindowIcon(QIcon.fromTheme("document-properties"))
@@ -42,6 +43,7 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         # self._set_insolation_tab()
         self._set_miscellaneous_tab()
         self._set_habitability_tab()
+        self._set_ring_tab()
         self._set_image_tab()
 
         self.tab_widget.addTab(self.general_tab, "General")
@@ -51,6 +53,7 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         self.tab_widget.addTab(self.children_orbit_limits_tab, "Children Orbit Limits")
         self.tab_widget.addTab(self.miscellaneous_tab, "Miscellaneous")
         # self.tab_widget.addTab(self.insolation_tab, "Insolation")
+        self.tab_widget.addTab(self.ring_tab, "Ring")
         self.tab_widget.addTab(self.habitability_tab, "Habitability")
         self.tab_widget.addTab(self.image_tab, "Image")
 
@@ -61,7 +64,7 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         self.check_boxes['Use Suggested Eccentricity'] = CheckBox(self.le['Eccentricity'])
 
     def _set_other_labels(self):
-        self.other_labels = {'Habitability Tab': self.habitability_tab}
+        self.other_labels = {'Habitability Tab': self.habitability_tab, 'Ring Tab': self.ring_tab}
 
     def _set_other_edits(self):
         sse: Planet = self.parent_item.ssc_object
@@ -408,6 +411,14 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         tab_layout.addWidget(self.relative_size_group_box)
         tab_layout.addStretch()
 
+    def _initialize_ring_tab(self):
+        sse: Planet = self.parent_item.ssc_object
+        self.ring_tab = RingTab(sse, self.tab_widget)
+
+    def _set_ring_tab(self):
+        sse: Planet = self.parent_item.ssc_object
+        self.ring_tab.set_boxes()
+
     # def _initialize_insolation_tab(self):
     #     sse: Planet = self.parent_item.ssc_object
     #     self.insolation_tab = InsolationTab(sse, self.tab_widget, self.habitability_tab)
@@ -437,6 +448,8 @@ class PlanetDetailsDialog(BasicDetailsDialog):
     def return_other_edits_to_initial_values(self):
         self.other_edits['Composition Type'].setCurrentText(self.other_edit_init_values['Composition Type'])
         self.other_edits['Orbit Type'].setCurrentText(self.other_edit_init_values['Orbit Type'])
+        self.parent_item.ssc_object.has_ring = self.ring_tab.init_has_ring
+        self.parent_item.ssc_object.ring = self.ring_tab.ring_copy
 
     def confirm_other_edit_changes(self):
         self.other_edit_init_values['Composition Type'] = self.parent_item.ssc_object.chemical_composition
@@ -444,6 +457,10 @@ class PlanetDetailsDialog(BasicDetailsDialog):
 
 
 class SatelliteDetailsDialog(PlanetDetailsDialog):
+
+    def _set_tabs(self):
+        super()._set_tabs()
+        self.tab_widget.removeTab(6)
 
     def _set_unit_labels(self):
         sse: Satellite = self.parent_item.ssc_object
@@ -524,7 +541,8 @@ class TrojanDetailsDialog(PlanetDetailsDialog):
 
     def _set_tabs(self):
         super()._set_tabs()
-        self.tab_widget.removeTab(7)
+        self.tab_widget.removeTab(8)
+        self.tab_widget.removeTab(6)
         self.tab_widget.removeTab(4)
         self.tab_widget.removeTab(3)
 
@@ -627,7 +645,8 @@ class AsteroidBeltDetailsDialog(PlanetDetailsDialog):
 
     def _set_tabs(self):
         super()._set_tabs()
-        self.tab_widget.removeTab(7)
+        self.tab_widget.removeTab(8)
+        self.tab_widget.removeTab(6)
         self.tab_widget.removeTab(4)
         self.tab_widget.removeTab(3)
 

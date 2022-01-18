@@ -4,14 +4,16 @@ from typing import Union
 import os
 import glob
 
-import matplotlib.pyplot as plt
+import cairo
 import pkg_resources
+from PIL import ImageQt, Image
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import Qt, QThread, QModelIndex, QRectF, QPoint, QPointF
-from PyQt5.QtGui import QIcon, QResizeEvent
+from PyQt5.QtGui import QIcon, QResizeEvent, QPixmap
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QMenu, QAction, QFileDialog, QSizePolicy, \
-    QComboBox, QCheckBox, QDialog, QDialogButtonBox, QMessageBox, QGraphicsView, QGraphicsScene, QGestureEvent
+    QComboBox, QCheckBox, QDialog, QDialogButtonBox, QMessageBox, QGraphicsView, QGraphicsScene, QGestureEvent, QLabel, \
+    QLineEdit, QScrollArea
 
 from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
 from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items import \
@@ -20,53 +22,52 @@ from stellar_system_creator.gui.stellar_system_element_context_menus.stellar_bod
     GroupBox, ComboBox
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
 from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem, MultiStellarSystemSType
+from stellar_system_creator.visualization.system_plot import get_ndarray_from_cairo_image_surface, \
+    save_image_ndarray
 
 # https://stackoverflow.com/questions/57432570/generate-a-svg-file-with-pyqt5
 
 
-class SystemRenderingWidget(QSvgWidget):
+class SystemRenderingWidget(QLabel):
 
     def __init__(self, graphics_view):
         super().__init__()
         self.hide()
-        self.latest_fig = None
+        self.latest_surface = None
         self.graphics_view: GraphicsView = graphics_view
         self.setMouseTracking(True)
         self.old_pos = None
-        self.temp_file_name = '~.tempfile0'
+        self.temp_file_name = '~.tempfile0.png'
         self.temp_file = None
+        self.setScaledContents(True)
         while len(glob.glob(self.temp_file_name)):
             self.temp_file_name = self.temp_file_name[:-1] + str(int(self.temp_file_name[-1]) + 1)
 
-    def set_temp_file(self):
-        self.temp_file = open(self.temp_file_name, 'x+b')
-
     def delete_temp_file(self):
-        self.temp_file.close()
         os.remove(self.temp_file_name)
         self.temp_file = None
 
     def render_image(self, ssc_object: Union[MultiStellarSystemSType, StellarSystem, PlanetarySystem, None]):
-
         if ssc_object is not None:
-            if ssc_object.parent is not None and self.temp_file is not None:
+            if ssc_object.parent is not None and self.temp_file_name is not None:
                 self.change_draw_line_options(ssc_object)
                 self.hide()
-                save_format = 'svg'
-                fd = self.temp_file
+                save_format = 'png'
+                fd = self.temp_file_name
                 if isinstance(ssc_object, MultiStellarSystemSType):
-                    ssc_object.draw_multi_stellar_system(save_fig=True, save_temp_file=fd, save_format=save_format)
+                    ssc_object.draw_multi_stellar_system(save=True, save_temp_file=fd, save_format=save_format)
                 elif isinstance(ssc_object, StellarSystem):
-                    ssc_object.draw_stellar_system(save_fig=True, save_temp_file=fd, save_format=save_format)
+                    ssc_object.draw_stellar_system(save=True, save_temp_file=fd, save_format=save_format)
                 elif isinstance(ssc_object, PlanetarySystem):
-                    ssc_object.draw_planetary_system(save_fig=True, save_temp_file=fd, save_format=save_format)
-                fd.seek(0)
-                self.renderer().load(fd.name)
-                self.renderer().setAspectRatioMode(Qt.KeepAspectRatio)
-                # self.setStyleSheet(self.graphics_view.styleSheet())
-                self.adjustSize()
+                    ssc_object.draw_planetary_system(save=True, save_temp_file=fd, save_format=save_format)
+                pixmap = QPixmap.fromImage(ImageQt.ImageQt(Image.open(fd)))
+                self.setPixmap(pixmap)
+                # self.update()
+                self.setBaseSize(pixmap.size())
+                self.resize(self.baseSize())
+                self.graphics_view.scene().setSceneRect(0, 0, pixmap.width(), pixmap.height())
+                self.graphics_view.fitInView(self.graphics_view.sceneRect(), Qt.KeepAspectRatio)
                 self.update()
-                # self.graphics_view.fitInView(self.graphics_view.sceneRect(), Qt.KeepAspectRatio)
             else:
                 self.hide()
         else:
@@ -75,25 +76,44 @@ class SystemRenderingWidget(QSvgWidget):
     def change_draw_line_options(self, ssc_object):
         # noinspection PyTypeChecker
         rsd: RenderingSettingsDialog = self.graphics_view.parent().rendering_settings_dialog
+
         if isinstance(ssc_object, MultiStellarSystemSType):
-            for child in ssc_object.children:
-                child.want_draw_stellar_system_limits = rsd.draw_stellar_system_limits_check_box.isChecked()
-                child.want_draw_orbit_lines = rsd.draw_planet_orbit_line_check_box.isChecked()
-                child.want_orbit_label = rsd.draw_planet_orbit_distance_check_box.isChecked()
-                child.want_draw_extended_habitable_zone = rsd.draw_extended_habitable_zone_check_box.isChecked()
-                child.want_draw_conservative_habitable_zone = rsd.draw_conservative_habitable_zone_check_box.isChecked()
-                child.want_draw_frost_line = rsd.draw_frost_line_check_box.isChecked()
-        elif isinstance(ssc_object, StellarSystem):
-            ssc_object.want_draw_stellar_system_limits = rsd.draw_stellar_system_limits_check_box.isChecked()
-            ssc_object.want_draw_orbit_lines = rsd.draw_planet_orbit_line_check_box.isChecked()
-            ssc_object.want_orbit_label = rsd.draw_planet_orbit_distance_check_box.isChecked()
-            ssc_object.want_draw_extended_habitable_zone = rsd.draw_extended_habitable_zone_check_box.isChecked()
-            ssc_object.want_draw_conservative_habitable_zone = rsd.draw_conservative_habitable_zone_check_box.isChecked()
-            ssc_object.want_draw_frost_line = rsd.draw_frost_line_check_box.isChecked()
-        elif isinstance(ssc_object, PlanetarySystem):
-            ssc_object.want_draw_planetary_system_limits = rsd.draw_planetary_system_limits_check_box.isChecked()
-            ssc_object.want_draw_satellite_orbits = rsd.draw_satellite_orbit_line_check_box.isChecked()
-            ssc_object.want_orbit_label = rsd.draw_satellite_orbit_distance_check_box.isChecked()
+            system_plots = ssc_object.system_plot.system_plots
+        elif isinstance(ssc_object, (PlanetarySystem, StellarSystem)):
+            system_plots = [ssc_object.system_plot]
+        else:
+            return
+
+        for sp in system_plots:
+            sp.scale = float(rsd.image_scale_line_edit.line_edit.text())
+
+            # drawing options - lines // areas
+            sp.want_orbit_limits = rsd.draw_orbit_limits_line_check_box.isChecked()
+            sp.want_habitable_zones_extended = rsd.draw_extended_habitable_zone_check_box.isChecked()
+            sp.want_habitable_zones_conservative = rsd.draw_conservative_habitable_zone_check_box.isChecked()
+            sp.want_water_frost_line = rsd.draw_water_frost_line_check_box.isChecked()
+            sp.want_rock_line = rsd.draw_rock_line_check_box.isChecked()
+            sp.want_tidal_locking_radius = rsd.draw_tidal_locking_radius_check_box.isChecked()
+            sp.want_orbit_lines = rsd.draw_orbit_line_check_box.isChecked()
+            sp.orbit_line_width = float(rsd.orbit_line_width_line_edit.line_edit.text())
+
+            # drawing options - labels
+            sp.want_orbit_limits_labels = rsd.draw_orbit_limits_labels_check_box.isChecked()
+            sp.want_other_line_labels = rsd.draw_other_line_labels_check_box.isChecked()
+            sp.want_children_orbit_labels = rsd.draw_children_orbit_labels_check_box.isChecked()
+            sp.want_children_name_labels = rsd.draw_children_name_labels_check_box.isChecked()
+            sp.want_parent_name_labels = rsd.draw_parents_name_labels_check_box.isChecked()
+
+            sp.orbit_distance_font_size = float(rsd.line_distance_font_size_line_edit.line_edit.text())
+            sp.object_name_font_size = float(rsd.object_name_font_size_line_edit.line_edit.text())
+
+            # drawing options - objects
+            sp.satellite_plot_y_step = float(rsd.satellite_display_distance_line_edit.line_edit.text())
+            sp.want_satellites = rsd.draw_children_satellites_check_box.isChecked()
+            sp.want_trojans = rsd.draw_children_trojans_check_box.isChecked()
+            sp.want_asteroid_belts = rsd.draw_asteroid_belt_check_box.isChecked()
+            sp.want_children_objects = rsd.draw_children_check_box.isChecked()
+            sp.want_parents = rsd.draw_parents_check_box.isChecked()
 
     # https://learndataanalysis.org/drag-and-move-an-object-with-your-mouse-pyqt5-tutorial/
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
@@ -132,7 +152,6 @@ class SystemImageWidget(QWidget):
         layout.setSpacing(0)
         layout.setStretchFactor(self.options_widget, 0)
         layout.setStretchFactor(self.system_rendering_widget, 1)
-        # layout.sets
         self.setLayout(layout)
 
     # def changed_scene_process(self):
@@ -187,26 +206,26 @@ class SystemImageWidget(QWidget):
         self.options_widget.setFixedSize(self.options_widget.sizeHint())
 
     def render_process(self):
-        ssc_object = self.target_treeview.ssc_object
-        ssc_object.set_fig_and_ax()
-        self.system_rendering_widget.set_temp_file()
-        self.render_thread = ImageRenderingProcess(self.target_treeview, self.system_rendering_widget, self.render_button)
+        # ssc_object = self.target_treeview.ssc_object
+        # self.system_rendering_widget.set_temp_file()
+        self.render_thread = ImageRenderingProcess(self.target_treeview, self.system_rendering_widget,
+                                                   self.render_button)
         self.render_thread.finished.connect(self.thread_finished_process)
         self.render_thread.start()
 
     def thread_finished_process(self):
         ssc_object = self.target_treeview.ssc_object
         self.system_rendering_widget.show()
-        self.system_rendering_widget.latest_fig = ssc_object.fig
-        ssc_object.clear_fig_and_ax()
+        self.system_rendering_widget.latest_surface = ssc_object.system_plot.plot_base_surface
+        ssc_object.clear_system_plot()
         self.system_rendering_widget.delete_temp_file()
 
     def rendering_settings_process(self):
         self.rendering_settings_dialog.show()
 
     def save_image_process(self):
-        fig: plt.Figure = self.system_rendering_widget.latest_fig
-        if fig is None:
+        surface: cairo.ImageSurface = self.system_rendering_widget.latest_surface
+        if surface is None:
             message_box = QMessageBox()
             message_box.setIcon(QMessageBox.Information)
             message_box.setWindowTitle("'Save Image' has failed...")
@@ -215,11 +234,10 @@ class SystemImageWidget(QWidget):
             return
 
         filename = QFileDialog.getSaveFileName(self, 'Save Image', '', "All Files (*);;"
-                                                                       "PDF (*.pdf);;"
-                                                                       "SVG (*.svg);;"
                                                                        "PNG (*.png)")[0]
         if filename != '':
-            fig.savefig(filename, dpi=1200)
+            array = get_ndarray_from_cairo_image_surface(surface)
+            save_image_ndarray(array, filename)
 
 
 class GraphicsScene(QGraphicsScene):
@@ -239,89 +257,153 @@ class RenderingSettingsDialog(QDialog):
         # self._set_button_box()
 
         layout = QVBoxLayout()
-        layout.addWidget(self.options_widget)
+        layout.addWidget(self.scrollable_area)
         # layout.addWidget(self.button_box)
         self.setLayout(layout)
+        # self.adjustSize()
 
     def _set_options_widget(self):
         self._set_available_systems_drop_down()
-        # self._set_multi_stellar_system_groupbox()
-        self._set_stellar_system_groupbox()
-        self._set_planetary_system_groupbox()
+        self._set_line_area_options_groupbox()
+        self._set_label_options_groupbox()
+        self._set_object_options_groupbox()
         self.options_widget = QWidget()
         layout = QVBoxLayout()
 
         layout.addWidget(self.available_systems_drop_down)
-        # layout.addWidget(self.multi_stellar_system_groupbox)
-        layout.addWidget(self.stellar_system_groupbox)
-        layout.addWidget(self.planetary_system_groupbox)
+        self.image_scale_line_edit = RenderingSettingsLineEdit(6, 'Image resolution scale: ')
+        layout.addWidget(self.image_scale_line_edit)
+        layout.addWidget(self.line_area_groupbox)
+        layout.addWidget(self.label_groupbox)
+        layout.addWidget(self.object_groupbox)
         layout.addStretch()
         self.options_widget.setLayout(layout)
 
-    def _set_multi_stellar_system_groupbox(self):
-        self.multi_stellar_system_groupbox = GroupBox('Multi-Stellar System Options')
+        self.scrollable_area = QScrollArea()
+        self.scrollable_area.setWidget(self.options_widget)
+        self.scrollable_area.setWidgetResizable(True)
+        self.scrollable_area.adjustSize()
+        self.scrollable_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scrollable_area.horizontalScrollBar().setEnabled(False)
+        self.scrollable_area.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+
+    def _set_line_area_options_groupbox(self):
+        self.line_area_groupbox = GroupBox('Line/Area Options')
         layout = QVBoxLayout()
 
-        self.multi_stellar_system_groupbox.setLayout(layout)
+        self.draw_orbit_limits_line_check_box = QCheckBox()
+        self.draw_orbit_limits_line_check_box.setText('Show inner/outer orbit limits lines')
+        self.draw_orbit_limits_line_check_box.setChecked(True)
 
-    def _set_stellar_system_groupbox(self):
-        self.stellar_system_groupbox = GroupBox('Stellar System Options')
-        layout = QVBoxLayout()
+        self.draw_tidal_locking_radius_check_box = QCheckBox()
+        self.draw_tidal_locking_radius_check_box.setText('Show tidal locking radius')
+        self.draw_tidal_locking_radius_check_box.setChecked(True)
 
-        self.draw_stellar_system_limits_check_box = QCheckBox()
-        self.draw_stellar_system_limits_check_box.setText('Show inner/outer limits')
-        self.draw_stellar_system_limits_check_box.setChecked(True)
+        self.draw_water_frost_line_check_box = QCheckBox()
+        self.draw_water_frost_line_check_box.setText('Show water frost-line')
+        self.draw_water_frost_line_check_box.setChecked(True)
 
-        self.draw_planet_orbit_line_check_box = QCheckBox()
-        self.draw_planet_orbit_line_check_box.setText('Show planet orbit lines')
-        self.draw_planet_orbit_line_check_box.setChecked(True)
-
-        self.draw_planet_orbit_distance_check_box = QCheckBox()
-        self.draw_planet_orbit_distance_check_box.setText('Show planet orbit distance')
-        self.draw_planet_orbit_distance_check_box.setChecked(True)
-
-        self.draw_extended_habitable_zone_check_box = QCheckBox()
-        self.draw_extended_habitable_zone_check_box.setText('Show relaxed HZ')
-        self.draw_extended_habitable_zone_check_box.setChecked(True)
+        self.draw_rock_line_check_box = QCheckBox()
+        self.draw_rock_line_check_box.setText('Show rock-line')
+        self.draw_rock_line_check_box.setChecked(True)
 
         self.draw_conservative_habitable_zone_check_box = QCheckBox()
-        self.draw_conservative_habitable_zone_check_box.setText('Show conservative HZ')
+        self.draw_conservative_habitable_zone_check_box.setText('Show conservative Habitable Zone')
         self.draw_conservative_habitable_zone_check_box.setChecked(True)
 
-        self.draw_frost_line_check_box = QCheckBox()
-        self.draw_frost_line_check_box.setText('Show water frost-line')
-        self.draw_frost_line_check_box.setChecked(True)
+        self.draw_extended_habitable_zone_check_box = QCheckBox()
+        self.draw_extended_habitable_zone_check_box.setText('Show extended Habitable Zone')
+        self.draw_extended_habitable_zone_check_box.setChecked(True)
 
-        layout.addWidget(self.draw_stellar_system_limits_check_box)
-        layout.addWidget(self.draw_planet_orbit_line_check_box)
-        layout.addWidget(self.draw_planet_orbit_distance_check_box)
-        layout.addWidget(self.draw_extended_habitable_zone_check_box)
+        self.draw_orbit_line_check_box = QCheckBox()
+        self.draw_orbit_line_check_box.setText('Show orbit lines')
+        self.draw_orbit_line_check_box.setChecked(True)
+
+        self.orbit_line_width_line_edit = RenderingSettingsLineEdit(3, 'Orbit line width: ')
+
+        layout.addWidget(self.draw_orbit_limits_line_check_box)
+        layout.addWidget(self.draw_tidal_locking_radius_check_box)
+        layout.addWidget(self.draw_water_frost_line_check_box)
+        layout.addWidget(self.draw_rock_line_check_box)
         layout.addWidget(self.draw_conservative_habitable_zone_check_box)
-        layout.addWidget(self.draw_frost_line_check_box)
+        layout.addWidget(self.draw_extended_habitable_zone_check_box)
+        layout.addWidget(self.draw_orbit_line_check_box)
+        layout.addWidget(self.orbit_line_width_line_edit)
         layout.addStretch()
-        self.stellar_system_groupbox.setLayout(layout)
+        self.line_area_groupbox.setLayout(layout)
 
-    def _set_planetary_system_groupbox(self):
-        self.planetary_system_groupbox = GroupBox('Planetary System Options')
+    def _set_label_options_groupbox(self):
+        self.label_groupbox = GroupBox('Label Options')
         layout = QVBoxLayout()
 
-        self.draw_planetary_system_limits_check_box = QCheckBox()
-        self.draw_planetary_system_limits_check_box.setText('Show inner/outer limits')
-        self.draw_planetary_system_limits_check_box.setChecked(True)
+        self.draw_orbit_limits_labels_check_box = QCheckBox()
+        self.draw_orbit_limits_labels_check_box.setText('Show inner/outer orbit limits labels')
+        self.draw_orbit_limits_labels_check_box.setChecked(True)
 
-        self.draw_satellite_orbit_line_check_box = QCheckBox()
-        self.draw_satellite_orbit_line_check_box.setText('Show satellite orbit lines')
-        self.draw_satellite_orbit_line_check_box.setChecked(True)
+        self.draw_other_line_labels_check_box = QCheckBox()
+        self.draw_other_line_labels_check_box.setText('Show other lines distances')
+        self.draw_other_line_labels_check_box.setChecked(True)
 
-        self.draw_satellite_orbit_distance_check_box = QCheckBox()
-        self.draw_satellite_orbit_distance_check_box.setText('Show planet orbit distance')
-        self.draw_satellite_orbit_distance_check_box.setChecked(True)
+        self.draw_children_orbit_labels_check_box = QCheckBox()
+        self.draw_children_orbit_labels_check_box.setText('Show children distances')
+        self.draw_children_orbit_labels_check_box.setChecked(True)
 
-        layout.addWidget(self.draw_planetary_system_limits_check_box)
-        layout.addWidget(self.draw_satellite_orbit_line_check_box)
-        layout.addWidget(self.draw_satellite_orbit_distance_check_box)
+        self.draw_children_name_labels_check_box = QCheckBox()
+        self.draw_children_name_labels_check_box.setText('Show children names')
+        self.draw_children_name_labels_check_box.setChecked(True)
+
+        self.draw_parents_name_labels_check_box = QCheckBox()
+        self.draw_parents_name_labels_check_box.setText('Show parent names')
+        self.draw_parents_name_labels_check_box.setChecked(True)
+
+        self.object_name_font_size_line_edit = RenderingSettingsLineEdit(10, 'Object name font size: ')
+        self.line_distance_font_size_line_edit = RenderingSettingsLineEdit(10, 'Orbit label font size: ')
+
+        layout.addWidget(self.draw_orbit_limits_labels_check_box)
+        layout.addWidget(self.draw_other_line_labels_check_box)
+        layout.addWidget(self.draw_children_orbit_labels_check_box)
+        layout.addWidget(self.draw_children_name_labels_check_box)
+        layout.addWidget(self.draw_parents_name_labels_check_box)
+        layout.addWidget(self.object_name_font_size_line_edit)
+        layout.addWidget(self.line_distance_font_size_line_edit)
         layout.addStretch()
-        self.planetary_system_groupbox.setLayout(layout)
+        self.label_groupbox.setLayout(layout)
+
+    def _set_object_options_groupbox(self):
+        self.object_groupbox = GroupBox('Celestial Object Options')
+        layout = QVBoxLayout()
+
+        self.draw_parents_check_box = QCheckBox()
+        self.draw_parents_check_box.setText('Show parents')
+        self.draw_parents_check_box.setChecked(True)
+
+        self.draw_children_check_box = QCheckBox()
+        self.draw_children_check_box.setText('Show children')
+        self.draw_children_check_box.setChecked(True)
+
+        self.draw_asteroid_belt_check_box = QCheckBox()
+        self.draw_asteroid_belt_check_box.setText('Show asteroid belts')
+        self.draw_asteroid_belt_check_box.setChecked(True)
+
+        self.draw_children_trojans_check_box = QCheckBox()
+        self.draw_children_trojans_check_box.setText('Show children trojans')
+        self.draw_children_trojans_check_box.setChecked(True)
+
+        self.draw_children_satellites_check_box = QCheckBox()
+        self.draw_children_satellites_check_box.setText('Show children satellites')
+        self.draw_children_satellites_check_box.setChecked(True)
+
+        self.satellite_display_distance_line_edit = RenderingSettingsLineEdit(
+            0.1, 'Satellite display vertical distance: ')
+
+        layout.addWidget(self.draw_parents_check_box)
+        layout.addWidget(self.draw_children_check_box)
+        layout.addWidget(self.draw_asteroid_belt_check_box)
+        layout.addWidget(self.draw_children_trojans_check_box)
+        layout.addWidget(self.draw_children_satellites_check_box)
+        layout.addWidget(self.satellite_display_distance_line_edit)
+        layout.addStretch()
+        self.object_groupbox.setLayout(layout)
 
     def _set_available_systems_drop_down(self):
         self.available_systems_drop_down = QComboBox()
@@ -429,16 +511,14 @@ class ImageRenderingProcess(QThread):
         loading_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/gui_icons/loading.svg')
         self.render_button.setIcon(QIcon(loading_dir))
         self.render_button.setDisabled(True)
-        try:
-            self.rendering_widget.render_image(self.ssc_object)
-        except Exception as e:
-            message_box = QMessageBox()
-            message_box.setIcon(QMessageBox.Information)
-            message_box.setWindowTitle("'Rendering' has failed...")
-            message_box.setText(f"Error message: {e}")
-            message_box.exec()
-        self.ssc_object.fig = None
-        self.ssc_object.ax = None
+        # try:
+        self.rendering_widget.render_image(self.ssc_object)
+        # except Exception as e:
+        #     message_box = QMessageBox()
+        #     message_box.setIcon(QMessageBox.Information)
+        #     message_box.setWindowTitle("'Rendering' has failed...")
+        #     message_box.setText(f"Error message: {e}")
+        #     message_box.exec()
 
         self.render_button.setEnabled(True)
         self.render_button.setIcon(button_icon)
@@ -450,7 +530,7 @@ class GraphicsView(QGraphicsView):
         super().__init__(*args, **kwargs)
         self.total_zoom_factor = 1
         self.setTransformationAnchor(QGraphicsView.NoAnchor)
-        # self.fitInView(self.sceneRect(), Qt.KeepAspectRatio)
+        self.fitInView(self.sceneRect(), Qt.KeepAspectRatio)
 
     def resizeEvent(self, event: QResizeEvent):
         # self.fitInView(self.sceneRect(), Qt.KeepAspectRatio)
@@ -475,13 +555,42 @@ class GraphicsView(QGraphicsView):
             zoomFactor = zoomInFactor
         else:
             zoomFactor = zoomOutFactor
-        if 20 > self.total_zoom_factor * zoomFactor > 0.5:
-            self.scale(zoomFactor, zoomFactor)
+        # if 1000 > self.total_zoom_factor * zoomFactor > 0.5:
+        self.scale(zoomFactor, zoomFactor)
 
-            # Get the new position
-            newPos = self.mapToScene(event.pos())
+        # Get the new position
+        newPos = self.mapToScene(event.pos())
 
-            # Move scene to old position
-            delta = newPos - oldPos
-            self.translate(delta.x(), delta.y())
-            self.total_zoom_factor *= zoomFactor
+        # Move scene to old position
+        delta = newPos - oldPos
+        self.translate(delta.x(), delta.y())
+        self.total_zoom_factor *= zoomFactor
+
+
+class RenderingSettingsLineEdit(QWidget):
+
+    def __init__(self, default_value, label_string):
+        self.default_value = default_value
+        super().__init__()
+
+        def line_edit_process(line_edit: QLineEdit):
+            try:
+                float(line_edit.text())
+            except ValueError:
+                line_edit.setText(str(default_value))
+
+        self.line_edit = QLineEdit()
+        self.line_edit.setText(str(default_value))
+        self.line_edit.editingFinished.connect(partial(line_edit_process, self.line_edit))
+        self.line_edit.setFixedWidth(50)
+
+        self.label = QLabel(label_string)
+        layout = QHBoxLayout()
+        layout.addWidget(self.label)
+        layout.addWidget(self.line_edit)
+        layout.addStretch()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        self.setLayout(layout)
+

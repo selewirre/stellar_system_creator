@@ -112,5 +112,6 @@
 \contentsline {chapter}{\numberline {5}GUI}{29}{chapter.5}%
 \contentsline {section}{\numberline {5.1}Simple example}{29}{section.5.1}%
 \contentsline {section}{\numberline {5.2}Details Dialog}{30}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Rendering}{30}{section.5.3}%
 \contentsline {chapter}{\numberline {6}Attributions}{31}{chapter.6}%
 \contentsline {section}{\numberline {6.1}Images}{31}{section.6.1}%

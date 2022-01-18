@@ -19,7 +19,7 @@ which includes one or more of the other systems.
 When you create a :ref:`multi-stellar system <multi_stellar_system>`,
 you create an :ref:`S-type stellar binary system <binary_system>`
 (two :ref:`stars <star>` orbiting around each other with a distance big enough that other objects
-can orbit around each :ref:`stars <star>` individually). By default, a :ref:`binary system <binary_system>`
+can orbit around each :ref:`star <star>` individually). By default, a :ref:`binary system <binary_system>`
 with two :ref:`stars <star>` of the same :ref:`mass <mass>` as our sun are generated,
 with :ref:`mean distance <semi_major_axis>` of 500 AU
 and an eccentric orbit of 0.6 :ref:`eccentricity <eccentricity>`.
@@ -41,8 +41,8 @@ will pop up, where you choose the name of the the :ref:`planetary system <planet
 and the :ref:`planet <planet>`.
 You can then open up the new :ref:`planetary system <planetary_system>` item,
 and find out the new :ref:`planet <planet>`, as
-well as the empty items :ref:`satellites <satellite>` and :ref:`Trojans <trojan>`.
-You can add :ref:`satellites <satellite>` and :ref:`Trojans <trojan>` in
+well as the empty item lists :ref:`Satellites <satellite>` and :ref:`Trojans <trojan>`.
+You can add :ref:`Satellites <satellite>` and :ref:`Trojans <trojan>` in
 a similar way. To modify the :ref:`planet <planet>`'s characteristics, open up the details menu of the
 :ref:`planet <planet>`. To add an :ref:`asteroid belt <asteroid_belt>` in the
 :ref:`stellar system <stellar_system>` of your choice, follow the same
@@ -62,7 +62,9 @@ should be less than 100 MB.
 To open an existing project in a new tab, go to files -> Open Project and
 select the project of your choice.
 
-To open the documentation through the GUI, go to Help -> Documentation.
+To open the documentation through the GUI, go to menu option "Help". There are three ways to open the
+documentation. One is within the gui itself (small window opening HTML files),
+another is as a PDF file, and the third one is as an HTML file on the default internet browser.
 
 Details Dialog
 --------------
@@ -70,7 +72,7 @@ Details Dialog
 Opening a detail dialog, depending on the element opened, there
 are multiple tabs and for each one there are many options to modify and explore.
 Each :ref:`quantity <quantities>` you find in the tab that has the information
-symbol on the side, can be double clicked to displace the help menu entry on that
+symbol on the side, can be double clicked to display the help menu entry on that
 :ref:`quantity <quantities>`.
 
 The main tab is Designations, a tab that contains general information,
@@ -87,9 +89,14 @@ Another tab would be the :ref:`orbit <orbital>` characteristics, which includes
 The :ref:`children orbit limit <children_orbit_limits>` tab contain different types of orbit
 limits for the bodies that orbit around the body for which the detail dialog is open.
 
-The :ref:`surface <surface>` dialog contains all potential surface related
+The :ref:`surface <surface>` tab contains all potential surface related
 characteristics such as :ref:`temperature <temperature>`, :ref:`gravitational acceleration <surface_gravity>`,
 :ref:`size of parent in the sky <angular_diameter>`, and :ref:`tectonic activity <tectonic_activity>`.
+
+The :ref:`ring <ring>` tab allows the modification of the color of the potential ring of
+a given :ref:`planet <planet>`. The addition of ring gaps happens automatically
+with the addition of ref:`satellites <satellite>`, or one can manually change the color gradient
+in such a way so as to imitate the ring-gap feeling.
 
 The :ref:`insolation <insolation_models>` tab contains the two different :ref:`insolation models <insolation_models>`
 that can be used to calculate the :ref:`habitable zone <habitable_zones>` around
@@ -103,3 +110,34 @@ the :ref:`habitability <habitability>` is dependent on multiple factors.
 Each one that is violated is portrayed on the habitability violations box.
 
 Finally, the image tab contains the default image, or a option for the user to add their own.
+
+Rendering
+---------
+
+One of the biggest advantages of this package is the ability to render images of the
+created systems. With a simple click of a button (same as the logo) and a few seconds
+of patience, the system is rendered.
+
+The user has a multitude of options to choose from, by clicking the "Rendering Settings"
+button. From the pop-up dialog, the user can choose which sub-system to render (via the
+top-most drop-down menu).
+The user can chose the resolution scale of the rendered system. The resolution with
+scale "s" corresponds to a png image of :math:`1100 \cdot s` x :math:`300 \cdot s`
+pixels. The lower the resolution, the faster the rendition process.
+Next there are three groups of options. The first one, called "Line/Area Options",
+allows the user to choose which of the vector-lines/areas will be rendered, as
+well as their line-width.
+The second one, called "Label Options" allows the user to choose which of the labels
+of the distances and celestial objects' names will be displayed as well as their font size.
+Lastly, there "Celestial Object Options" allows the user to choose which specific type of
+:ref:`celestial object <celestial_bodies>` they want to render. The option
+"Satellite display vertical distance" refers to the distance between rendered :ref:`satellites <satellite>`
+in :ref:`stellar systems <stellar_system>` (they are depicted on the
+left side of their parent :ref:`planet <planet>`. This value is normalized to the total height of the displayed image,
+meaning that with the default value of 0.1, up to 9 satellites will be depicted on the rendered image.
+The user may choose to make this value smaller, to allow for more satellites to be displayed.
+However, I do find more than 15 satellites to make the rendered image a tad too crowded.
+
+Finally, the user can save the rendered image as a PNG file. I suggest working with a lower scale (resolution)
+until the rendered image is satisfying for speed purposes, and then re-rendering with a higher scale before
+saving the image.

@@ -47,7 +47,7 @@
   
   
   
-    <title>Ring &#8212; Stellar System Creator 0.1.2.1 documentation</title>
+    <title>Ring &#8212; Stellar System Creator 0.2.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/rtd_sphinx_search.min.css" />
@@ -56,6 +56,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/js/rtd_sphinx_search.min.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Celestial Systems" href="../celestial_systems/celestial_systems.html" />
@@ -83,11 +84,11 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex navheader">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="../index.html" title="Stellar System Creator 0.1.2.1 documentation"
+        <a href="../index.html" title="Stellar System Creator 0.2.0.0 documentation"
            class="md-header-nav__button md-logo">
           
               <img src="../_static/logo.ico" height="26"
-                   alt="Stellar System Creator 0.1.2.1 documentation logo">
+                   alt="Stellar System Creator 0.2.0.0 documentation logo">
           
         </a>
       </div>
@@ -153,7 +154,7 @@
   <nav class="md-tabs" data-md-component="tabs">
     <div class="md-tabs__inner md-grid">
       <ul class="md-tabs__list">
-          <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link">Stellar System Creator 0.1.2.1 documentation</a></li>
+          <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link">Stellar System Creator 0.2.0.0 documentation</a></li>
           <li class="md-tabs__item"><a href="celestial_bodies.html" class="md-tabs__link">Celestial Bodies</a></li>
       </ul>
     </div>
@@ -166,13 +167,13 @@
               <div class="md-sidebar__inner">
                 <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href="../index.html" title="Stellar System Creator 0.1.2.1 documentation" class="md-nav__button md-logo">
+    <a href="../index.html" title="Stellar System Creator 0.2.0.0 documentation" class="md-nav__button md-logo">
       
         <img src="../_static/logo.ico" alt=" logo" width="48" height="48">
       
     </a>
     <a href="../index.html"
-       title="Stellar System Creator 0.1.2.1 documentation">Stellar System Creator</a>
+       title="Stellar System Creator 0.2.0.0 documentation">Stellar System Creator</a>
   </label>
   
 
@@ -312,7 +313,23 @@
 <p id="id1">An ring is is a torus,
 pancake or ring-shaped accumulation of matter composed of
 gas, dust, asteroids, or collision fragments in <a class="reference internal" href="../quantities/orbital/orbital.html#id1"><span class="std std-ref">orbit</span></a> around a <a class="reference internal" href="planet.html#id1"><span class="std std-ref">planet</span></a>.</p>
-<p>It is not yet implemented in this package. Soon though!</p>
+<p>In this package, a ring is always attached to a <a class="reference internal" href="planet.html#id1"><span class="std std-ref">planet</span></a>.
+Ring objects are characterized by their inner and and outer <a class="reference internal" href="../quantities/geometric/radius.html#id1"><span class="std std-ref">radius</span></a>,
+forbidden bands and a radial gradient patterns.
+The inner radius is given as <span class="math notranslate nohighlight">\(1.1 R_p\)</span> where <span class="math notranslate nohighlight">\(R_p\)</span> is the radius of the host
+<a class="reference internal" href="planet.html#id1"><span class="std std-ref">planet</span></a>.
+THe outer radius is given by the <a class="reference internal" href="../quantities/children_orbit_limits/dense_roche_limit.html#id1"><span class="std std-ref">dense Roche orbit limit</span></a>.
+Forbidden bands are bands where material has moved away from, due to the gravitational
+presence of a bigger body (<a class="reference internal" href="satellite.html#id1"><span class="std std-ref">satellite</span></a>).
+The more <a class="reference internal" href="satellite.html#id1"><span class="std std-ref">satellite</span></a> a <a class="reference internal" href="planet.html#id1"><span class="std std-ref">planet</span></a> has, the more intricate the
+forbidden bands of the ring will be.</p>
+<p>Finally, the color gradient defines the color of the ring at a given distance from the center.
+The color gradinet has 5 parameters. The first parameter can be from 0 to 1 and represents the position
+at which the color will be - with 0 being the equivalent of the inner radius and 1 being the equivalent of
+the outer radius). The next four parameters represent the RGBA (Red - Green - Blue - Alpha) color code
+of the position of choice. These parameters take numbers between 0 and 255. The higher the alpha, the
+less transparent the ring will be.
+The user may add as many positions of color as they like.</p>
 </section>
 
 

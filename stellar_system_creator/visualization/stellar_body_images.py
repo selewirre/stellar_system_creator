@@ -35,8 +35,6 @@ class StellarBodyMarkerDict:
 
 stellar_body_marker_dict = StellarBodyMarkerDict()
 
-# a = stellar_body_marker_dict['patata']
-
 kelvin_table = {
     3000: (255, 56, 0),
     3250: (255, 109, 0),
