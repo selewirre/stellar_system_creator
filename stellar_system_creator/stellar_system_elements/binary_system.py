@@ -1,4 +1,5 @@
 import copy
+import inspect
 
 import numpy as np
 from typing import Union, Tuple
@@ -249,6 +250,17 @@ class BinarySystem:
 
     def __hash__(self):
         return super().__hash__()
+
+    @property
+    def children(self):
+        return self._children
+
+    @classmethod
+    def load_with_args(cls, binary_system: "BinarySystem"):
+        arg_keys = inspect.getfullargspec(cls)
+        kwargs = {key: binary_system.__dict__[key] for key in arg_keys}
+        cls_obj = cls(**kwargs)
+        return cls_obj
 
 
 class StellarBinary(BinarySystem):

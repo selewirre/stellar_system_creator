@@ -1,6 +1,6 @@
 from typing import Union, Tuple, List
 
-import cairocffi as cairo
+import cairo
 import numpy as np
 from PIL import Image
 
@@ -19,7 +19,7 @@ from stellar_system_creator.stellar_system_elements.stellar_system import Stella
 #           }
 
 # https://davidmathlogic.com/colorblind/#%23332288-%23117733-%2344AA99-%2388CCEE-%23CAAE22-%23CC6677-%23AA4499-%23882255-%23FFDEAD
-from stellar_system_creator.visualization.drawing_tools import GradientColor, get_text_extents
+from stellar_system_creator.visualization.drawing_tools import GradientColor
 
 colors = {'purple': [51 / 255, 34 / 255, 136 / 255, 1],
           'darkgreen': [17 / 255, 119 / 255, 51 / 255, 1],
@@ -74,11 +74,6 @@ class SystemPlot:
     def save_image(self, filename):
         array = get_ndarray_from_cairo_image_surface(self.plot_base_surface)
         save_image_ndarray(array, filename)
-
-    def get_pil_image(self):
-        array = get_ndarray_from_cairo_image_surface(self.plot_base_surface)
-        pil_image = Image.fromarray(array, 'RGBA')
-        return pil_image
 
     def transform_im_to_data(self, im_value, mode='x'):
         base_surface = self.plot_base_surface
@@ -530,11 +525,6 @@ class SystemMultiPlot:
         array = get_ndarray_from_cairo_image_surface(self.plot_base_surface)
         save_image_ndarray(array, filename)
 
-    def get_pil_image(self):
-        array = get_ndarray_from_cairo_image_surface(self.plot_base_surface)
-        pil_image = Image.fromarray(array, 'RGBA')
-        return pil_image
-
 
 def get_cairo_image_surface_from_ndarray(data: np.ndarray, flip_horizontally=False) -> cairo.ImageSurface:
     if flip_horizontally:
@@ -638,7 +628,7 @@ def draw_object(system_plot: SystemPlot, planet_relative_radius, planet_orbit_ra
     context.arc(planet_x_position + planet_radius, planet_y_position + planet_radius, planet_radius, 0., 2. * np.pi)
     context.fill()
 
-    if with_inset and zoom_factor != 1:
+    if with_inset:
         context.save()
 
         context.set_source_rgba(1, 1, 1, 1)
@@ -650,8 +640,8 @@ def draw_object(system_plot: SystemPlot, planet_relative_radius, planet_orbit_ra
 
         context.set_font_size(system_plot.scale * system_plot.orbit_distance_font_size / scale_xy)
         text = f"x{zoom_factor:.0g}"
-        text_extents = get_text_extents(context.text_extents(text))
-
+        text_extents: cairo.TextExtents = context.text_extents(text)
+        # text_extents.width - 2 * text_extents.x_bearing
         context.move_to(planet_x_position + planet_radius * 2 * (1 + spacing), planet_y_position - text_extents.height)
 
         context.text_path(text)
@@ -739,14 +729,13 @@ def draw_parent_ring(system_plot: SystemPlot, ring_inner_radius=None, ring_outer
     y_edge = base_surface.get_height() / 2
     radius = get_orbit_radius(base_surface)
 
-    linear_gradient = cairo.RadialGradient(0., y_edge, x_inner_edge,
-                                           -x_outer_edge, y_edge, 2*x_outer_edge)
-    # linear_gradient = cairo.LinearGradient(x_inner_edge, y_edge, x_outer_edge, y_edge)
+    radial_gradient = cairo.RadialGradient(0., y_edge, x_inner_edge, 0., y_edge, x_outer_edge)
     for i, color_set in enumerate(ring_color_list):
         cs = color_set.get_color()
-        linear_gradient.add_color_stop_rgba(*cs)
+        cs[0] = cs[0] * x_outer_edge
+        radial_gradient.add_color_stop_rgba(*cs)
 
-    context.set_source(linear_gradient)
+    context.set_source(radial_gradient)
     context.arc(x_outer_edge - radius, y_edge, radius, -0.5 * np.pi, 0.5 * np.pi)
     context.fill()
 
@@ -761,7 +750,7 @@ def draw_parent_ring(system_plot: SystemPlot, ring_inner_radius=None, ring_outer
 
         x_fb0_edge = system_plot.transform_data_to_im(fb[0], 'x')
         context.arc(x_fb0_edge - radius, y_edge, radius, -0.5 * np.pi, 0.5 * np.pi)
-        context.set_source(linear_gradient)
+        context.set_source(radial_gradient)
         context.set_operator(cairo.OPERATOR_OVER)
         context.fill()
 
@@ -795,7 +784,7 @@ def draw_orbit(system_plot: SystemPlot, color_rgba: list, mean_orbit_distance: [
     radius = get_orbit_radius(base_surface)
 
     # draw line
-    if mean_orbit_distance is not None and not np.isnan(mean_orbit_distance):
+    if mean_orbit_distance is not None:
         context.save()
         context.set_source_rgba(*color_gbra)
         context.set_line_width(line_width * system_plot.scale)
@@ -805,7 +794,7 @@ def draw_orbit(system_plot: SystemPlot, color_rgba: list, mean_orbit_distance: [
         context.restore()
         color_gbra = color_gbr + [color_rgba[-1] / 2]  # change color alpha if periapsis and apoaspis need to be drawn.
 
-    if periapsis is not None and apoapsis is not None and not np.isnan(periapsis) and not np.isnan(apoapsis):
+    if periapsis is not None and apoapsis is not None:
         context.save()
         context.set_source_rgba(*color_gbra)
 
@@ -830,8 +819,6 @@ def draw_orbit(system_plot: SystemPlot, color_rgba: list, mean_orbit_distance: [
 def draw_orbit_label(system_plot: SystemPlot, color_rgba: list, mean_orbit_distance: [float, None],
                      text_position: str = 'top', text_units: str = 'A.U.',
                      numeral_normalization: float = 1, font_size: float = 10) -> bool:
-    if np.isnan(mean_orbit_distance) or mean_orbit_distance is None:
-        return False
     # TODO: Allow user to define font type and size with a drop down menu on the settings.
     context: cairo.Context = system_plot.plot_base_context
     base_surface: cairo.ImageSurface = system_plot.plot_base_surface
@@ -848,7 +835,7 @@ def draw_orbit_label(system_plot: SystemPlot, color_rgba: list, mean_orbit_dista
 
     # set text
     text = f"{mean_orbit_distance / numeral_normalization:.2g} {text_units}"
-    text_extents = get_text_extents(context.text_extents(text))
+    text_extents = context.text_extents(text)
 
     x_edge = system_plot.transform_data_to_im(mean_orbit_distance, 'x')
     if text_position == 'bottom':
@@ -886,7 +873,7 @@ def draw_object_label(system_plot: SystemPlot, label_text: str, color_rgba: list
     context.set_source_rgba(*color_gbra)
 
     # set text
-    text_extents = get_text_extents(context.text_extents(label_text))
+    text_extents = context.text_extents(label_text)
 
     x_edge = system_plot.transform_data_to_im(planet_orbit_radius, 'x') * 1.01
     y_edge = abs(0.7 + y0) * base_surface.get_height() / 2 - text_extents.height / 2 - text_extents.y_bearing

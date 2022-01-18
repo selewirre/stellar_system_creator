@@ -1,26 +1,37 @@
 import copy
 import warnings
 
+import inspect
 import pandas as pd
 from pint import UnitStrippedWarning
 
 from stellar_system_creator.astrothings.astromechanical_calculations import *
 from stellar_system_creator.astrothings.habitability_calculations import *
-from stellar_system_creator.astrothings.find_mass_class import get_star_mass_class, get_star_appearance_frequency, get_planetary_mass_class
-from stellar_system_creator.astrothings.luminosity_models.solar_luminosity_model import calculate_main_sequence_luminosity
-from stellar_system_creator.astrothings.luminosity_models.planetary_luminosity_model import calculate_planetary_luminosity
-from stellar_system_creator.astrothings.radius_models.hot_gasgiant_radius_model import is_gasgiant_hot, get_hot_gas_giant_mass_class
-from stellar_system_creator.astrothings.radius_models.planetary_radius_model import calculate_planet_radius, image_composition_dict, \
+from stellar_system_creator.astrothings.find_mass_class import get_star_mass_class, get_star_appearance_frequency, \
+    get_planetary_mass_class
+from stellar_system_creator.astrothings.luminosity_models.solar_luminosity_model import \
+    calculate_main_sequence_luminosity, calculate_blackhole_luminosity
+from stellar_system_creator.astrothings.luminosity_models.planetary_luminosity_model import \
+    calculate_planetary_luminosity
+from stellar_system_creator.astrothings.radius_models.hot_gasgiant_radius_model import is_gasgiant_hot, \
+    get_hot_gas_giant_mass_class
+from stellar_system_creator.astrothings.radius_models.planetary_radius_model import calculate_planet_radius, \
+    image_composition_dict, \
     planet_chemical_abundance_ratios
-from stellar_system_creator.astrothings.radius_models.solar_radius_model import calculate_main_sequence_radius
-from stellar_system_creator.astrothings.rotation_models.planetary_rotation_model import calculate_planetary_rotation_period
+from stellar_system_creator.astrothings.radius_models.solar_radius_model import calculate_main_sequence_radius, \
+    calculate_blackhole_radius
+from stellar_system_creator.astrothings.rotation_models.planetary_rotation_model import \
+    calculate_planetary_rotation_period
 from stellar_system_creator.astrothings.insolation_models.insolation_models import InsolationByKopparapu, \
     InsolationBySelsis, InsolationForWaterFrostline, BinaryInsolationForWaterFrostLine, InsolationForRockLine, \
     BinaryInsolationForRockLine
 from stellar_system_creator.astrothings.units import Q_, ureg
-from stellar_system_creator.visualization.stellar_body_images import adjust_star_image_by_temp, stellar_body_marker_dict, load_user_image
+from stellar_system_creator.visualization.drawing_tools import GradientColor
+from stellar_system_creator.visualization.stellar_body_images import adjust_star_image_by_temp, \
+    stellar_body_marker_dict, load_user_image
 import numpy as np
-from typing import Tuple, Union
+import scipy.stats as stats
+from typing import Tuple, Union, List
 
 
 class StellarBody:
@@ -160,6 +171,7 @@ class StellarBody:
             self.parent.remove_child(self)
             self.parent = parent
             self.parent.add_child(self)
+        self.part_of_binary = isinstance(self.parent, StellarBinary)
 
     def _get_radius(self) -> None:
         if 'suggested_radius' in self.__dict__:
@@ -193,7 +205,13 @@ class StellarBody:
             previous_suggested_age = self.suggested_age
         else:
             previous_suggested_age = -999 * ureg.T_s
-        self.suggested_age = self.lifetime / 2
+        if self.part_of_binary:
+            if self.parent.primary_body.lifetime < self.parent.secondary_body.lifetime:
+                self.suggested_age = self.parent.primary_body.lifetime / 2
+            else:
+                self.suggested_age = self.parent.secondary_body.lifetime / 2
+        else:
+            self.suggested_age = self.lifetime / 2
         if np.isnan(self.age.m) or previous_suggested_age == self.age:
             self.age = self.suggested_age
 
@@ -299,6 +317,20 @@ class StellarBody:
     def __hash__(self):
         return super().__hash__()
 
+    @property
+    def children(self):
+        return self._children
+
+    @classmethod
+    def load_with_args(cls, stellar_body: "StellarBody"):
+        arg_keys = inspect.getfullargspec(cls)
+        kwargs = {key: stellar_body.__dict__[key] for key in arg_keys}
+        kwargs.pop('image_filename')
+        cls_obj = cls(**kwargs)
+        cls_obj.image_filename = stellar_body.image_filename
+        cls_obj.image_array = stellar_body.image_array
+        return cls_obj
+
 
 class Star(StellarBody):
     def __init__(self, *args, **kwargs) -> None:
@@ -313,114 +345,6 @@ class Star(StellarBody):
     def get_luminosity_class(self) -> str:
         print(f'The luminosity identification class for {self.name} was not defined')
         return ''
-
-    def _set_insolation_model(self, model_name=None):
-        if 'insolation_model' not in self.__dict__:
-            if model_name is None:
-                self.insolation_model = InsolationByKopparapu(self.temperature, self.luminosity)
-            elif model_name == 'Kopparapu':
-                self.insolation_model = InsolationByKopparapu(self.temperature, self.luminosity)
-            else:
-                self.insolation_model = InsolationBySelsis(self.temperature, self.luminosity)
-        elif model_name is not None:
-            if model_name != self.insolation_model.name:
-                if model_name == 'Kopparapu':
-                    self.insolation_model = InsolationByKopparapu(self.temperature, self.luminosity)
-                else:
-                    self.insolation_model = InsolationBySelsis(self.temperature, self.luminosity)
-        elif self.temperature != self.insolation_model.star_temperature \
-                or self.luminosity != self.insolation_model.star_luminosity:
-            if self.insolation_model.name == 'Kopparapu':
-                self.insolation_model = InsolationByKopparapu(self.temperature, self.luminosity)
-            else:
-                self.insolation_model = InsolationBySelsis(self.temperature, self.luminosity)
-
-    def set_habitable_zone(self, zone_type: str, binary_companion=None):
-        model = self.insolation_model
-        comp_model_swl = None
-        if binary_companion is not None:
-            comp_model = binary_companion.insolation_model
-            comp_model_swl = comp_model.swl
-            from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
-            if isinstance(binary_companion, StellarBinary):
-                comp_model_swl = comp_model_swl[f'ptype{zone_type}']
-
-        if zone_type == 'SSHZ':
-            self.habitable_zone_limits['SSHZ'] = {name: calculate_single_star_habitable_orbital_threshold(
-                model.swl[name]) for name in model.names}
-        elif zone_type == 'RHZ' and binary_companion is not None:
-            mean_distance = self.parent.mean_distance
-            self.habitable_zone_limits['RHZ'] = {name: calculate_stype_radiative_habitable_limit(
-                model.swl[name], comp_model_swl[name], mean_distance, model.threshold_types[name])
-                for name in model.names}
-        elif zone_type == 'PHZ' and binary_companion is not None:
-            mean_distance = self.parent.mean_distance
-            eccentricity = self.parent.eccentricity
-            self.habitable_zone_limits['PHZ'] = {name: calculate_stype_permanent_habitable_limit(
-                model.swl[name], comp_model_swl[name], mean_distance, eccentricity, model.threshold_types[name])
-                for name in model.names}
-        elif zone_type == 'AHZ' and binary_companion is not None:
-            mean_distance = self.parent.mean_distance
-            eccentricity = self.parent.eccentricity
-            self.habitable_zone_limits['AHZ'] = {name: calculate_stype_average_habitable_limit(
-                model.swl[name], comp_model_swl[name], mean_distance, eccentricity) for name in model.names}
-
-        if zone_type in self.habitable_zone_limits:
-            if self.habitable_zone_limits[zone_type][model.earth_equivalent] > \
-                    self.habitable_zone_limits[zone_type][model.conservative_max_name]:
-                self.habitable_zone_limits[zone_type] = {name: np.nan * ureg.au for name in model.names}
-
-    def set_habitable_zones(self) -> None:
-        self.set_habitable_zone('SSHZ')
-        from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
-        if isinstance(self.parent, StellarBinary):
-            if self.parent.primary_body == self:
-                companion_body = self.parent.secondary_body
-            else:
-                companion_body = self.parent.primary_body
-            self.set_habitable_zone('RHZ', companion_body)
-            self.set_habitable_zone('PHZ', companion_body)
-            self.set_habitable_zone('AHZ', companion_body)
-            model = self.insolation_model
-            if np.isnan(self.habitable_zone_limits['RHZ'][model.earth_equivalent].m):
-                self.habitable_zone_limits['PHZ'] = {name: np.nan * ureg.au for name in model.names}
-                self.habitable_zone_limits['AHZ'] = {name: np.nan * ureg.au for name in model.names}
-
-    def check_habitability(self) -> Tuple[bool, str]:
-        habitability = True
-        habitability_violations = []
-
-        if 'AHZ' in self.habitable_zone_limits.keys():
-            relevant_zone_type = 'AHZ'
-        elif 'PHZ' in self.habitable_zone_limits.keys():
-            relevant_zone_type = 'PHZ'
-        elif 'RHZ' in self.habitable_zone_limits.keys():
-            relevant_zone_type = 'RHZ'
-        else:
-            relevant_zone_type = 'SSHZ'
-
-        model = self.insolation_model
-        if self.habitable_zone_limits[relevant_zone_type][model.relaxed_max_name] \
-                < self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name] or \
-                np.isnan(self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name]):
-            habitability = False
-            habitability_violations.append('There are no habitable zones in this system.')
-        elif self.inner_orbit_limit > self.habitable_zone_limits[relevant_zone_type][model.relaxed_max_name] \
-                or self.outer_orbit_limit < self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name]:
-            habitability = False
-            habitability_violations.append('No overlap between the relaxed habitable zone and the orbit'
-                                           ' boundaries.')
-
-        # from https://link.springer.com/article/10.1007/BF00160399
-        if self.lifetime < 1 * ureg.gigayears:
-            habitability = False
-            habitability_violations.append('Star lifetime is smaller than 1 billion years, making the development'
-                                           ' of life unlikely.')
-
-        if not len(habitability_violations):
-            habitability_violations.append('None.')
-
-        return habitability, ' '.join(habitability_violations)
 
     def calculate_water_frost_lines(self):
         # setting single star frost zone
@@ -516,7 +440,8 @@ class Star(StellarBody):
         from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
         if isinstance(self.parent, StellarBinary):
             self.stype_critical_orbit = calculate_wide_binary_critical_orbit(
-                (self.mass / self.parent.mass).to_reduced_units().m, self.parent.mean_distance, self.parent.eccentricity)
+                (self.mass / self.parent.mass).to_reduced_units().m, self.parent.mean_distance,
+                self.parent.eccentricity)
         else:
             self.stype_critical_orbit = np.nan * self.rough_outer_orbit_limit.units
 
@@ -540,25 +465,142 @@ class Star(StellarBody):
         self.appearance_frequency = self.get_frequency()
         self.temperature = self.calculate_temperature()
         self.peak_wavelength = self.calculate_spectrum_peak_wavelength()
-        self._set_insolation_model_and_habitable_zones()
+        self.reset_insolation_model_and_habitability()
 
-    def _set_insolation_model_and_habitable_zones(self):
-        self._set_insolation_model()
-        self.habitable_zone_limits = {}
-        self.set_habitable_zones()
+    def _set_insolation_model(self, model_name=None):
+        if 'insolation_model' not in self.__dict__:
+            if model_name is None:
+                self.insolation_model = InsolationByKopparapu(self.temperature, self.luminosity)
+            elif model_name == 'Kopparapu':
+                self.insolation_model = InsolationByKopparapu(self.temperature, self.luminosity)
+            else:
+                self.insolation_model = InsolationBySelsis(self.temperature, self.luminosity)
+        elif model_name is not None:
+            if model_name != self.insolation_model.name:
+                if model_name == 'Kopparapu':
+                    self.insolation_model = InsolationByKopparapu(self.temperature, self.luminosity)
+                else:
+                    self.insolation_model = InsolationBySelsis(self.temperature, self.luminosity)
+        elif self.temperature != self.insolation_model.star_temperature \
+                or self.luminosity != self.insolation_model.star_luminosity:
+            if self.insolation_model.name == 'Kopparapu':
+                self.insolation_model = InsolationByKopparapu(self.temperature, self.luminosity)
+            else:
+                self.insolation_model = InsolationBySelsis(self.temperature, self.luminosity)
+
+    def set_habitable_zone(self, zone_type: str, binary_companion=None):
+        model = self.insolation_model
+        comp_model_swl = None
+        if binary_companion is not None:
+            comp_model = binary_companion.insolation_model
+            comp_model_swl = comp_model.swl
+            from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
+            if isinstance(binary_companion, StellarBinary):
+                comp_model_swl = comp_model_swl[f'ptype{zone_type}']
+
+        if zone_type == 'SSHZ':
+            self.habitable_zone_limits['SSHZ'] = {name: calculate_single_star_habitable_orbital_threshold(
+                model.swl[name]) for name in model.names}
+        elif zone_type == 'RHZ' and binary_companion is not None:
+            mean_distance = self.parent.mean_distance
+            self.habitable_zone_limits['RHZ'] = {name: calculate_stype_radiative_habitable_limit(
+                model.swl[name], comp_model_swl[name], mean_distance, model.threshold_types[name])
+                for name in model.names}
+        elif zone_type == 'PHZ' and binary_companion is not None:
+            mean_distance = self.parent.mean_distance
+            eccentricity = self.parent.eccentricity
+            self.habitable_zone_limits['PHZ'] = {name: calculate_stype_permanent_habitable_limit(
+                model.swl[name], comp_model_swl[name], mean_distance, eccentricity, model.threshold_types[name])
+                for name in model.names}
+        elif zone_type == 'AHZ' and binary_companion is not None:
+            mean_distance = self.parent.mean_distance
+            eccentricity = self.parent.eccentricity
+            self.habitable_zone_limits['AHZ'] = {name: calculate_stype_average_habitable_limit(
+                model.swl[name], comp_model_swl[name], mean_distance, eccentricity) for name in model.names}
+
+        if zone_type in self.habitable_zone_limits:
+            if self.habitable_zone_limits[zone_type][model.earth_equivalent] > \
+                    self.habitable_zone_limits[zone_type][model.conservative_max_name]:
+                self.habitable_zone_limits[zone_type] = {name: np.nan * ureg.au for name in model.names}
+
+    def set_solo_habitable_zones(self):
+        self.set_habitable_zone('SSHZ')
+
+    def set_dual_habitable_zones(self):
+        from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
+        if isinstance(self.parent, StellarBinary):
+            if self.parent.primary_body == self:
+                companion_body = self.parent.secondary_body
+            else:
+                companion_body = self.parent.primary_body
+            self.set_habitable_zone('RHZ', companion_body)
+            self.set_habitable_zone('PHZ', companion_body)
+            self.set_habitable_zone('AHZ', companion_body)
+            model = self.insolation_model
+            if np.isnan(self.habitable_zone_limits['RHZ'][model.earth_equivalent].m):
+                self.habitable_zone_limits['PHZ'] = {name: np.nan * ureg.au for name in model.names}
+                self.habitable_zone_limits['AHZ'] = {name: np.nan * ureg.au for name in model.names}
+
+    def set_habitable_zones(self) -> None:
+        self.set_solo_habitable_zones()
+        self.set_dual_habitable_zones()
+
+    def check_habitability(self) -> Tuple[bool, str]:
+        habitability = True
+        habitability_violations = []
+
+        if 'AHZ' in self.habitable_zone_limits.keys():
+            relevant_zone_type = 'AHZ'
+        elif 'PHZ' in self.habitable_zone_limits.keys():
+            relevant_zone_type = 'PHZ'
+        elif 'RHZ' in self.habitable_zone_limits.keys():
+            relevant_zone_type = 'RHZ'
+        else:
+            relevant_zone_type = 'SSHZ'
+
+        model = self.insolation_model
+        if self.habitable_zone_limits[relevant_zone_type][model.relaxed_max_name] \
+                < self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name] or \
+                np.isnan(self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name]):
+            habitability = False
+            habitability_violations.append('There are no habitable zones in this system.')
+        elif self.inner_orbit_limit > self.habitable_zone_limits[relevant_zone_type][model.relaxed_max_name] \
+                or self.outer_orbit_limit < self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name]:
+            habitability = False
+            habitability_violations.append('No overlap between the relaxed habitable zone and the orbit'
+                                           ' boundaries.')
+
+        # from https://link.springer.com/article/10.1007/BF00160399
+        if self.lifetime < 1 * ureg.gigayears:
+            habitability = False
+            habitability_violations.append('Star lifetime is smaller than 1 billion years, making the development'
+                                           ' of life unlikely.')
+
+        if not len(habitability_violations):
+            habitability_violations.append('None.')
+
+        return habitability, ' '.join(habitability_violations)
 
     def reset_insolation_model(self, model_name='Kopparapu'):
         self._set_insolation_model(model_name)
         self._set_orbit_values()  # here for cause the frost lines also depend on the binary
 
-    def reset_habitability(self):
+    def reset_solo_habitability(self):
         self.habitable_zone_limits = {}
-        self.set_habitable_zones()
+        self.set_solo_habitable_zones()
+        self.do_habitability_check()
+
+    def do_habitability_check(self):
         self.habitability, self.habitability_violations = self.check_habitability()
 
     def reset_insolation_model_and_habitability(self, model_name='Kopparapu'):
         self.reset_insolation_model(model_name)
-        self.reset_habitability()
+        self.reset_solo_habitability()
+        try:
+            self.set_dual_habitable_zones()
+            self.do_habitability_check()
+        except Exception:
+            pass
 
 
 class MainSequenceStar(Star):
@@ -587,6 +629,31 @@ class MainSequenceStar(Star):
         return image_array
 
 
+class BlackHole(Star):
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+    def get_luminosity_class(self) -> str:
+        return 'Black hole'
+
+    def calculate_suggested_radius(self) -> Q_:
+        return calculate_blackhole_radius(self.mass)
+
+    def calculate_suggested_spin_period(self) -> Q_:
+        return np.nan * ureg.hours
+
+    def calculate_suggested_luminosity(self) -> Q_:
+        return calculate_blackhole_luminosity(self.mass)
+
+    def calculate_lifetime(self) -> Q_:
+        return calculate_blackhole_lifetime(self.mass)
+
+    def get_image_array(self) -> np.ndarray:
+        image_array = stellar_body_marker_dict['blackhole'].copy()
+        return image_array
+
+
 class Planet(StellarBody):
 
     def __init__(self, name, mass: Q_, radius: Q_ = np.nan * ureg.R_e, parent=None,
@@ -595,7 +662,8 @@ class Planet(StellarBody):
                  longitude_of_ascending_node: Q_ = 0 * ureg.deg, argument_of_periapsis: Q_ = np.nan * ureg.deg,
                  axial_tilt: Q_ = 0 * ureg.deg, albedo: float = 0, normalized_greenhouse: float = 0,
                  heat_distribution: float = 1, emissivity: float = 1,
-                 luminosity: Q_ = np.nan * ureg.L_s, age: Q_ = np.nan * ureg.T_s, image_filename=None) -> None:
+                 luminosity: Q_ = np.nan * ureg.L_s, age: Q_ = np.nan * ureg.T_s, image_filename=None,
+                 has_ring: bool = False) -> None:
 
         self.semi_major_axis = semi_major_axis
         self.orbital_eccentricity = orbital_eccentricity
@@ -608,17 +676,19 @@ class Planet(StellarBody):
         self.albedo = albedo  # earth, uranus, neptune ~ 0.3. jupiter, saturn ~ 0.34. mercury, mars ~0.14. venus ~ 0.75
         self.normalized_greenhouse = normalized_greenhouse  # for earth ~ 0.34
         self.heat_distribution = heat_distribution  # ~ 1 for all fast rotating planets (not tidally locked)
-        self.emissivity = emissivity
         # ~0.5 for tidally locked planets with no atmosphere and no oceans
+        self.emissivity = emissivity
+        self.has_ring = has_ring
 
         super().__init__(name, mass, radius, luminosity, spin_period, age, parent, image_filename)
 
-    def __post_init__(self):
+    def __post_init__(self, want_to_update_parent=False):
         self._get_suggested_orbital_eccentricity()
         self.incident_flux = self.calculate_incident_flux()
         self.temperature = self.calculate_temperature()
 
-        super().__post_init__()
+        super().__post_init__(want_to_update_parent)
+        self.ring = self.get_ring()
 
     def _get_suggested_orbital_eccentricity(self) -> None:
         if 'suggested_orbital_eccentricity' in self.__dict__:
@@ -646,14 +716,16 @@ class Planet(StellarBody):
         if self.parent is None:
             return 0
         elif isinstance(self.parent, BinarySystem):
-            secondary_star_mass_ratio = self.parent.secondary_body.mass/self.parent.mass
+            secondary_star_mass_ratio = self.parent.secondary_body.mass / self.parent.mass
             return calculate_forced_eccentricity_in_close_binary(self.semi_major_axis, self.parent.mean_distance,
                                                                  self.parent.eccentricity, secondary_star_mass_ratio)
-        elif isinstance(self.parent, StellarBody) and self.parent.parent is None:
+        elif isinstance(self.parent, Star) and self.parent.parent is None:
             return 0
-        elif isinstance(self.parent, StellarBody) and isinstance(self.parent.parent, BinarySystem):
+        elif isinstance(self.parent, Star) and isinstance(self.parent.parent, BinarySystem):
             return calculate_forced_eccentricity_in_wide_binary(self.semi_major_axis, self.parent.parent.mean_distance,
                                                                 self.parent.parent.eccentricity)
+        elif isinstance(self.parent, Planet) and self.parent.parent is not None:
+            return 0
         else:
             return np.nan
 
@@ -668,7 +740,7 @@ class Planet(StellarBody):
     def calculate_suggested_spin_period(self) -> Q_:
         """
         From our own stellar system averages. Does not account for atmospheric tides (like Venus) or tidal locking
-        (like Mercury). Spin is also going to be affected by other crushing objects, and exchage of angular momentum with
+        (like Mercury). Spin is also going to be affected by other crushing objects, and exchange of angular momentum with
         heavy satellites (e.g. moon).
         """
         if self.parent is not None:
@@ -684,12 +756,14 @@ class Planet(StellarBody):
 
     def get_image_array(self) -> np.ndarray:
         if self.composition != '':
-            if self.habitability:
+            if self.habitability and not self.composition.startswith('Waterworld'):
                 image = stellar_body_marker_dict['habitableworld'].copy()
             else:
                 image = stellar_body_marker_dict[image_composition_dict[self.composition]].copy()
             if self.composition == 'Gasgiant' and self.is_gasgiant_hot():
                 image = stellar_body_marker_dict['hotgasgiant'].copy()
+            if self.composition.startswith('Waterworld') and self.temperature.m < 250:
+                image = stellar_body_marker_dict['cold_waterworld'].copy()
             return image
         else:
             return np.nan
@@ -715,8 +789,8 @@ class Planet(StellarBody):
                 else:
                     companion_body = self.parent.parent.secondary_body
                 incident_flux = incident_flux + calculate_companion_incident_flux_in_wide_binary(
-                    companion_body.luminosity, self.semi_major_axis, self.parent.mean_distance,
-                    self.orbital_eccentricity, self.parent.eccentricity, ecc_correction)
+                    companion_body.luminosity, self.semi_major_axis, self.parent.parent.mean_distance,
+                    self.orbital_eccentricity, self.parent.parent.eccentricity, ecc_correction)
         else:
             incident_flux = np.nan * ureg.S_s
 
@@ -778,13 +852,16 @@ class Planet(StellarBody):
         if self.parent is not None:
             from .binary_system import StellarBinary
             if not isinstance(self.parent, StellarBinary):
-                to_self = calculate_tide_height(self.parent.mass, self.mass, self.radius, self.semi_major_axis)
-                to_parent = calculate_tide_height(self.mass, self.parent.mass, self.parent.radius, self.semi_major_axis)
+                to_self = calculate_tide_height(self.parent.mass, self.mass, self.radius,
+                                                self.semi_major_axis, self.orbital_eccentricity)
+                to_parent = calculate_tide_height(self.mass, self.parent.mass, self.parent.radius,
+                                                  self.semi_major_axis, self.orbital_eccentricity)
             else:
-                to_self = calculate_tide_height(self.parent.mass, self.mass, self.radius, self.semi_major_axis)
+                to_self = calculate_tide_height(self.parent.mass, self.mass, self.radius,
+                                                self.semi_major_axis, self.orbital_eccentricity)
                 to_parent = {parent_body.name: calculate_tide_height(
-                    self.mass, parent_body.mass, parent_body.radius, self.semi_major_axis)
-                             for parent_body in [self.parent.primary_body, self.parent.secondary_body]}
+                    self.mass, parent_body.mass, parent_body.radius, self.semi_major_axis, self.orbital_eccentricity)
+                    for parent_body in [self.parent.primary_body, self.parent.secondary_body]}
         else:
             to_self = to_parent = np.nan * ureg.meter
         return to_self, to_parent
@@ -818,7 +895,7 @@ class Planet(StellarBody):
             tidal_heating_flux = calculate_tidal_heating(
                 self.parent.mass, self.semi_major_axis, self.orbital_eccentricity, self.radius)
         else:
-            tidal_heating_flux = 0 * ureg.W / ureg.meter**2
+            tidal_heating_flux = 0 * ureg.W / ureg.meter ** 2
         total_heating_flux = primordial_heating_flux + radiogenic_heating_flux + tidal_heating_flux
 
         internal_heating_fluxes = {'Primordial': primordial_heating_flux, 'Radiogenic': radiogenic_heating_flux,
@@ -993,9 +1070,9 @@ class Planet(StellarBody):
                     stability_violation.append('Semi-major axis is closer to the parent than the Rocky/Iron-planet '
                                                'formation line.')
 
-            if self.apoapsis > self.semi_major_axis_maximum_limit:
+            if self.semi_major_axis > self.semi_major_axis_maximum_limit:
                 stability = False
-                stability_violation.append('Apoapsis is farther from the parent than the outer orbit limit.')
+                stability_violation.append('Semi-major axis is farther from the parent than the outer orbit limit.')
 
         if not len(stability_violation):
             stability_violation.append('None')
@@ -1026,11 +1103,18 @@ class Planet(StellarBody):
 
         return tectonic_activity
 
+    def get_ring(self) -> Union[None, "Ring"]:
+        if 'ring' not in self.__dict__.keys():
+            return Ring(self)
+        else:
+            self.ring.__post_init__()
+            return self.ring
+
 
 class AsteroidBelt(Planet):
 
     def __init__(self, name, mass: Q_ = 0.0004 * ureg.M_e, relative_count: int = 250, extend: Q_ = np.nan * ureg.au,
-                 parent=None, semi_major_axis: Q_ = np.nan * ureg.au, orbital_eccentricity: float = 0,
+                 parent=None, semi_major_axis: Q_ = np.nan * ureg.au, orbital_eccentricity: float = np.nan,
                  orbit_type='prograde', composition='', inclination: Q_ = 0 * ureg.deg,
                  longitude_of_ascending_node: Q_ = 0 * ureg.deg, argument_of_periapsis: Q_ = np.nan * ureg.deg,
                  axial_tilt: Q_ = 0 * ureg.deg, albedo: float = 0,
@@ -1043,7 +1127,7 @@ class AsteroidBelt(Planet):
                          inclination, longitude_of_ascending_node, argument_of_periapsis, axial_tilt, albedo,
                          age=age, image_filename=image_filename)
 
-    def __post_init__(self):
+    def __post_init__(self, want_to_update_parent=False):
         if np.isnan(self.extend.m):
             self.extend = self.semi_major_axis / 8
         if self.composition == '':
@@ -1052,10 +1136,11 @@ class AsteroidBelt(Planet):
             else:
                 self.composition = 'Waterworld100'
 
-        super().__post_init__()
+        super().__post_init__(want_to_update_parent)
 
         self._set_mass_distribution()
         self._set_radius_distribution()
+        self._set_semi_major_axis_distribution()
 
     # def calculate_suggested_radius(self) -> float:
     #     return np.nan
@@ -1067,6 +1152,14 @@ class AsteroidBelt(Planet):
     def _set_radius_distribution(self):
         self.radius_distribution: Q_ = (self.mass_distribution / (4 * np.pi / 3 * self.density)).to_reduced_units() \
                                        ** (1 / 3)
+
+    def _set_semi_major_axis_distribution(self):
+        # semi_major_axis_distribution is a gaussian distribution in the area of a disc with radius r and thickness dr
+        sma = self.semi_major_axis.m ** 2
+        extend = self.extend.to(self.extend.u).m ** 2
+
+        self.semi_major_axis_distribution: Q_ = np.sqrt(stats.truncnorm(
+            (0 - sma) / extend, np.inf, loc=sma, scale=extend).rvs(self.relative_count)) * self.semi_major_axis.u
 
     def calculate_suggested_luminosity(self) -> Q_:
         return 0 * ureg.L_s
@@ -1098,7 +1191,7 @@ class Trojan(Planet):
                          parent.longitude_of_ascending_node, parent.argument_of_periapsis,
                          parent.axial_tilt, albedo, age=age, image_filename=image_filename)
 
-    def __post_init__(self):
+    def __post_init__(self, want_to_update_parent=False):
         if self.parent is not None:
             self.semi_major_axis = self.parent.semi_major_axis
             self.orbital_eccentricity = self.parent.orbital_eccentricity
@@ -1128,10 +1221,11 @@ class Trojan(Planet):
             if self.composition == '':
                 self.composition = 'Waterworld45'
 
-        super().__post_init__()
+        super().__post_init__(want_to_update_parent)
 
         self._set_mass_distribution()
         self._set_radius_distribution()
+        self._set_semi_major_axis_distribution()
 
     # def calculate_suggested_radius(self) -> float:
     #     return np.nan
@@ -1144,8 +1238,19 @@ class Trojan(Planet):
         self.radius_distribution: Q_ = (self.mass_distribution / (4 * np.pi / 3 * self.density)).to_reduced_units() \
                                        ** (1 / 3)
 
+    def _set_semi_major_axis_distribution(self):
+        # semi_major_axis_distribution is a gaussian distribution in the area of a disc with radius r and thickness dr
+        sma = self.semi_major_axis.m ** 2
+        extend = self.extend.to(self.extend.u).m ** 2
+
+        self.semi_major_axis_distribution: Q_ = np.sqrt(stats.truncnorm(
+            (0 - sma) / extend, np.inf, loc=sma, scale=extend).rvs(self.relative_count)) * self.semi_major_axis.u
+
     def calculate_suggested_orbital_eccentricity(self) -> float:
-        return self.parent.suggested_orbital_eccentricity
+        if self.parent is not None:
+            return self.parent.suggested_orbital_eccentricity
+        else:
+            return 0
 
     def calculate_suggested_luminosity(self) -> Q_:
         return 0 * ureg.L_s
@@ -1215,7 +1320,7 @@ class Trojan(Planet):
 class Satellite(Planet):
 
     def __init__(self, name, mass: Q_, parent: Planet, radius: Q_ = np.nan * ureg.R_e,
-                 semi_major_axis: Q_ = np.nan * ureg.R_e, orbital_eccentricity: float = 0, orbit_type='prograde',
+                 semi_major_axis: Q_ = np.nan * ureg.R_e, orbital_eccentricity: float = np.nan, orbit_type='prograde',
                  composition='', spin_period: Q_ = np.nan * ureg.days, inclination: Q_ = 0 * ureg.deg,
                  longitude_of_ascending_node: Q_ = 0 * ureg.deg, argument_of_periapsis: Q_ = np.nan * ureg.deg,
                  axial_tilt: Q_ = 0 * ureg.deg, albedo: float = 0, normalized_greenhouse: float = 0,
@@ -1229,7 +1334,7 @@ class Satellite(Planet):
                         axial_tilt, albedo, normalized_greenhouse, heat_distribution, emissivity, luminosity, age,
                         image_filename)
 
-    def __post_init__(self):
+    def __post_init__(self, want_to_update_parent=False):
         if self.composition == '' and self.parent is not None:
             if self.parent.semi_major_axis < self.parent.parent.water_frost_line \
                     or np.isnan(self.parent.semi_major_axis.m):
@@ -1239,7 +1344,13 @@ class Satellite(Planet):
         elif self.composition == '':
             self.composition = 'Waterworld45'
 
-        Planet.__post_init__(self)
+        Planet.__post_init__(self, want_to_update_parent)
+        self._update_parent_rings()
+
+    def _update_parent_rings(self):
+        if self.parent is not None:
+            if self.parent.has_ring:
+                self.parent.ring.__post_init__()
 
     def get_image_array(self) -> np.ndarray:
         if self.mass > 0.03 * ureg.M_e:
@@ -1279,8 +1390,10 @@ class Satellite(Planet):
 
     def calculate_max_satellite_mass(self):
         if self.parent is not None:
-            return calculate_max_satellite_mass(self.parent.mass, self.parent.radius, self.parent.outer_orbit_limit,
-                                                self.orbit_type_factor, self.farthest_parent.lifetime)
+            # return calculate_max_satellite_mass(self.parent.mass, self.parent.radius, self.parent.outer_orbit_limit,
+            #                                     self.orbit_type_factor, self.farthest_parent.lifetime)
+            return calculate_max_satellite_mass(self.parent.mass, self.parent.radius,
+                                                self.semi_major_axis, self.age, self.lifetime)
         else:
             return np.nan * self.mass.u
 
@@ -1298,6 +1411,7 @@ class Satellite(Planet):
 
     def _set_orbit_values(self) -> None:
         Planet._set_orbit_values(self)
+
     #     self.semi_major_axis_maximum_limit = self.parent.outer_orbit_limit * self.orbit_type_factor
 
     def _set_other_characteristics(self):
@@ -1352,7 +1466,8 @@ class Satellite(Planet):
                 habitability_violation.append('Parent lacks a proper HZ.')
             elif not inner_limit < self.parent.semi_major_axis < outer_limit:
                 habitability = False
-                habitability_violation.append('Planetary semi-major axis is not within the habitable zone of the parent.')
+                habitability_violation.append(
+                    'Planetary semi-major axis is not within the habitable zone of the parent.')
         else:
             habitability = False
             habitability_violation.append('Parent planet was not defined.')
@@ -1389,7 +1504,7 @@ class TrojanSatellite(Satellite, Trojan):
                            axial_tilt, albedo, normalized_greenhouse, heat_distribution, emissivity,
                            luminosity, age=age, image_filename=image_filename)
 
-    def __post_init__(self):
+    def __post_init__(self, want_to_update_parent=False):
         if self.parent is not None:
             self.semi_major_axis = self.parent.semi_major_axis
             self.orbital_eccentricity = self.parent.orbital_eccentricity
@@ -1404,7 +1519,7 @@ class TrojanSatellite(Satellite, Trojan):
             self.inclination = np.nan * ureg.deg
             self.longitude_of_ascending_node = np.nan * ureg.deg
             self.argument_of_periapsis = np.nan * ureg.deg
-        super().__post_init__()
+        super().__post_init__(want_to_update_parent)
 
     def calculate_orbital_period(self):
         if self.parent is not None:
@@ -1457,6 +1572,119 @@ class TrojanSatellite(Satellite, Trojan):
 
     def calculate_max_satellite_mass(self):
         if self.parent is not None:
-            return calculate_three_body_lagrange_point_smallest_body_mass_limit(self.parent.parent.mass, self.parent.mass)
+            return calculate_three_body_lagrange_point_smallest_body_mass_limit(self.parent.parent.mass,
+                                                                                self.parent.mass)
         else:
             return np.nan * self.mass.u
+
+
+class Ring:
+    def __init__(self, parent: Planet):
+        self.parent = parent
+        self.ring_radial_gradient_colors = [GradientColor(0, 0.8, 0.7, 0.6, 1), GradientColor(1, 0.8, 0.7, 0.6, 0)]
+        self.__post_init__()
+
+    def __post_init__(self, want_to_update_parent=False):
+        self.inner_radius = self.get_inner_radius()
+        self.outer_radius = self.get_outer_radius()
+        self.parents_satellites = self.get_parent_satellites()
+        self.forbidden_bands = self.get_forbidden_bands()
+
+    def get_inner_radius(self) -> Q_:
+        return 1.1 * self.parent.radius
+
+    def get_outer_radius(self) -> Q_:
+        return self.parent.dense_roche_limit
+
+    def get_parent_satellites(self) -> List[Satellite]:
+        satellite_list = []
+        for child in self.parent.children:
+            if isinstance(child, Satellite) and not isinstance(child, TrojanSatellite):
+                satellite_list.append(child)
+        return satellite_list
+
+    def get_forbidden_bands(self) -> List[List[Q_]]:
+        all_forbidden_bands = []
+        for satellite in self.parents_satellites:
+            basic_band_center = satellite.semi_major_axis.to('km').m
+            basic_band_extend = satellite.hill_sphere.to('km').m
+
+            forbidden_bands = [[basic_band_center*resonance - basic_band_extend *
+                                (resonance / res_orders[i]) ** res_orders[i],
+                                basic_band_center*resonance + basic_band_extend *
+                                (resonance / res_orders[i]) ** res_orders[i]]
+                               for i, resonance in enumerate(resonances)]
+            all_forbidden_bands += forbidden_bands
+
+        all_forbidden_bands = merge_intervals(all_forbidden_bands)
+
+        final_forbidden_bands = []
+        for fb in all_forbidden_bands:
+            if min(fb) < self.outer_radius.to('km').m and max(fb) > self.inner_radius.to('km').m:
+                final_forbidden_bands.append(fb)
+
+        final_forbidden_bands.sort()
+        final_forbidden_bands = final_forbidden_bands * ureg.km
+        return final_forbidden_bands
+
+    def change_ring_radial_gradient_colors(self, new_colors_pos_rgba: List[Union[List[float], GradientColor]]):
+        """
+        This functions takes as input a list of lists.
+        Each sublist contains 5 parameters:
+         pos: from 0 to 1, the position of the color in a circle (0 is center, 1 is the edge)
+         r: from 0 to 1, the red part of the color
+         g: from 0 to 1, the green part of the color
+         b: from 0 to 1, the blue part of the color
+         a: from 0 to 1, the alpha part of the color (0 is fully transparent)
+        """
+        self.ring_radial_gradient_colors = []
+        for elements in new_colors_pos_rgba:
+            if isinstance(elements, GradientColor):
+                self.ring_radial_gradient_colors.append(elements)
+            else:
+                self.ring_radial_gradient_colors.append(GradientColor(*elements))
+
+    def copy(self):
+        return copy.deepcopy(self)
+
+resonances = [1]
+res_orders = [1]
+for m in range(1, 10):
+    for order in range(1, 10):
+        r = m / (m + order)
+        if r < 1 and r not in resonances and (r / order) ** (order+1) > 1.0E-6:
+            resonances.append(r)
+            res_orders.append(order)
+
+zipped_lists = zip(resonances, res_orders)
+sorted_pairs = sorted(zipped_lists)
+tuples = zip(*sorted_pairs)
+resonances, res_orders = [list(tpl) for tpl in tuples]
+
+res_orders = np.array(res_orders)
+resonances = np.array(resonances)
+
+
+def merge_intervals(intervals):
+    """Source: https://www.geeksforgeeks.org/merging-intervals/"""
+    # Sorting based on the increasing order of the start intervals
+    intervals.sort(key=lambda x: x[0])
+
+    max_val = -np.inf  # 'max_val' gives the last point of that particular interval
+    min_val = -np.inf  # 's' gives the starting point of that interval
+    merged_intervals = []  # 'm' array contains the list of all merged intervals
+    for i in range(len(intervals)):
+        a = intervals[i]
+        if a[0] > max_val:
+            if i != 0:
+                merged_intervals.append([min_val, max_val])
+            min_val = a[0]
+            max_val = a[1]
+        else:
+            if a[1] >= max_val:
+                max_val = a[1]
+
+    if max_val != -np.inf and [min_val, max_val] not in merged_intervals:
+        merged_intervals.append([min_val, max_val])
+
+    return merged_intervals
