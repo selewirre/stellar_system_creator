@@ -226,7 +226,11 @@ class LineEdit(QLineEdit):
             except ValueError:
                 value = text
 
-            if not isinstance(self.sse.__dict__[self.value_name], type(value)):
+            if isinstance(value, float):
+                value_type = (float, int)
+            else:
+                value_type = type(value)
+            if not isinstance(self.sse.__dict__[self.value_name], value_type):
                 self.keep_old_text_action()
             else:
                 self.sse.__dict__[self.value_name] = value

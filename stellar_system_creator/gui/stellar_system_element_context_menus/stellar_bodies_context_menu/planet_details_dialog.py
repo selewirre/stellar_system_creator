@@ -563,11 +563,12 @@ class TrojanDetailsDialog(PlanetDetailsDialog):
         self.add_key_to_layout(material_characteristics_box_layout, self.ulabels, 'Density',
                                'quantities/material/density.html')
 
-        # # setting relative count
-        # self.distribution_characteristics_group_box = GroupBox('Distribution Characteristics')
-        # distribution_characteristics_box_layout = QFormLayout()
-        # self.distribution_characteristics_group_box.setLayout(distribution_characteristics_box_layout)
-        # self.add_key_to_layout(distribution_characteristics_box_layout, self.ule, 'Extent')
+        # setting relative count
+        self.distribution_characteristics_group_box = GroupBox('Distribution Characteristics')
+        distribution_characteristics_box_layout = QFormLayout()
+        self.distribution_characteristics_group_box.setLayout(distribution_characteristics_box_layout)
+        self.add_key_to_layout(distribution_characteristics_box_layout, self.le, 'Relative Count',
+                               'quantities/material/relative_count.html')
 
         # setting age characteristics group box
         self.age_characteristics_group_box = GroupBox('Age Characteristics')
@@ -582,7 +583,7 @@ class TrojanDetailsDialog(PlanetDetailsDialog):
                                'quantities/life/lifetime.html')
 
         tab_layout.addWidget(self.material_characteristics_group_box)
-        # tab_layout.addWidget(self.distribution_characteristics_group_box)
+        tab_layout.addWidget(self.distribution_characteristics_group_box)
         tab_layout.addWidget(self.age_characteristics_group_box)
         tab_layout.addStretch()
 
@@ -667,6 +668,13 @@ class AsteroidBeltDetailsDialog(PlanetDetailsDialog):
         self.add_key_to_layout(material_characteristics_box_layout, self.ulabels, 'Density',
                                'quantities/material/density.html')
 
+        # setting relative count
+        self.distribution_characteristics_group_box = GroupBox('Distribution Characteristics')
+        distribution_characteristics_box_layout = QFormLayout()
+        self.distribution_characteristics_group_box.setLayout(distribution_characteristics_box_layout)
+        self.add_key_to_layout(distribution_characteristics_box_layout, self.le, 'Relative Count',
+                               'quantities/material/relative_count.html')
+
         # setting age characteristics group box
         self.age_characteristics_group_box = GroupBox('Age Characteristics')
         age_characteristics_box_layout = QFormLayout()
@@ -680,6 +688,7 @@ class AsteroidBeltDetailsDialog(PlanetDetailsDialog):
                                'quantities/life/lifetime.html')
 
         tab_layout.addWidget(self.material_characteristics_group_box)
+        tab_layout.addWidget(self.distribution_characteristics_group_box)
         tab_layout.addWidget(self.age_characteristics_group_box)
         tab_layout.addStretch()
 

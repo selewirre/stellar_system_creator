@@ -1128,6 +1128,7 @@ class AsteroidBelt(Planet):
                          age=age, image_filename=image_filename)
 
     def __post_init__(self, want_to_update_parent=False):
+        self.relative_count = int(self.relative_count)
         if np.isnan(self.extend.m):
             self.extend = self.semi_major_axis / 8
         if self.composition == '':
@@ -1192,6 +1193,7 @@ class Trojan(Planet):
                          parent.axial_tilt, albedo, age=age, image_filename=image_filename)
 
     def __post_init__(self, want_to_update_parent=False):
+        self.relative_count = int(self.relative_count)
         if self.parent is not None:
             self.semi_major_axis = self.parent.semi_major_axis
             self.orbital_eccentricity = self.parent.orbital_eccentricity

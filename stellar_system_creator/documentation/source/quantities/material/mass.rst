@@ -16,5 +16,6 @@ Suggested (approximate) masses:
 4. For gas-giants: between 100 earth masses and 10 jupiter masses (Mj)
 5. For long-lived, red stars: 0.081 and 0.5 solar masses (Ms)
 6. For habitable stars: 0.6 to 1.4 solar masses
-7. For short-live, big blue stars: 1.4 to 50 solar masses.
+7. For short-live, big blue/white stars: 1.4 to 50 solar masses.
+8. For :ref:`black holes <black_hole>` the mass should be approximately above 3.3 solar masses.
 
