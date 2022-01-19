@@ -5,14 +5,16 @@ import sys
 from functools import partial
 
 from PyQt5.QtCore import Qt, QUrl
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtGui import QIcon, QPixmap, QImage
 from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage
 from PyQt5.QtWidgets import QMenu, QAction, QFileDialog, QMenuBar, QMessageBox, QDialog, QVBoxLayout, QToolBar, \
-    QPushButton, QSizePolicy, QHBoxLayout
+    QPushButton, QSizePolicy, QHBoxLayout, QApplication
 
 from stellar_system_creator.astrothings.units import ureg
 from stellar_system_creator.filing import save as save_ssc_object, add_extension_if_necessary
 from stellar_system_creator.gui.gui_central_widget import CentralWidget
+from stellar_system_creator.gui.gui_theme import get_icon_with_theme_colors, get_dark_theme_pallet, \
+    get_light_theme_pallet
 from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
 from stellar_system_creator.stellar_system_elements.stellar_body import MainSequenceStar, Planet
@@ -53,6 +55,10 @@ class FileMenu(QMenu):
         self.addAction(self.save_project_action)
         self.addAction(self.save_as_project_action)
         self.addSeparator()
+        self.addMenu(self.theme_submenu)
+        self.theme_submenu.addAction(self.dark_theme_action)
+        self.theme_submenu.addAction(self.light_theme_action)
+        self.addSeparator()
         # self.addAction(self.settings_action)
         # self.addSeparator()
         self.addAction(self.exit_action)
@@ -65,6 +71,8 @@ class FileMenu(QMenu):
         self.save_project_action.triggered.connect(partial(save_project, self))
         self.save_as_project_action.triggered.connect(partial(save_as_project, self))
         self.exit_action.triggered.connect(partial(exit_application, self))
+        self.dark_theme_action.triggered.connect(partial(change_theme, self, get_dark_theme_pallet))
+        self.light_theme_action.triggered.connect(partial(change_theme, self, get_light_theme_pallet))
 
     def _create_menu_actions(self, menubar):
         self.new_project_submenu = QMenu("&New Project", menubar)
@@ -82,6 +90,10 @@ class FileMenu(QMenu):
         self.save_as_project_action.setShortcut('Ctrl+Alt+S')
 
         self.settings_action = QAction("&Settings...", menubar)
+
+        self.theme_submenu = QMenu("&Theme", menubar)
+        self.dark_theme_action = QAction("&Dark...", menubar)
+        self.light_theme_action = QAction("&Light...", menubar)
 
         self.exit_action = QAction(QIcon.fromTheme("application-exit"), "&Exit", menubar)
         # self.exit_action.setShortcut('Alt+F4')
@@ -233,14 +245,21 @@ class HelpDialog(QDialog):
         layout.addStretch()
         self.setLayout(layout)
 
+    def reset_toolbar(self):
+        old_toolbar = self.toolbar
+        old_toolbar.deleteLater()
+        self._set_toolbar()
+        self.layout().replaceWidget(old_toolbar, self.toolbar)
+
     def _set_toolbar(self):
         self.toolbar = QToolBar(self)
+        current_palette = QApplication.instance().palette()
 
         # setting back button
         self.back_button = QPushButton()
         self.back_button.setEnabled(False)
         left_arrow_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/gui_icons/left-arrow.svg')
-        self.back_button.setIcon(QIcon(left_arrow_dir))
+        self.back_button.setIcon(get_icon_with_theme_colors(left_arrow_dir, current_palette))
         self.back_button.clicked.connect(self.back_process)
         self.toolbar.addWidget(self.back_button)
 
@@ -248,14 +267,14 @@ class HelpDialog(QDialog):
         self.forward_button = QPushButton()
         self.forward_button.setEnabled(False)
         right_arrow_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/gui_icons/right-arrow.svg')
-        self.forward_button.setIcon(QIcon(right_arrow_dir))
+        self.forward_button.setIcon(get_icon_with_theme_colors(right_arrow_dir, self.palette()))
         self.forward_button.clicked.connect(self.forward_process)
         self.toolbar.addWidget(self.forward_button)
 
         # setting home button
         self.home_button = QPushButton()
         home_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/gui_icons/home.svg')
-        self.home_button.setIcon(QIcon(home_dir))
+        self.home_button.setIcon(get_icon_with_theme_colors(home_dir, self.palette()))
         self.home_button.clicked.connect(self.homing_process)
         self.toolbar.addSeparator()
         self.toolbar.addWidget(self.home_button)
@@ -355,6 +374,23 @@ def save_project(parent):
     tab_text = central_widget.tabText(central_widget.currentIndex())
     if saved and tab_text.startswith('*'):
         central_widget.setTabText(central_widget.currentIndex(), tab_text[1:])
+
+
+def change_theme(parent, get_theme_pallet):
+    app = QApplication.instance()
+    if app is None:
+        raise RuntimeError("No Qt Application found.")
+    app.setStyle("Fusion")
+    app.setPalette(get_theme_pallet())
+
+    app = QApplication.instance()
+    if app is None:
+        raise RuntimeError("No Qt Application found.")
+    app.setStyle("Fusion")
+
+    menubar: MenuBar = parent.parent().parent().menubar
+    helpmenu: HelpMenu = menubar.findChild(HelpMenu)
+    helpmenu.help_dialog.reset_toolbar()
 
 
 def exit_application(parent):

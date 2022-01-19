@@ -16,6 +16,7 @@ from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QMen
     QLineEdit, QScrollArea
 
 from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
+from stellar_system_creator.gui.gui_theme import get_icon_with_theme_colors
 from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items import \
     TreeViewItemFromStellarSystemElement
 from stellar_system_creator.gui.stellar_system_element_context_menus.stellar_bodies_context_menu.detail_dialog_widgets import \
@@ -174,6 +175,7 @@ class SystemImageWidget(QWidget):
         self.render_button.setShortcut('Ctrl+R')
         render_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/logo.ico')
         self.render_button.setIcon(QIcon(render_dir))
+        self.render_button.setText('Render')
         self.render_button.setStyleSheet("padding: 1px;")
         self.render_button.adjustSize()
         shortcut_string = self.render_button.shortcut().toString()
@@ -509,7 +511,7 @@ class ImageRenderingProcess(QThread):
     def run(self):
         button_icon = self.render_button.icon()
         loading_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/gui_icons/loading.svg')
-        self.render_button.setIcon(QIcon(loading_dir))
+        self.render_button.setIcon(get_icon_with_theme_colors(loading_dir))
         self.render_button.setDisabled(True)
         # try:
         self.rendering_widget.render_image(self.ssc_object)
