@@ -127,6 +127,7 @@ class ParentHabitabilityTab(Tab):
 
         widget = QWidget(parent)
         self.setWidget(widget)
+        self.zones_tab_widget_index = None
         self.tab_layout = QVBoxLayout()
         widget.setLayout(self.tab_layout)
 
@@ -170,6 +171,10 @@ class ParentHabitabilityTab(Tab):
 
             self.habitability_subtabs[hzltype].setLayout(subtab_layout)
             self.zones_tab_widget.addTab(self.habitability_subtabs[hzltype], hzltype)
+
+        if self.zones_tab_widget_index is None:
+            self.zones_tab_widget_index = self.zones_tab_widget.count() - 1
+        self.zones_tab_widget.setCurrentIndex(self.zones_tab_widget_index)
 
     def changes_due_to_isolation_model_change(self):
         clearLayout(self.zones_group_box.layout())

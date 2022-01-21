@@ -1,4 +1,4 @@
-import cairo
+import cairocffi as cairo
 
 
 class Color:
@@ -44,6 +44,22 @@ class GradientColor(Color):
     def get_color(self):
         return [self.pos] + super().get_color()
 
+
+def get_text_extents(text_extents):
+    if cairo.__name__ == 'cairocffi':
+        return CairocffiTextExtents(text_extents)
+    else:
+        return text_extents
+
+
+class CairocffiTextExtents:
+    def __init__(self, text_extents_tuple):
+        self.x_bearing = text_extents_tuple[0]
+        self.y_bearing = text_extents_tuple[1]
+        self.width = text_extents_tuple[2]
+        self.height = text_extents_tuple[3]
+        self.x_advance = text_extents_tuple[4]
+        self.y_advance = text_extents_tuple[5]
 
 # class SVGSurface(cairo.Surface):
 #

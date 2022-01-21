@@ -60,8 +60,12 @@ class BinarySystem:
         self.eccentricity = self.eccentricity
 
         self.mass = self.calculate_total_mass()
-        self.lifetime = self.primary_body.lifetime
-        self.age = self.primary_body.age
+        if self.primary_body.lifetime < self.secondary_body.lifetime:
+            self.lifetime = self.primary_body.lifetime
+            self.age = self.primary_body.age
+        else:
+            self.lifetime = self.secondary_body.lifetime
+            self.age = self.secondary_body.age
 
         self.maximum_distance = self.calculate_maximum_distance()
         self.minimum_distance = self.calculate_minimum_distance()
@@ -273,8 +277,9 @@ class StellarBinary(BinarySystem):
 
     def __post_init__(self, want_to_update_parent=False):
         super().__post_init__()
-        self.reset_insolation_model_and_habitability_for_children()
-        self._set_insolation_model_and_habitability()
+        # self.reset_insolation_model_and_habitability_for_children()
+        # self.reset_solo_habitability()
+        self.reset_insolation_model_and_habitability()
 
         if want_to_update_parent:
             self.update_parent()
@@ -396,44 +401,53 @@ class StellarBinary(BinarySystem):
         if model_name == '':
             model_name = self.primary_body.insolation_model.name
 
-        if isinstance(self.primary_body, Star):
-            if model_name != self.primary_body.insolation_model.name:
-                self.primary_body.reset_insolation_model(model_name)
-        if isinstance(self.secondary_body, Star):
-            if model_name != self.secondary_body.insolation_model.name:
-                self.secondary_body.reset_insolation_model(model_name)
-
+        changed = False
         if model_name != self.primary_body.insolation_model.name:
-            self.primary_body.reset_habitability()
+            self.primary_body.reset_insolation_model(model_name)
+            self.primary_body.set_solo_habitable_zones()
+            changed = True
         if model_name != self.secondary_body.insolation_model.name:
-            self.secondary_body.reset_habitability()
+            self.secondary_body.reset_insolation_model(model_name)
+            self.secondary_body.set_solo_habitable_zones()
+            changed = True
 
-        if isinstance(self.primary_body, StellarBinary):
-            if model_name != self.primary_body.insolation_model.name:
-                self.primary_body.reset_insolation_model(model_name)
-        if isinstance(self.secondary_body, StellarBinary):
-            if model_name != self.secondary_body.insolation_model.name:
-                self.secondary_body.reset_insolation_model(model_name)
-
-    def _set_insolation_model_and_habitability(self):
-        self.reset_habitability()
-        self.reset_insolation_model()
+        # if changed:
+        self.primary_body.set_dual_habitable_zones()
+        self.primary_body.do_habitability_check()
+        self.secondary_body.set_dual_habitable_zones()
+        self.secondary_body.do_habitability_check()
 
     def reset_insolation_model_and_habitability(self, model_name=''):
-        self.reset_insolation_model_and_habitability_for_children(model_name)
-        self._set_insolation_model_and_habitability()
+        self.reset_insolation_model(model_name)
+        self.reset_solo_habitability()
+        try:
+            self.set_dual_habitable_zones()
+            self.do_habitability_check()
+        except Exception:
+            pass
 
-    def reset_insolation_model(self, model_name='Kopparapu'):
-        self.insolation_model = BinaryInsolationModel(self.habitable_zone_limits, self.primary_body.insolation_model)
+    def reset_insolation_model(self, model_name=''):
+        self.reset_insolation_model_and_habitability_for_children(model_name)
+        self.reset_solo_habitability()
+        primary_im_swl = self.primary_body.insolation_model.swl
+        secondary_im_swl = self.secondary_body.insolation_model.swl
+        combinded_swl = {name: primary_im_swl[name] + secondary_im_swl[name]
+                         for name in self.primary_body.insolation_model.names}
+        self.insolation_model = BinaryInsolationModel(combinded_swl, self.primary_body.insolation_model)
+        try:
+            self.set_dual_habitable_zones()
+            self.do_habitability_check()
+        except Exception:
+            pass
         self._set_orbit_values()  # here for cause the frost lines also depend on the binary
 
-    def reset_habitability(self):
-        self.habitable_zone_limits = {}
-        self.primary_body.reset_habitability()
-        self.secondary_body.reset_habitability()
-        self.set_habitable_zones()
-        self.insolation_model = BinaryInsolationModel(self.habitable_zone_limits, self.primary_body.insolation_model)
+    def do_habitability_check(self):
         self.habitability, self.habitability_violations = self.check_habitability()
+
+    def reset_solo_habitability(self):
+        self.habitable_zone_limits = {}
+        self.set_solo_habitable_zones()
+        self.do_habitability_check()
 
     def set_habitable_zone(self, zone_type: str, binary_companion=None):
         prime_model: InsolationThresholdModel = self.primary_body.insolation_model
@@ -441,21 +455,14 @@ class StellarBinary(BinarySystem):
         prime_swl = prime_model.swl
         sec_swl = sec_model.swl
 
-        if isinstance(self.primary_body, StellarBinary):
-            prime_swl = prime_swl[f'{zone_type}']
-        if isinstance(self.secondary_body, StellarBinary):
-            sec_swl = sec_swl[f'{zone_type}']
-
         model = None
         model_swl = None
         comp_model_swl = None
         if binary_companion is not None:
             model = self.insolation_model
-            model_swl = model.swl[f'ptype{zone_type}']
+            model_swl = {name: self.habitable_zone_limits[f'ptype{zone_type}'][name] ** 2 for name in model.names}
             comp_model = binary_companion.insolation_model
             comp_model_swl = comp_model.swl
-            if isinstance(binary_companion, StellarBinary):
-                comp_model_swl = comp_model_swl[f'ptype{zone_type}']
 
         if zone_type == 'ptypeRHZ':
             self.habitable_zone_limits['ptypeRHZ'] = {name: calculate_ptype_radiative_habitable_limit(
@@ -498,7 +505,7 @@ class StellarBinary(BinarySystem):
                         abs(self.habitable_zone_limits[zone_type][prime_model.conservative_max_name]):
                     self.habitable_zone_limits[zone_type] = {name: np.nan * ureg.au for name in prime_model.names}
 
-    def set_habitable_zones(self) -> None:
+    def set_solo_habitable_zones(self):
         self.set_habitable_zone('ptypeRHZ')
         self.set_habitable_zone('ptypePHZ')
         self.set_habitable_zone('ptypeAHZ')
@@ -506,6 +513,9 @@ class StellarBinary(BinarySystem):
         if np.isnan(self.habitable_zone_limits['ptypeRHZ'][model.earth_equivalent].m):
             self.habitable_zone_limits['ptypePHZ'] = {name: np.nan * ureg.au for name in model.names}
             self.habitable_zone_limits['ptypeAHZ'] = {name: np.nan * ureg.au for name in model.names}
+
+    def set_dual_habitable_zones(self):
+        model = self.primary_body.insolation_model
         if isinstance(self.parent, StellarBinary):
             if self.parent.primary_body == self:
                 companion_body = self.parent.secondary_body
@@ -514,9 +524,13 @@ class StellarBinary(BinarySystem):
             self.set_habitable_zone('RHZ', companion_body)
             self.set_habitable_zone('PHZ', companion_body)
             self.set_habitable_zone('AHZ', companion_body)
-            if np.isnan(self.habitable_zone_limits['RHZ'][model.earth_equivalent].m):
+            if np.isnan(self.habitable_zone_limits['RHZ'][model.relaxed_max_name].m):
                 self.habitable_zone_limits['PHZ'] = {name: np.nan * ureg.au for name in model.names}
                 self.habitable_zone_limits['AHZ'] = {name: np.nan * ureg.au for name in model.names}
+
+    def set_habitable_zones(self) -> None:
+        self.set_solo_habitable_zones()
+        self.set_dual_habitable_zones()
 
     def check_habitability(self) -> Tuple[bool, str]:
         habitability = True
@@ -535,7 +549,7 @@ class StellarBinary(BinarySystem):
         else:
             relevant_zone_type = 'ptypeRHZ'
 
-        model = self.insolation_model
+        model = self.primary_body.insolation_model
         if self.habitable_zone_limits[relevant_zone_type][model.relaxed_max_name] \
                 < self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name] or \
                 np.isnan(self.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name]):

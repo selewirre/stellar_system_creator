@@ -11,6 +11,7 @@ from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
 from stellar_system_creator.gui.gui_image_rendering import SystemImageWidget
 from PyQt5.Qt import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel
 
+from stellar_system_creator.gui.gui_theme import get_icon_with_theme_colors
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
 from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem
 
@@ -74,11 +75,7 @@ class CentralWidget(QTabWidget):
 
         # hide_button_icon = self.style().standardIcon(getattr(QStyle, 'SP_TitleBarMinButton'))
         # hide_button = QPushButton(hide_button_icon, '', self)
-        hide_button = QPushButton(parent=tab_header)
-        minimize_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/gui_icons/window-minimize.svg')
-        hide_button.setIcon(QIcon(minimize_dir))
-        hide_button.setStyleSheet("padding: 1px;")
-        hide_button.adjustSize()
+        hide_button = TabMinimizeButton(parent=tab_header)
         # hide_button.setSize(hide_button.size().height(), 0.8*hide_button.size().width())
 
         hide_button.pressed.connect(self.toggle_hide_tab_contents)
@@ -135,10 +132,23 @@ class CentralWidget(QTabWidget):
         return project_tree_view.ssc_object
 
 
+class TabMinimizeButton(QPushButton):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_minimize_icon()
+
+    def set_minimize_icon(self):
+        minimize_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/gui_icons/window-minimize.svg')
+        self.setIcon(get_icon_with_theme_colors(minimize_dir))
+        self.setStyleSheet("padding: 1px;")
+        self.adjustSize()
+
+
 class TabHeaderDialog(QDialog):
 
     def __init__(self, parent_item, header_label: QLabel, parent):
-        from gui_project_tree_view import ProjectTreeView
+        from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
         self.parent_item: ProjectTreeView = parent_item
         super().__init__(parent)
         self.setModal(False)

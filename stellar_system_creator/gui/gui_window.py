@@ -15,14 +15,15 @@
 # example on dialogbuttonbox with tabwidget https://codetorial.net/en/pyqt5/widget/qtabwidget_advanced.html
 # example on radiobutton https://pythonbasics.org/pyqt-radiobutton/
 # example on qthread https://stackoverflow.com/questions/6783194/background-thread-with-qthread-in-pyqt
-
+import glob
 import sys
+import os
 
 from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow
 
 # from stellar_system_creator.filing import load
-from stellar_system_creator.gui.gui_example import get_dark_theme_pallet
+from stellar_system_creator.gui.gui_theme import get_dark_theme_pallet, get_light_theme_pallet
 from stellar_system_creator.gui.gui_menubar import MenuBar
 from stellar_system_creator.gui.gui_central_widget import CentralWidget
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)  # enable highdpi scaling
@@ -44,6 +45,10 @@ class Window(QMainWindow):
 
         self._create_central_widget()
         self._create_menubar()
+        temp_files_name = '~.tempfile*'
+        temp_file_names = glob.glob(temp_files_name)
+        for file_name in temp_file_names:
+            os.remove(file_name)
 
     def _create_central_widget(self):
         self.central_widget = CentralWidget()
@@ -60,8 +65,7 @@ if __name__ == "__main__":
     app.setPalette(get_dark_theme_pallet())
     win = Window()
     # import pkg_resources
-    filename = '../examples/output_files/TrakunaStellarSystem.ssc'
-    # filename = '../examples/output_files/QuezuliferhQuaternaryMultiStellarSystem.ssc'
+    filename = '../examples/output_files/QuezuliferhWideBinarySystem.ssc'
     win.central_widget.add_new_tab(filename)
     win.show()
     # win.showMaximized()
