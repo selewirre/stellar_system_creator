@@ -1,13 +1,18 @@
-import pkg_resources
 import sys
 from functools import partial
 
+import pkg_resources
+from PyQt5.QtCore import QUrl
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMenu, QAction, QFileDialog, QMenuBar, QMessageBox
+from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage
+from PyQt5.QtWidgets import QMenu, QAction, QFileDialog, QMenuBar, QMessageBox, QDialog, QVBoxLayout, QToolBar, \
+    QPushButton, QApplication, QSplitterHandle, QWidget
 
 from stellar_system_creator.astrothings.units import ureg
 from stellar_system_creator.filing import save as save_ssc_object, add_extension_if_necessary
 from stellar_system_creator.gui.gui_central_widget import CentralWidget
+from stellar_system_creator.gui.gui_theme import get_icon_with_theme_colors, get_dark_theme_pallet, \
+    get_light_theme_pallet
 from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
 from stellar_system_creator.stellar_system_elements.stellar_body import MainSequenceStar, Planet
@@ -48,6 +53,10 @@ class FileMenu(QMenu):
         self.addAction(self.save_project_action)
         self.addAction(self.save_as_project_action)
         self.addSeparator()
+        self.addMenu(self.theme_submenu)
+        self.theme_submenu.addAction(self.dark_theme_action)
+        self.theme_submenu.addAction(self.light_theme_action)
+        self.addSeparator()
         # self.addAction(self.settings_action)
         # self.addSeparator()
         self.addAction(self.exit_action)
@@ -60,6 +69,8 @@ class FileMenu(QMenu):
         self.save_project_action.triggered.connect(partial(save_project, self))
         self.save_as_project_action.triggered.connect(partial(save_as_project, self))
         self.exit_action.triggered.connect(partial(exit_application, self))
+        self.dark_theme_action.triggered.connect(partial(change_theme, self, get_dark_theme_pallet))
+        self.light_theme_action.triggered.connect(partial(change_theme, self, get_light_theme_pallet))
 
     def _create_menu_actions(self, menubar):
         self.new_project_submenu = QMenu("&New Project", menubar)
@@ -77,6 +88,10 @@ class FileMenu(QMenu):
         self.save_as_project_action.setShortcut('Ctrl+Alt+S')
 
         self.settings_action = QAction("&Settings...", menubar)
+
+        self.theme_submenu = QMenu("&Theme", menubar)
+        self.dark_theme_action = QAction("&Dark...", menubar)
+        self.light_theme_action = QAction("&Light...", menubar)
 
         self.exit_action = QAction(QIcon.fromTheme("application-exit"), "&Exit", menubar)
         # self.exit_action.setShortcut('Alt+F4')
@@ -182,15 +197,121 @@ class HelpMenu(QMenu):
         self._create_menu_actions(menubar)
         self._connect_actions()
         self._create_menu()
+        self.help_dialog = HelpDialog(self)
 
     def _create_menu(self):
         self.addAction(self.documentation_action)
+        self.addAction(self.documentation_in_browser_action)
+        self.addAction(self.documentation_pdf_action)
 
     def _connect_actions(self):
-        self.documentation_action.triggered.connect(open_documentation)
+        # self.documentation_action.triggered.connect(open_documentation)
+        self.documentation_action.triggered.connect(self.open_documentation_process)
+        self.documentation_in_browser_action.triggered.connect(open_documentation_in_browser)
+        self.documentation_pdf_action.triggered.connect(open_documentation_pdf)
 
     def _create_menu_actions(self, menubar):
         self.documentation_action = QAction("&Documentation", menubar)
+        self.documentation_action.setShortcut('F1')
+
+        self.documentation_in_browser_action = QAction("&Open Documentation in Browser", menubar)
+        self.documentation_in_browser_action.setShortcut('Ctrl+F1')
+
+        self.documentation_pdf_action = QAction("&Open Documentation PDF", menubar)
+        self.documentation_pdf_action.setShortcut('Ctrl+Shift+F1')
+
+    def open_documentation_process(self, page_directory=None):
+        if page_directory is not None:
+            if page_directory:
+                self.help_dialog.loadPage(page_directory)
+        self.help_dialog.show()
+
+
+class HelpDialog(QDialog):
+    """Source: https://zetcode.com/pyqt/qwebengineview/"""
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setWindowTitle('Documentation')
+        self.setModal(False)
+        self.setFixedSize(600, 450)
+
+        self._set_web_engine_view()
+        self._set_toolbar()
+        layout = QVBoxLayout()
+        layout.addWidget(self.toolbar)
+        layout.addWidget(self.web_engine_view)
+        layout.addStretch()
+        self.setLayout(layout)
+
+    def reset_toolbar(self):
+        old_toolbar = self.toolbar
+        old_toolbar.deleteLater()
+        self._set_toolbar()
+        self.layout().replaceWidget(old_toolbar, self.toolbar)
+
+    def _set_toolbar(self):
+        self.toolbar = QToolBar(self)
+        current_palette = QApplication.instance().palette()
+
+        # setting back button
+        self.back_button = QPushButton()
+        self.back_button.setEnabled(False)
+        left_arrow_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/gui_icons/left-arrow.svg')
+        self.back_button.setIcon(get_icon_with_theme_colors(left_arrow_dir, current_palette))
+        self.back_button.clicked.connect(self.back_process)
+        self.toolbar.addWidget(self.back_button)
+
+        # setting forward button
+        self.forward_button = QPushButton()
+        self.forward_button.setEnabled(False)
+        right_arrow_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/gui_icons/right-arrow.svg')
+        self.forward_button.setIcon(get_icon_with_theme_colors(right_arrow_dir, self.palette()))
+        self.forward_button.clicked.connect(self.forward_process)
+        self.toolbar.addWidget(self.forward_button)
+
+        # setting home button
+        self.home_button = QPushButton()
+        home_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/gui_icons/home.svg')
+        self.home_button.setIcon(get_icon_with_theme_colors(home_dir, self.palette()))
+        self.home_button.clicked.connect(self.homing_process)
+        self.toolbar.addSeparator()
+        self.toolbar.addWidget(self.home_button)
+
+        self.toolbar.layout().setContentsMargins(0, 0, 0, 0)
+        self.toolbar.layout().setSpacing(0)
+
+    def _set_web_engine_view(self):
+        self.web_engine_view = QWebEngineView()
+        self.loadPage()
+        self.web_engine_view.page().urlChanged.connect(self.loading_finished_process)
+        # self.web_engine_view.page().titleChanged.connect(self.setWindowTitle)
+        # self.windowTitleChanged.connect(self.setWindowTitle)
+
+    def loadPage(self, page_directory='index.html'):
+        filename = pkg_resources.resource_filename('stellar_system_creator',
+                                                   f'documentation/build/html/{page_directory}')
+        file = QUrl.fromLocalFile(filename)
+        self.web_engine_view.load(file)
+
+    def loading_finished_process(self):
+        if self.web_engine_view.history().canGoBack():
+            self.back_button.setEnabled(True)
+        else:
+            self.back_button.setEnabled(False)
+
+        if self.web_engine_view.history().canGoForward():
+            self.forward_button.setEnabled(True)
+        else:
+            self.forward_button.setEnabled(False)
+
+    def back_process(self):
+        self.web_engine_view.page().triggerAction(QWebEnginePage.Back)
+
+    def forward_process(self):
+        self.web_engine_view.page().triggerAction(QWebEnginePage.Forward)
+
+    def homing_process(self):
+        self.loadPage()
 
 
 def new_project(parent, system_type):
@@ -223,12 +344,14 @@ def open_project(parent):
     central_widget: CentralWidget = parent.parent().parent().central_widget
     filename = QFileDialog.getOpenFileName(parent, 'Open Project(s)', '', "All Files (*);;Python Files (*.ssc)")[0]
     try:
-        central_widget.add_new_tab(filename)
-    except Exception:
+        if filename != '':
+            central_widget.add_new_tab(filename)
+    except Exception as e:
+        print(e)
         message_box = QMessageBox()
         message_box.setIcon(QMessageBox.Information)
         message_box.setWindowTitle("'Open Project' has failed...")
-        message_box.setText(f"File '{filename}' is not compatible.")
+        message_box.setText(f"File '{filename}' is not compatible or does not exist.")
         message_box.exec()
 
 
@@ -252,6 +375,30 @@ def save_project(parent):
         central_widget.setTabText(central_widget.currentIndex(), tab_text[1:])
 
 
+def change_theme(parent, get_theme_pallet):
+    app = QApplication.instance()
+    if app is None:
+        raise RuntimeError("No Qt Application found.")
+    app.setStyle("Fusion")
+    app.setPalette(get_theme_pallet())
+
+    app = QApplication.instance()
+    if app is None:
+        raise RuntimeError("No Qt Application found.")
+    app.setStyle("Fusion")
+
+    menubar: MenuBar = parent.parent().parent().menubar
+    helpmenu: HelpMenu = menubar.findChild(HelpMenu)
+    helpmenu.help_dialog.reset_toolbar()
+
+    central_widget: CentralWidget = parent.parent().parent().central_widget
+    initial_index = central_widget.currentIndex()
+    for i in range(central_widget.count()):
+        central_widget.setCurrentIndex(i)
+        central_widget.currentWidget().children()[1].children()[1].children()[0].set_minimize_icon()
+    central_widget.setCurrentIndex(initial_index)
+
+
 def exit_application(parent):
     central_widget: CentralWidget = parent.parent().parent().central_widget
     for i in range(central_widget.count()):
@@ -262,11 +409,22 @@ def exit_application(parent):
         sys.exit()
 
 
-def open_documentation():
-    # filename = pkg_resources.resource_filename('stellar_system_creator',
-    #                                            'documentation/build/latex/stellarsystemcreator.pdf')
+def open_documentation_in_browser():
     filename = pkg_resources.resource_filename('stellar_system_creator',
                                                'documentation/build/html/index.html')
+    import subprocess, os, platform
+    if platform.system() == 'Darwin':  # macOS
+        subprocess.call(('open', filename))
+    elif platform.system() == 'Windows':  # Windows
+        os.startfile(filename)
+        # subprocess.call(('start', filename), shell=True)
+    else:  # linux variants
+        subprocess.call(('xdg-open', filename))
+
+
+def open_documentation_pdf():
+    filename = pkg_resources.resource_filename('stellar_system_creator',
+                                               'documentation/build/latex/stellarsystemcreator.pdf')
     import subprocess, os, platform
     if platform.system() == 'Darwin':  # macOS
         subprocess.call(('open', filename))

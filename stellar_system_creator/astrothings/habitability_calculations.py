@@ -249,6 +249,11 @@ def calculate_ptype_average_habitable_limit(primary_swl: Q_, secondary_swl: Q_, 
     Lsp = secondary_swl
     Ltotp = Lpp + Lsp
     mu = secondary_star_mass_ratio
+    if Lpp < Lsp:
+        Lpp = secondary_swl
+        Lsp = primary_swl
+        mu = 1 - secondary_star_mass_ratio
+
     rbmean = binary_mean_distance * (1 - binary_eccentricity ** 2) ** 0.25
     rbmeanprimary = mu * rbmean
     rbmeansecondary = (1 - mu) * rbmean
