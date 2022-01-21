@@ -1,14 +1,12 @@
-import codecs
-
-import pkg_resources
 import sys
 from functools import partial
 
-from PyQt5.QtCore import Qt, QUrl
-from PyQt5.QtGui import QIcon, QPixmap, QImage
+import pkg_resources
+from PyQt5.QtCore import QUrl
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage
 from PyQt5.QtWidgets import QMenu, QAction, QFileDialog, QMenuBar, QMessageBox, QDialog, QVBoxLayout, QToolBar, \
-    QPushButton, QSizePolicy, QHBoxLayout, QApplication
+    QPushButton, QApplication, QSplitterHandle, QWidget
 
 from stellar_system_creator.astrothings.units import ureg
 from stellar_system_creator.filing import save as save_ssc_object, add_extension_if_necessary
@@ -346,13 +344,14 @@ def open_project(parent):
     central_widget: CentralWidget = parent.parent().parent().central_widget
     filename = QFileDialog.getOpenFileName(parent, 'Open Project(s)', '', "All Files (*);;Python Files (*.ssc)")[0]
     try:
-        central_widget.add_new_tab(filename)
+        if filename != '':
+            central_widget.add_new_tab(filename)
     except Exception as e:
         print(e)
         message_box = QMessageBox()
         message_box.setIcon(QMessageBox.Information)
         message_box.setWindowTitle("'Open Project' has failed...")
-        message_box.setText(f"File '{filename}' is not compatible.")
+        message_box.setText(f"File '{filename}' is not compatible or does not exist.")
         message_box.exec()
 
 
@@ -392,6 +391,13 @@ def change_theme(parent, get_theme_pallet):
     helpmenu: HelpMenu = menubar.findChild(HelpMenu)
     helpmenu.help_dialog.reset_toolbar()
 
+    central_widget: CentralWidget = parent.parent().parent().central_widget
+    initial_index = central_widget.currentIndex()
+    for i in range(central_widget.count()):
+        central_widget.setCurrentIndex(i)
+        central_widget.currentWidget().children()[1].children()[1].children()[0].set_minimize_icon()
+    central_widget.setCurrentIndex(initial_index)
+
 
 def exit_application(parent):
     central_widget: CentralWidget = parent.parent().parent().central_widget
@@ -404,8 +410,6 @@ def exit_application(parent):
 
 
 def open_documentation_in_browser():
-    # filename = pkg_resources.resource_filename('stellar_system_creator',
-    #                                            'documentation/build/latex/stellarsystemcreator.pdf')
     filename = pkg_resources.resource_filename('stellar_system_creator',
                                                'documentation/build/html/index.html')
     import subprocess, os, platform

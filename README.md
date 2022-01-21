@@ -8,7 +8,7 @@ To install this package, run:
 
 ```
 python3 setup.py sdist bdist_wheel
-pip3 install dist/stellar_system_creator-0.2.2.0.tar.gz
+pip3 install dist/stellar_system_creator-0.2.3.0.tar.gz
 ```
 
 If you want to check out the example code, look in the folder `examples/...`
@@ -20,15 +20,16 @@ import sys
 
 import pkg_resources
 from PyQt5.QtWidgets import QApplication
+from stellar_system_creator.gui.gui_theme import get_dark_theme_pallet
 from stellar_system_creator.gui.gui_window import Window
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
-    # app.setPalette(get_dark_theme_pallet())
+    app.setPalette(get_dark_theme_pallet())
     win = Window()
     filename = pkg_resources.resource_filename(
-        'stellar_system_creator', 'examples/output_files/TrakunaStellarSystem.ssc')
+        'stellar_system_creator', 'examples/output_files/QuezuliferhWideBinarySystem.ssc')
     win.central_widget.add_new_tab(filename)
 
     win.show()

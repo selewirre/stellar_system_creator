@@ -5,7 +5,8 @@ GUI
 
 The gui is (a hopefully) easy to navigate tool, once you get the basics. We will start
 with an example, and move forward to talking about the individual buttons an functionalities
-that are available.
+that are available. For visual learners, there is a series of video tutorials on this
+`YouTube Channel <https://www.youtube.com/channel/UCWAz_u7tOu2IIIBqjZzY9gA>`_.
 
 Simple example
 --------------

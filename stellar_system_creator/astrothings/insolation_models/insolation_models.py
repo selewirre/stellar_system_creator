@@ -191,14 +191,14 @@ class InsolationBySelsis(InsolationThresholdModel):
 
 class BinaryInsolationModel:
 
-    def __init__(self, habitable_zones: Dict, child_insolation_model: InsolationThresholdModel):
+    def __init__(self, combined_spectral_weighted_luminosity: Dict, child_insolation_model: InsolationThresholdModel):
         self.name = child_insolation_model.name
 
         self._set_parameter_names(child_insolation_model)
         self._set_popular_limit_names(child_insolation_model)
         self._set_orbit_thresholds_in_sol(child_insolation_model)
         self._set_threshold_types(child_insolation_model)
-        self._set_spectrally_weighted_luminosities_on_thresholds(habitable_zones)
+        self._set_spectrally_weighted_luminosities_on_thresholds(combined_spectral_weighted_luminosity)
 
     def _set_parameter_names(self, child_insolation_model: InsolationThresholdModel):
         self.names = child_insolation_model.names
@@ -216,11 +216,10 @@ class BinaryInsolationModel:
     def _set_threshold_types(self, child_insolation_model: InsolationThresholdModel):
         self.threshold_types = child_insolation_model.threshold_types
 
-    def _set_spectrally_weighted_luminosities_on_thresholds(self, habitable_zones: Dict):
+    def _set_spectrally_weighted_luminosities_on_thresholds(self, combined_spectral_weighted_luminosity: Dict):
         self.spectrally_weighted_luminosities_on_thresholds = {}
-        for zone_type in habitable_zones.keys():
-            self.spectrally_weighted_luminosities_on_thresholds[zone_type] = {name: habitable_zones[zone_type][name]
-                                                                              ** 2 for name in self.names}
+        self.spectrally_weighted_luminosities_on_thresholds = {name: combined_spectral_weighted_luminosity[name]
+                                                               for name in self.names}
         self.swl = self.spectrally_weighted_luminosities_on_thresholds
 
 

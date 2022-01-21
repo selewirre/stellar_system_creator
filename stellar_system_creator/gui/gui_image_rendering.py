@@ -4,7 +4,7 @@ from typing import Union
 import os
 import glob
 
-import cairo
+import cairocffi as cairo
 import pkg_resources
 from PIL import ImageQt, Image
 from PyQt5 import QtGui, QtCore
@@ -68,6 +68,7 @@ class SystemRenderingWidget(QLabel):
                 self.resize(self.baseSize())
                 self.graphics_view.scene().setSceneRect(0, 0, pixmap.width(), pixmap.height())
                 self.graphics_view.fitInView(self.graphics_view.sceneRect(), Qt.KeepAspectRatio)
+                self.graphics_view.total_zoom_factor = 1
                 self.update()
             else:
                 self.hide()
@@ -172,10 +173,10 @@ class SystemImageWidget(QWidget):
         layout = QHBoxLayout()
 
         self.render_button = QPushButton(parent=self)
+        self.render_button.setText('Render')
         self.render_button.setShortcut('Ctrl+R')
         render_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/logo.ico')
         self.render_button.setIcon(QIcon(render_dir))
-        self.render_button.setText('Render')
         self.render_button.setStyleSheet("padding: 1px;")
         self.render_button.adjustSize()
         shortcut_string = self.render_button.shortcut().toString()
@@ -513,14 +514,14 @@ class ImageRenderingProcess(QThread):
         loading_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/gui_icons/loading.svg')
         self.render_button.setIcon(get_icon_with_theme_colors(loading_dir))
         self.render_button.setDisabled(True)
-        # try:
-        self.rendering_widget.render_image(self.ssc_object)
-        # except Exception as e:
-        #     message_box = QMessageBox()
-        #     message_box.setIcon(QMessageBox.Information)
-        #     message_box.setWindowTitle("'Rendering' has failed...")
-        #     message_box.setText(f"Error message: {e}")
-        #     message_box.exec()
+        try:
+            self.rendering_widget.render_image(self.ssc_object)
+        except Exception as e:
+            message_box = QMessageBox()
+            message_box.setIcon(QMessageBox.Information)
+            message_box.setWindowTitle("'Rendering' has failed...")
+            message_box.setText(f"Error message: {e}")
+            message_box.exec()
 
         self.render_button.setEnabled(True)
         self.render_button.setIcon(button_icon)
@@ -557,16 +558,16 @@ class GraphicsView(QGraphicsView):
             zoomFactor = zoomInFactor
         else:
             zoomFactor = zoomOutFactor
-        # if 1000 > self.total_zoom_factor * zoomFactor > 0.5:
-        self.scale(zoomFactor, zoomFactor)
+        if 1000 > self.total_zoom_factor * zoomFactor > 0.5:
+            self.scale(zoomFactor, zoomFactor)
 
-        # Get the new position
-        newPos = self.mapToScene(event.pos())
+            # Get the new position
+            newPos = self.mapToScene(event.pos())
 
-        # Move scene to old position
-        delta = newPos - oldPos
-        self.translate(delta.x(), delta.y())
-        self.total_zoom_factor *= zoomFactor
+            # Move scene to old position
+            delta = newPos - oldPos
+            self.translate(delta.x(), delta.y())
+            self.total_zoom_factor *= zoomFactor
 
 
 class RenderingSettingsLineEdit(QWidget):

@@ -63,14 +63,10 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
     app.setPalette(get_dark_theme_pallet())
-    # app.setPalette(get_light_theme_pallet())
     win = Window()
     # import pkg_resources
-    # filename = '../examples/output_files/TrakunaStellarSystem.ssc'
-    # filename = '../../../stellar_system_creator_linux_file/my_system.ssc'
-    filename = '../../patata.ssc'
-    # filename = '../examples/output_files/QuezuliferhQuaternaryMultiStellarSystem.ssc'
-    # win.central_widget.add_new_tab(filename)
+    filename = '../examples/output_files/QuezuliferhWideBinarySystem.ssc'
+    win.central_widget.add_new_tab(filename)
     win.show()
     # win.showMaximized()
     sys.exit(app.exec_())

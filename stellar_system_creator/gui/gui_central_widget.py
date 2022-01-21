@@ -75,11 +75,7 @@ class CentralWidget(QTabWidget):
 
         # hide_button_icon = self.style().standardIcon(getattr(QStyle, 'SP_TitleBarMinButton'))
         # hide_button = QPushButton(hide_button_icon, '', self)
-        hide_button = QPushButton(parent=tab_header)
-        minimize_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/gui_icons/window-minimize.svg')
-        hide_button.setIcon(get_icon_with_theme_colors(minimize_dir))
-        hide_button.setStyleSheet("padding: 1px;")
-        hide_button.adjustSize()
+        hide_button = TabMinimizeButton(parent=tab_header)
         # hide_button.setSize(hide_button.size().height(), 0.8*hide_button.size().width())
 
         hide_button.pressed.connect(self.toggle_hide_tab_contents)
@@ -134,6 +130,19 @@ class CentralWidget(QTabWidget):
     def get_ssc_object_of_current_tab(self) -> Union[StellarSystem, PlanetarySystem]:
         project_tree_view = self.get_project_tree_view_of_current_tab()
         return project_tree_view.ssc_object
+
+
+class TabMinimizeButton(QPushButton):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_minimize_icon()
+
+    def set_minimize_icon(self):
+        minimize_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/gui_icons/window-minimize.svg')
+        self.setIcon(get_icon_with_theme_colors(minimize_dir))
+        self.setStyleSheet("padding: 1px;")
+        self.adjustSize()
 
 
 class TabHeaderDialog(QDialog):

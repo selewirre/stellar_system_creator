@@ -1,7 +1,7 @@
 from functools import partial
 from typing import Union, Dict, List
 
-import cairo
+import cairocffi as cairo
 import pkg_resources
 from PyQt5.QtGui import QPixmap
 from bs4 import BeautifulSoup

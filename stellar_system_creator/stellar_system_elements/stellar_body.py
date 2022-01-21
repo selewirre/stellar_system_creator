@@ -494,9 +494,6 @@ class Star(StellarBody):
         if binary_companion is not None:
             comp_model = binary_companion.insolation_model
             comp_model_swl = comp_model.swl
-            from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
-            if isinstance(binary_companion, StellarBinary):
-                comp_model_swl = comp_model_swl[f'ptype{zone_type}']
 
         if zone_type == 'SSHZ':
             self.habitable_zone_limits['SSHZ'] = {name: calculate_single_star_habitable_orbital_threshold(
@@ -985,17 +982,25 @@ class Planet(StellarBody):
         habitability = True
         habitability_violation = []
 
+        if not self.composition.startswith('Waterworld') and not self.composition.startswith('Rockworld'):
+            habitability = False
+            habitability_violation.append(f'Life on worlds with composition type {self.composition} is unlikely')
+            return habitability, ' '.join(habitability_violation)
+
         # https://en.wikipedia.org/wiki/Planetary_habitability - Mass
         low_mass_limit = 0.0268 if self.composition.startswith('Waterworld') else 0.1
-        if not low_mass_limit <= self.mass.to('M_e').magnitude <= 5:
+        high_mass_limit = 12 if self.composition.startswith('Waterworld') else 5
+        if not low_mass_limit <= self.mass.to('M_e').magnitude <= high_mass_limit:
             habitability = False
             habitability_violation.append('Planetary mass must be between 0.1 and 5 earth masses for earth like planets'
-                                          'and 0.0268 and 5 for waterworlds.')
+                                          'and 0.0268 and 12 for water-worlds.')
 
         # https://en.wikipedia.org/wiki/Planetary_habitability - Radius
-        if not 0.5 <= self.radius.to('R_e').magnitude <= 1.5:
+        high_radius_limit = 2.8 if self.composition.startswith('Waterworld') else 2
+        if not 0.45 <= self.radius.to('R_e').magnitude <= high_radius_limit:
             habitability = False
-            habitability_violation.append('Planetary radius must be between 0.5 and 1.5 earth radii.')
+            habitability_violation.append('Planetary radius must be between 0.45 and 2 earth radii for earth-like'
+                                          ' planets and 0.45 and 2.8 earth radii for water-worlds.')
 
         # if not 0.4 < self.surface_gravity.to('g_e').magnitude < 1.6:
         #     habitability = False
@@ -1042,6 +1047,13 @@ class Planet(StellarBody):
 
         if not len(habitability_violation):
             habitability_violation.append('None')
+
+        if self.composition.startswith('Waterworld'):
+            habitability_violation.append(f'\n\nNote: Life on water-worlds could emerge around the warm water close '
+                                          f'to the surface, in the oceanic depths close to the rocky interior (if any),'
+                                          f' or underneath a cold exterior surface (ice) even if the planet is not '
+                                          f'within the habitable zone of the stellar parent.')
+
         return habitability, ' '.join(habitability_violation)
 
     def get_orbital_stability(self) -> Tuple[bool, str]:
@@ -1424,17 +1436,25 @@ class Satellite(Planet):
         habitability = True
         habitability_violation = []
 
+        if not self.composition.startswith('Waterworld') and not self.composition.startswith('Rockworld'):
+            habitability = False
+            habitability_violation.append(f'Life on worlds with composition type {self.composition} is unlikely')
+            return habitability, ' '.join(habitability_violation)
+
         # https://en.wikipedia.org/wiki/Planetary_habitability - Mass
         low_mass_limit = 0.0268 if self.composition.startswith('Waterworld') else 0.1
-        if not low_mass_limit <= self.mass.to('M_e').magnitude <= 5:
+        high_mass_limit = 12 if self.composition.startswith('Waterworld') else 5
+        if not low_mass_limit <= self.mass.to('M_e').magnitude <= high_mass_limit:
             habitability = False
             habitability_violation.append('Planetary mass must be between 0.1 and 5 earth masses for earth like planets'
-                                          'and 0.0268 and 5 for waterworlds.')
+                                          'and 0.0268 and 12 for water-worlds.')
 
         # https://en.wikipedia.org/wiki/Planetary_habitability - Radius
-        if not 0.5 <= self.radius.to('R_e').magnitude <= 1.5:
+        high_radius_limit = 2.8 if self.composition.startswith('Waterworld') else 2
+        if not 0.45 <= self.radius.to('R_e').magnitude <= high_radius_limit:
             habitability = False
-            habitability_violation.append('Planetary radius must be between 0.5 and 1.5 earth radii.')
+            habitability_violation.append('Planetary radius must be between 0.45 and 2 earth radii for earth-like'
+                                          ' planets and 0.45 and 2.8 earth radii for water-worlds.')
 
         # if not 0.4 < self.surface_gravity.to('g_e').magnitude < 1.6:
         #     habitability = False
@@ -1478,6 +1498,10 @@ class Satellite(Planet):
             habitability = False
             habitability_violation.append('The orbit is unstable.')
 
+        if not self.tectonic_activity.startswith('Medium'):
+            habitability = False
+            habitability_violation.append(f'The tectonic activity is probably {self.tectonic_activity.lower()}.')
+
         if 'maximum_mass_limit' in self.__dict__.keys():
             if self.mass > self.maximum_mass_limit:
                 habitability = False
@@ -1486,6 +1510,13 @@ class Satellite(Planet):
 
         if not len(habitability_violation):
             habitability_violation.append('None')
+
+        if self.composition.startswith('Waterworld'):
+            habitability_violation.append(f'\n\nNote: Life on water-worlds could emerge around the warm water close '
+                                          f'to the surface, in the oceanic depths close to the rocky interior (if any),'
+                                          f' or underneath a cold exterior surface (ice) even if the planet is not '
+                                          f'within the habitable zone of the stellar parent.')
+
         return habitability, ' '.join(habitability_violation)
 
 
