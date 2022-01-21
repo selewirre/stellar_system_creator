@@ -39,6 +39,7 @@ setuptools.setup(
                       'cairocffi',
                       'numpy',
                       'pandas',
+                      'pillow',
                       'pint',
                       'pyqt5',
                       'pyqtwebengine',
