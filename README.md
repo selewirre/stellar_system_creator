@@ -1,7 +1,8 @@
 [comment]: https://www.jetbrains.com/help/pycharm/markdown.html#code-blocks
 [comment]: https://www.markdownguide.org/basic-syntax/
 # Description
-This is a package to create custom, scientifically plausible stellar systems.
+This is a package to create custom, scientifically plausible stellar systems. 
+Find more on https://sites.google.com/view/caelian-assistants/
 
 # Installation
 To install this package, run:
