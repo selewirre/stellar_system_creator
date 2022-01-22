@@ -1,6 +1,7 @@
 from functools import partial
 from typing import Union, Dict, List
 
+import cairocffi
 import cairocffi as cairo
 import pkg_resources
 from PyQt5.QtGui import QPixmap
@@ -94,7 +95,7 @@ class UnitLineEdit(QWidget):
         return self.sse.__dict__[self.value_name]
 
     def _set_unit_drop_menu(self):
-        self.unit_drop_menu = QComboBox()
+        self.unit_drop_menu = UnitComboBox()
         self.dict_pretty = bidict({})
         self.dict_pretty, unit_str = get_unit_bidict(self.value)
         self.unit_drop_menu.addItems(list(self.dict_pretty.inverse.keys()))
@@ -107,7 +108,8 @@ class UnitLineEdit(QWidget):
         # self.line_edit.inputRejected.connect(self.keep_old_text_action)
 
     def change_text_action(self, process_change=True) -> None:
-        if self.hasFocus() or self.line_edit.hasFocus():
+        if self.hasFocus() or self.line_edit.hasFocus() \
+                or self.previousInFocusChain() or self.line_edit.previousInFocusChain():
             try:
                 self.sse.__dict__[self.value_name] = \
                     Q_(float(self.line_edit.text()), self.dict_pretty.inverse[self.unit_drop_menu.currentText()])
@@ -184,7 +186,7 @@ class UnitLabel(QWidget):
             return self.sse.__dict__[self.value_name]
 
     def _set_unit_drop_menu(self):
-        self.unit_drop_menu = QComboBox()
+        self.unit_drop_menu = UnitComboBox()
         self.dict_pretty = bidict({})
         self.dict_pretty, unit_str = get_unit_bidict(self.value)
         self.unit_drop_menu.addItems(list(self.dict_pretty.inverse.keys()))
@@ -219,7 +221,7 @@ class LineEdit(QLineEdit):
         self.influenced_labels = influenced_labels
 
     def change_text_action(self, process_change=True) -> None:
-        if self.hasFocus():
+        if self.hasFocus() or self.previousInFocusChain():
             text = self.text()
             try:
                 value = float(text)
@@ -651,6 +653,16 @@ class ComboBox(QComboBox):
                 self.influenced_labels[key].update_text()
 
 
+class UnitComboBox(QComboBox):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setFocusPolicy(Qt.StrongFocus)
+
+    def wheelEvent(self, *args, **kwargs):
+        pass
+
+
 class ImageLabel(QLabel):
 
     def __init__(self, sse: Union[Star, Planet, Satellite], *args, **kwargs):
@@ -733,7 +745,8 @@ class ImageLineEdit(QWidget):
         self.line_edit.clearFocus()
 
     def change_text_action(self, process_change=True) -> None:
-        if self.hasFocus() or self.line_edit.hasFocus():
+        if self.hasFocus() or self.line_edit.hasFocus() \
+                or self.previousInFocusChain() or self.line_edit.previousInFocusChain():
             self.sse.image_filename = self.line_edit.text()
             if process_change:
                 self.sse.__post_init__()

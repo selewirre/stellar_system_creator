@@ -21,8 +21,8 @@ def set_multi_stellar_system_tree_model_from_ssc_object(tree_model, ssc_object: 
 
     treeview_dict = {
         'S-type Binary': {'TreeViewItem': TreeViewItemFromString('S-type Binary', ssc_object),
-                           'Children': {ssc_object.parent: tvifsse(ssc_object.parent)},
-                           'Binary Children': {}},
+                          'Children': {ssc_object.parent: tvifsse(ssc_object.parent)},
+                          'Binary Children': {}},
         'Stellar Systems': {'TreeViewItem': TreeViewItemFromString('Stellar Systems', ssc_object),
                             'Children': {}}
     }
