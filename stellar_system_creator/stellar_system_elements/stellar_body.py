@@ -476,7 +476,8 @@ class Star(StellarBody):
             else:
                 self.insolation_model = InsolationBySelsis(self.temperature, self.luminosity)
         elif model_name is not None:
-            if model_name != self.insolation_model.name:
+            if model_name != self.insolation_model.name or self.temperature != self.insolation_model.star_temperature \
+                    or self.luminosity != self.insolation_model.star_luminosity:
                 if model_name == 'Kopparapu':
                     self.insolation_model = InsolationByKopparapu(self.temperature, self.luminosity)
                 else:
@@ -1642,9 +1643,9 @@ class Ring:
             basic_band_center = satellite.semi_major_axis.to('km').m
             basic_band_extend = satellite.hill_sphere.to('km').m
 
-            forbidden_bands = [[basic_band_center*resonance - basic_band_extend *
+            forbidden_bands = [[basic_band_center * resonance - basic_band_extend *
                                 (resonance / res_orders[i]) ** res_orders[i],
-                                basic_band_center*resonance + basic_band_extend *
+                                basic_band_center * resonance + basic_band_extend *
                                 (resonance / res_orders[i]) ** res_orders[i]]
                                for i, resonance in enumerate(resonances)]
             all_forbidden_bands += forbidden_bands
@@ -1680,12 +1681,13 @@ class Ring:
     def copy(self):
         return copy.deepcopy(self)
 
+
 resonances = [1]
 res_orders = [1]
 for m in range(1, 10):
     for order in range(1, 10):
         r = m / (m + order)
-        if r < 1 and r not in resonances and (r / order) ** (order+1) > 1.0E-6:
+        if r < 1 and r not in resonances and (r / order) ** (order + 1) > 1.0E-6:
             resonances.append(r)
             res_orders.append(order)
 
