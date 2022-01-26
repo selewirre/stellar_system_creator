@@ -15,7 +15,10 @@
 # example on dialogbuttonbox with tabwidget https://codetorial.net/en/pyqt5/widget/qtabwidget_advanced.html
 # example on radiobutton https://pythonbasics.org/pyqt-radiobutton/
 # example on qthread https://stackoverflow.com/questions/6783194/background-thread-with-qthread-in-pyqt
+import datetime
 import glob
+import logging
+# import pathlib
 import sys
 import os
 
@@ -59,14 +62,44 @@ class Window(QMainWindow):
         self.setMenuBar(self.menubar)
 
 
-if __name__ == "__main__":
+def run(filename=None):
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
     app.setPalette(get_dark_theme_pallet())
     win = Window()
-    # import pkg_resources
-    filename = '../examples/output_files/QuezuliferhWideBinarySystem.ssc'
-    win.central_widget.add_new_tab(filename)
+    if filename is not None:
+        win.central_widget.add_new_tab(filename)
     win.show()
     # win.showMaximized()
     sys.exit(app.exec_())
+
+
+def main(filename=None, divert_errors_to_log=False):
+    if divert_errors_to_log:
+        try:
+            run(filename)
+        except Exception:
+            time = str(datetime.datetime.now())
+            time = time.replace(' ', '_')
+            time = time.replace('-', '_')
+            time = time.replace(':', '_')
+            time = time.replace('.', 'p')
+            logging.basicConfig(filename=f'../Error_Report_{time}.log', level=logging.DEBUG,
+                                format='%(asctime)s %(message)s')
+            logging.error('A critical error occurred.', exc_info=True)
+    else:
+        run(filename)
+
+
+if __name__ == "__main__":
+    # https://stackoverflow.com/questions/162291/how-to-check-if-a-process-is-running-via-a-batch-script
+    if len(sys.argv) == 1:
+        filename = None
+    else:
+        filename = sys.argv[1]
+        filename = os.path.abspath(filename)
+        # if len(filename.split('\\')) > 1:
+        #     filename = '/'.join(filename.split('\\'))
+
+    # filename = '../examples/output_files/QuezuliferhWideBinarySystem.ssc'
+    main(filename)

@@ -9,7 +9,7 @@ To install this package, run:
 
 ```
 python3 setup.py sdist bdist_wheel
-pip3 install dist/stellar_system_creator-0.2.3.1.tar.gz
+pip3 install dist/stellar_system_creator-0.2.4.0.tar.gz
 ```
 
 If you want to check out the example code, look in the folder `examples/...`
@@ -17,25 +17,13 @@ If you want to check out the example code, look in the folder `examples/...`
 To run the GUI (which is still under construction) use the following code:
 
 ```python
-import sys
-
 import pkg_resources
-from PyQt5.QtWidgets import QApplication
-from stellar_system_creator.gui.gui_theme import get_dark_theme_pallet
-from stellar_system_creator.gui.gui_window import Window
+from stellar_system_creator.gui.gui_window import main
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    app.setStyle("Fusion")
-    app.setPalette(get_dark_theme_pallet())
-    win = Window()
     filename = pkg_resources.resource_filename(
         'stellar_system_creator', 'examples/output_files/QuezuliferhWideBinarySystem.ssc')
-    win.central_widget.add_new_tab(filename)
-
-    win.show()
-    # win.showMaximized()
-    sys.exit(app.exec_())
+    main(filename)
 ```
 
 What you can do with the GUI:

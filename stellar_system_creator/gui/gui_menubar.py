@@ -1,3 +1,4 @@
+import platform
 import sys
 from functools import partial
 
@@ -58,19 +59,25 @@ class FileMenu(QMenu):
         self.theme_submenu.addAction(self.light_theme_action)
         self.addSeparator()
         # self.addAction(self.settings_action)
-        # self.addSeparator()
+        if platform.system() == 'Windows':
+            self.addAction(self.add_file_association_action)
+            self.addSeparator()
         self.addAction(self.exit_action)
 
     def _connect_actions(self):
         self.new_project_multi_stellar_system_action.triggered.connect(partial(new_project, self, 'Multi-Stellar System'))
         self.new_project_stellar_system_action.triggered.connect(partial(new_project, self, 'Stellar System'))
         self.new_project_planetary_system_action.triggered.connect(partial(new_project, self, 'Planetary System'))
+
         self.open_project_action.triggered.connect(partial(open_project, self))
         self.save_project_action.triggered.connect(partial(save_project, self))
         self.save_as_project_action.triggered.connect(partial(save_as_project, self))
-        self.exit_action.triggered.connect(partial(exit_application, self))
+
         self.dark_theme_action.triggered.connect(partial(change_theme, self, get_dark_theme_pallet))
         self.light_theme_action.triggered.connect(partial(change_theme, self, get_light_theme_pallet))
+
+        self.add_file_association_action.triggered.connect(partial(add_file_association, sys.argv[0]))
+        self.exit_action.triggered.connect(partial(exit_application, self))
 
     def _create_menu_actions(self, menubar):
         self.new_project_submenu = QMenu("&New Project", menubar)
@@ -92,6 +99,11 @@ class FileMenu(QMenu):
         self.theme_submenu = QMenu("&Theme", menubar)
         self.dark_theme_action = QAction("&Dark...", menubar)
         self.light_theme_action = QAction("&Light...", menubar)
+
+        self.add_file_association_action = QAction("&Add File Association...", menubar)
+        self.add_file_association_action.setToolTip('Associate *.ssc files with the Stellar System Creator.'
+                                                    'Then, you can open them with this program by double-clicking'
+                                                    ' on them.')
 
         self.exit_action = QAction(QIcon.fromTheme("application-exit"), "&Exit", menubar)
         # self.exit_action.setShortcut('Alt+F4')
@@ -433,3 +445,43 @@ def open_documentation_pdf():
         # subprocess.call(('start', filename), shell=True)
     else:  # linux variants
         subprocess.call(('xdg-open', filename))
+
+
+def add_file_association(executable_filename):
+    import subprocess, os, platform
+    if platform.system() == 'Darwin':  # macOS
+        message_box = QMessageBox()
+        message_box.setIcon(QMessageBox.Information)
+        message_box.setWindowTitle("'Adding file association' failed...")
+        message_box.setText(f"This action is not yet supported on macOS.")
+        message_box.exec()
+    elif platform.system() == 'Windows':  # Windows
+        import ctypes
+
+        def is_admin():
+            try:
+                return ctypes.windll.shell32.IsUserAnAdmin()
+            except:
+                return False
+
+        if is_admin():
+            script = f"assoc .ssc && ftype sscfile=\"{executable_filename}\" \"%1\""
+            p = subprocess.Popen(["start", "cmd", "/k", script], shell=True)
+        else:
+            message_box = QMessageBox()
+            message_box.setIcon(QMessageBox.Information)
+            message_box.setWindowTitle("'Adding file association' failed...")
+            message_box.setText(f"This action requires administrator privileges. Re-open the program"
+                                f"with administrator privileges and try again.")
+            message_box.exec()
+    else:  # linux variants
+        # https://askubuntu.com/questions/289337/how-can-i-change-file-association-globally
+        # https://unix.stackexchange.com/questions/20075/how-do-i-change-file-associations-from-the-command-line
+        # https://askubuntu.com/questions/179865/how-do-i-change-the-mime-type-for-a-file
+        # https://help.ubuntu.com/community/AddingMimeTypes
+        message_box = QMessageBox()
+        message_box.setIcon(QMessageBox.Information)
+        message_box.setWindowTitle("'Adding file association' failed...")
+        message_box.setText(f"This action is not yet supported on this OS.")
+        message_box.exec()
+
