@@ -736,9 +736,14 @@ class ImageLineEdit(QWidget):
         self.browse_button.clicked.connect(self.browse_action)
 
     def browse_action(self):
-        filename = QFileDialog.getOpenFileName(self, 'Choose Image', '', "All Files (*);;Image Files (*.jpg, *.png)")[0]
-        if filename == '':
-            filename = '/visualization/default_images/gasgiant.png'
+        old_image_dir = self.sse.image_filename
+        if old_image_dir is None or old_image_dir == 'None':
+            old_image_dir = pkg_resources.resource_filename('stellar_system_creator',
+                                                            f'visualization/default_images/'
+                                                            f'habitableworld.png')
+
+        filename = QFileDialog.getOpenFileName(self, 'Choose Image', old_image_dir,
+                                               "All Files (*);;Image Files (*.jpg, *.png)")[0]
         self.line_edit.setText(filename)
         self.line_edit.setFocus()
         self.change_text_action()

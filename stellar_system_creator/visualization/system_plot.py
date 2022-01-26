@@ -75,6 +75,11 @@ class SystemPlot:
         array = get_ndarray_from_cairo_image_surface(self.plot_base_surface)
         save_image_ndarray(array, filename)
 
+    def get_pil_image(self):
+        array = get_ndarray_from_cairo_image_surface(self.plot_base_surface)
+        pil_image = Image.fromarray(array, 'RGBA')
+        return pil_image
+
     def transform_im_to_data(self, im_value, mode='x'):
         base_surface = self.plot_base_surface
         if mode == 'x':
@@ -524,6 +529,11 @@ class SystemMultiPlot:
     def save_image(self, filename):
         array = get_ndarray_from_cairo_image_surface(self.plot_base_surface)
         save_image_ndarray(array, filename)
+
+    def get_pil_image(self):
+        array = get_ndarray_from_cairo_image_surface(self.plot_base_surface)
+        pil_image = Image.fromarray(array, 'RGBA')
+        return pil_image
 
 
 def get_cairo_image_surface_from_ndarray(data: np.ndarray, flip_horizontally=False) -> cairo.ImageSurface:
