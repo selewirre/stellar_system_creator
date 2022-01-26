@@ -464,7 +464,13 @@ def add_file_association(executable_filename):
             except:
                 return False
 
-        if is_admin():
+        if executable_filename.endswith('.exe'):
+            message_box = QMessageBox()
+            message_box.setIcon(QMessageBox.Information)
+            message_box.setWindowTitle("'Adding file association' failed...")
+            message_box.setText(f"This action can not be performed for programs that do not end in *.exe.")
+            message_box.exec()
+        elif is_admin():
             script = f"assoc .ssc && ftype sscfile=\"{executable_filename}\" \"%1\""
             p = subprocess.Popen(["start", "cmd", "/k", script], shell=True)
         else:
