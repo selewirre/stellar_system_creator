@@ -2,39 +2,38 @@
 [comment]: https://www.markdownguide.org/basic-syntax/
 # Description
 This is a package to create custom, scientifically plausible stellar systems.
+Check out the [website](https://sites.google.com/view/caelian-assistants/stellar-system-creator),
+the [YouTube Channel](https://www.youtube.com/channel/UCWAz_u7tOu2IIIBqjZzY9gA), and the 
+[documentation](https://raw.githubusercontent.com/selewirre/stellar_system_creator/master/stellar_system_creator/documentation/build/latex/stellarsystemcreator.pdf)
 
 # Installation
 To install this package, run:
 
 ```
 python3 setup.py sdist bdist_wheel
-pip3 install dist/stellar_system_creator-0.2.3.0.tar.gz
+pip3 install dist/stellar_system_creator-0.3.0.1.tar.gz
 ```
 
 If you want to check out the example code, look in the folder `examples/...`
 
-To run the GUI (which is still under construction) use the following code:
+To run the GUI use the following code:
 
 ```python
 import sys
+import os
 
-import pkg_resources
-from PyQt5.QtWidgets import QApplication
-from stellar_system_creator.gui.gui_theme import get_dark_theme_pallet
-from stellar_system_creator.gui.gui_window import Window
+from stellar_system_creator.gui.gui_window import main
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    app.setStyle("Fusion")
-    app.setPalette(get_dark_theme_pallet())
-    win = Window()
-    filename = pkg_resources.resource_filename(
-        'stellar_system_creator', 'examples/output_files/QuezuliferhWideBinarySystem.ssc')
-    win.central_widget.add_new_tab(filename)
+    if len(sys.argv) == 1:
+        filename = None
+    else:
+        filename = sys.argv[1]
+        filename = os.path.abspath(filename)
 
-    win.show()
-    # win.showMaximized()
-    sys.exit(app.exec_())
+    # filename = '../examples/output_files/QuezuliferhWideBinarySystem.sscl'
+    main(filename)
+
 ```
 
 What you can do with the GUI:
@@ -51,8 +50,8 @@ What you can NOT do with the GUI just yet:
 2. Add your own image as system background.
 3. Add ssc files as subsystem (in add XX system option).
 
-When rendering, allow the program to work through it (takes 5-30 seconds) if you added asteroid belts and/or trojans.
-It is adding 500+ images on a single image.
+When loading a new system, allow the program to work through it (takes 5-10 seconds). 
+Rendering might also take some time.
 
 # License 
 GNU GPL v3 license.
@@ -65,9 +64,8 @@ I would greatly appreciate it if users clearly state that their illustrations an
 (partially or completely) with this project.
 
 # Other Sources
-Great worldbuiling sources of this type can be found on:
-1. [Artifexian world-building videos](https://www.youtube.com/playlist?list=PLduA6tsl3gygXJbq_iQ_5h2yri4WL6zsS)
-2. [Worldbuilding Pasta](https://worldbuildingpasta.blogspot.com/)
+Check my [website](https://sites.google.com/view/caelian-assistants/resources) 
+for more great world-builing sources of this type.
 
 # Contact
 Please report any questions, issues, concerns, suggestions at <selewirre@gmail.com>.
