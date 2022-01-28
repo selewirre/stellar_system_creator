@@ -1,3 +1,4 @@
+import platform
 import sys
 from functools import partial
 
@@ -9,7 +10,7 @@ from PyQt5.QtWidgets import QMenu, QAction, QFileDialog, QMenuBar, QMessageBox, 
     QPushButton, QApplication, QSplitterHandle, QWidget
 
 from stellar_system_creator.astrothings.units import ureg
-from stellar_system_creator.filing import save as save_ssc_object, add_extension_if_necessary
+from stellar_system_creator.filing import save as save_ssc_object, save_as_ssc_light, add_extension_if_necessary
 from stellar_system_creator.gui.gui_central_widget import CentralWidget
 from stellar_system_creator.gui.gui_theme import get_icon_with_theme_colors, get_dark_theme_pallet, \
     get_light_theme_pallet
@@ -43,7 +44,6 @@ class FileMenu(QMenu):
         self._create_menu()
 
     def _create_menu(self):
-
         self.addMenu(self.new_project_submenu)
         self.new_project_submenu.addAction(self.new_project_multi_stellar_system_action)
         self.new_project_submenu.addAction(self.new_project_stellar_system_action)
@@ -58,19 +58,26 @@ class FileMenu(QMenu):
         self.theme_submenu.addAction(self.light_theme_action)
         self.addSeparator()
         # self.addAction(self.settings_action)
-        # self.addSeparator()
+        if platform.system() == 'Windows':
+            self.addAction(self.add_file_association_action)
+            self.addSeparator()
         self.addAction(self.exit_action)
 
     def _connect_actions(self):
-        self.new_project_multi_stellar_system_action.triggered.connect(partial(new_project, self, 'Multi-Stellar System'))
+        self.new_project_multi_stellar_system_action.triggered.connect(
+            partial(new_project, self, 'Multi-Stellar System'))
         self.new_project_stellar_system_action.triggered.connect(partial(new_project, self, 'Stellar System'))
         self.new_project_planetary_system_action.triggered.connect(partial(new_project, self, 'Planetary System'))
+
         self.open_project_action.triggered.connect(partial(open_project, self))
         self.save_project_action.triggered.connect(partial(save_project, self))
         self.save_as_project_action.triggered.connect(partial(save_as_project, self))
-        self.exit_action.triggered.connect(partial(exit_application, self))
+
         self.dark_theme_action.triggered.connect(partial(change_theme, self, get_dark_theme_pallet))
         self.light_theme_action.triggered.connect(partial(change_theme, self, get_light_theme_pallet))
+
+        self.add_file_association_action.triggered.connect(partial(add_file_association, sys.argv[0]))
+        self.exit_action.triggered.connect(partial(exit_application, self))
 
     def _create_menu_actions(self, menubar):
         self.new_project_submenu = QMenu("&New Project", menubar)
@@ -93,6 +100,11 @@ class FileMenu(QMenu):
         self.dark_theme_action = QAction("&Dark...", menubar)
         self.light_theme_action = QAction("&Light...", menubar)
 
+        self.add_file_association_action = QAction("&Add File Association...", menubar)
+        self.add_file_association_action.setToolTip('Associate *.ssc files with the Stellar System Creator.'
+                                                    'Then, you can open them with this program by double-clicking'
+                                                    ' on them.')
+
         self.exit_action = QAction(QIcon.fromTheme("application-exit"), "&Exit", menubar)
         # self.exit_action.setShortcut('Alt+F4')
 
@@ -107,7 +119,6 @@ class EditMenu(QMenu):
         self._create_menu()
 
     def _create_menu(self):
-
         self.addAction(self.undo_action)
         self.addAction(self.redo_action)
         self.addSeparator()
@@ -171,7 +182,6 @@ class InsertMenu(QMenu):
         self._create_menu()
 
     def _create_menu(self):
-
         self.addAction(self.star_action)
         self.addSeparator()
         self.addAction(self.planet_action)
@@ -229,6 +239,7 @@ class HelpMenu(QMenu):
 
 class HelpDialog(QDialog):
     """Source: https://zetcode.com/pyqt/qwebengineview/"""
+
     def __init__(self, parent):
         super().__init__(parent)
         self.setWindowTitle('Documentation')
@@ -322,7 +333,7 @@ def new_project(parent, system_type):
         if system_type == 'Multi-Stellar System':
             parent_star1 = MainSequenceStar(system_name + '1', 1 * ureg.M_s)
             parent_star2 = MainSequenceStar(system_name + '2', 1 * ureg.M_s)
-            parent_binary = StellarBinary(system_name, parent_star1, parent_star2, 500*ureg.au, 0.6)
+            parent_binary = StellarBinary(system_name, parent_star1, parent_star2, 500 * ureg.au, 0.6)
             ss1 = StellarSystem(system_name + '1', parent_star1)
             ss2 = StellarSystem(system_name + '2', parent_star2)
             ssc_object = MultiStellarSystemSType(system_name, parent_binary, [ss1, ss2])
@@ -333,7 +344,7 @@ def new_project(parent, system_type):
             parent_planet = Planet(system_name, 1 * ureg.M_e)
             ssc_object = PlanetarySystem(system_name, parent_planet)
 
-        save_ssc_object(ssc_object, filename)
+        save_as_ssc_light(ssc_object, filename)
         central_widget: CentralWidget = parent.parent().parent().central_widget
         central_widget.add_new_tab(filename)
     else:
@@ -342,7 +353,9 @@ def new_project(parent, system_type):
 
 def open_project(parent):
     central_widget: CentralWidget = parent.parent().parent().central_widget
-    filename = QFileDialog.getOpenFileName(parent, 'Open Project(s)', '', "All Files (*);;Python Files (*.ssc)")[0]
+    filename = QFileDialog.getOpenFileName(parent, 'Open Project(s)', '',
+                                           "All Files (*);;Stellar System Creator Light Files (*.sscl);;"
+                                           "Stellar System Creator Files (*.ssc)")[0]
     try:
         if filename != '':
             central_widget.add_new_tab(filename)
@@ -360,7 +373,10 @@ def save_as_project(parent):
     ssc_object = central_widget.get_ssc_object_of_current_tab()
     filename: str = QFileDialog.getSaveFileName(parent, 'Save Project')[0]
     if filename != '':
-        save_ssc_object(ssc_object, filename)
+        if filename.endswith('.ssc'):
+            save_ssc_object(ssc_object, filename)
+        else:
+            save_as_ssc_light(ssc_object, filename)
     else:
         return
 
@@ -369,7 +385,10 @@ def save_project(parent):
     central_widget: CentralWidget = parent.parent().parent().central_widget
     ssc_object = central_widget.get_ssc_object_of_current_tab()
     filename = central_widget.get_project_tree_view_of_current_tab().filename
-    saved = save_ssc_object(ssc_object, filename)
+    if filename.endswith('.ssc'):
+        saved = save_ssc_object(ssc_object, filename)
+    else:
+        saved = save_as_ssc_light(ssc_object, filename)
     tab_text = central_widget.tabText(central_widget.currentIndex())
     if saved and tab_text.startswith('*'):
         central_widget.setTabText(central_widget.currentIndex(), tab_text[1:])
@@ -433,3 +452,48 @@ def open_documentation_pdf():
         # subprocess.call(('start', filename), shell=True)
     else:  # linux variants
         subprocess.call(('xdg-open', filename))
+
+
+def add_file_association(executable_filename):
+    import subprocess, os, platform
+    if platform.system() == 'Darwin':  # macOS
+        message_box = QMessageBox()
+        message_box.setIcon(QMessageBox.Information)
+        message_box.setWindowTitle("'Adding file association' failed...")
+        message_box.setText(f"This action is not yet supported on macOS.")
+        message_box.exec()
+    elif platform.system() == 'Windows':  # Windows
+        import ctypes
+
+        def is_admin():
+            try:
+                return ctypes.windll.shell32.IsUserAnAdmin()
+            except:
+                return False
+
+        if not executable_filename.endswith('.exe'):
+            message_box = QMessageBox()
+            message_box.setIcon(QMessageBox.Information)
+            message_box.setWindowTitle("'Adding file association' failed...")
+            message_box.setText(f"This action can not be performed for programs that do not end in *.exe.")
+            message_box.exec()
+        elif is_admin():
+            script = f'assoc .ssc=sscfile && ftype sscfile=\"{executable_filename}\" \"%1\"'
+            p = subprocess.Popen(["start", "cmd", "/k", script], shell=True)
+        else:
+            message_box = QMessageBox()
+            message_box.setIcon(QMessageBox.Information)
+            message_box.setWindowTitle("'Adding file association' failed...")
+            message_box.setText(f"This action requires administrator privileges. Re-open the program"
+                                f"with administrator privileges and try again.")
+            message_box.exec()
+    else:  # linux variants
+        # https://askubuntu.com/questions/289337/how-can-i-change-file-association-globally
+        # https://unix.stackexchange.com/questions/20075/how-do-i-change-file-associations-from-the-command-line
+        # https://askubuntu.com/questions/179865/how-do-i-change-the-mime-type-for-a-file
+        # https://help.ubuntu.com/community/AddingMimeTypes
+        message_box = QMessageBox()
+        message_box.setIcon(QMessageBox.Information)
+        message_box.setWindowTitle("'Adding file association' failed...")
+        message_box.setText(f"This action is not yet supported on this OS.")
+        message_box.exec()
