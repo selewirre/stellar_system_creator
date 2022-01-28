@@ -6,7 +6,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSplitter, QMessageBox, QDialog, QLineEdit, QFormLayout, QDialogButtonBox
 
-from stellar_system_creator.filing import load
+from stellar_system_creator.filing import load as load_ssc, load_ssc_light
 from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
 from stellar_system_creator.gui.gui_image_rendering import SystemImageWidget
 from PyQt5.Qt import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel
@@ -27,9 +27,12 @@ class CentralWidget(QTabWidget):
         self.tabBarDoubleClicked.connect(self.toggle_hide_tab_contents)
         self.tabCloseRequested.connect(self.close_tab)
 
-    def add_new_tab(self, filename):
+    def add_new_tab(self, filename: str):
         tab_content = QSplitter(Qt.Horizontal)
-        ssc_object = load(filename)
+        if filename.endswith('.ssc'):
+            ssc_object = load_ssc(filename)
+        else:
+            ssc_object = load_ssc_light(filename)
         tree_view = ProjectTreeView(ssc_object, filename)
         tab_header = self.make_tab_header(tree_view.ssc_object.name, tree_view, tab_content)
 

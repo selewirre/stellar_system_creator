@@ -7,7 +7,6 @@ from PyQt5.QtCore import Qt, QModelIndex
 from PyQt5.QtWidgets import QTreeView, QVBoxLayout
 from PyQt5.Qt import QStandardItemModel
 
-from stellar_system_creator.filing import load
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
 from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem, MultiStellarSystemSType
 from stellar_system_creator.stellar_system_elements.stellar_body import StellarBody
