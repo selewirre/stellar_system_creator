@@ -1,5 +1,7 @@
 import io
 import os
+from zipfile import ZipFile
+
 import pkg_resources
 import numpy as np
 from PIL import Image
@@ -79,4 +81,11 @@ def adjust_star_image_by_temp(image, temp):
 
 
 def load_user_image(filename):
-    return np.array(Image.open(filename))
+    directory = os.path.dirname(filename)
+    if not os.path.isfile(directory):
+        return np.array(Image.open(filename))
+    else:
+        with ZipFile(directory) as archive:
+            basename = os.path.basename(filename)
+            with archive.open(basename) as image_file:
+                return np.array(Image.open(image_file))

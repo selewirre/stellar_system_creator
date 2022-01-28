@@ -1,5 +1,6 @@
 import copy
 import inspect
+import uuid
 from typing import List, Union
 
 from stellar_system_creator.stellar_system_elements.binary_system import BinarySystem
@@ -17,6 +18,7 @@ class StellarSystem:
         if asteroid_belts is None:
             asteroid_belts = []
 
+        self._uuid = str(uuid.uuid4())
         self.name = name
         self.parent = parent
         self.planetary_systems = planetary_systems
@@ -74,6 +76,9 @@ class StellarSystem:
         self.asteroid_belts = [asteroid_belt for asteroid_belt in self.asteroid_belts
                                if asteroid_belt != garbage_asteroid_belt]
         self.parent.remove_child(garbage_asteroid_belt)
+
+    def get_children(self):
+        return self.planetary_systems + self.asteroid_belts
 
     def get_children_orbit_distances(self, units='au', system_plot=None):
         distances = []
@@ -145,12 +150,18 @@ class StellarSystem:
         cls_obj = cls(**kwargs)
         return cls_obj
 
+    @property
+    def uuid(self):
+        return self._uuid
+
 
 class MultiStellarSystemSType:
 
     def __init__(self, name, parent: BinarySystem = None, children: List[StellarSystem] = None) -> None:
         if children is None:
             children = []
+
+        self._uuid = str(uuid.uuid4())
         self.name = name
         self.parent = parent
         self.children = children
@@ -177,6 +188,9 @@ class MultiStellarSystemSType:
 
     def remove_object(self, garbage_object):
         self.remove_child(garbage_object)
+
+    def get_children(self):
+        return self.children
 
     def _set_system_plot(self):
         from stellar_system_creator.visualization.system_plot import SystemMultiPlot
@@ -212,3 +226,7 @@ class MultiStellarSystemSType:
         kwargs = {key: multi_stellar_system_s_type.__dict__[key] for key in arg_keys}
         cls_obj = cls(**kwargs)
         return cls_obj
+
+    @property
+    def uuid(self):
+        return self._uuid

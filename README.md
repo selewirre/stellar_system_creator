@@ -9,7 +9,7 @@ To install this package, run:
 
 ```
 python3 setup.py sdist bdist_wheel
-pip3 install dist/stellar_system_creator-0.2.4.0.tar.gz
+pip3 install dist/stellar_system_creator-0.3.0.0.tar.gz
 ```
 
 If you want to check out the example code, look in the folder `examples/...`
@@ -21,9 +21,9 @@ import pkg_resources
 from stellar_system_creator.gui.gui_window import main
 
 if __name__ == "__main__":
-    filename = pkg_resources.resource_filename(
-        'stellar_system_creator', 'examples/output_files/QuezuliferhWideBinarySystem.ssc')
-    main(filename)
+    # filename = pkg_resources.resource_filename(
+    #     'stellar_system_creator', 'examples/output_files/QuezuliferhWideBinarySystem.ssc')
+    main()
 ```
 
 What you can do with the GUI:

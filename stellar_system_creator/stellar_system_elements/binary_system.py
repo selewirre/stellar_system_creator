@@ -1,5 +1,6 @@
 import copy
 import inspect
+import uuid
 
 import numpy as np
 from typing import Union, Tuple
@@ -30,6 +31,7 @@ class BinarySystem:
                  mean_distance: Q_ = np.nan * ureg.au, eccentricity: float = np.nan,
                  parent: Union["BinarySystem", StellarBody, Star, Planet] = None) -> None:
 
+        self._uuid = str(uuid.uuid4())
         self.name = name
         self._set_children_list()
         self.primary_body = primary_body
@@ -258,6 +260,10 @@ class BinarySystem:
     @property
     def children(self):
         return self._children
+
+    @property
+    def uuid(self):
+        return self._uuid
 
     @classmethod
     def load_with_args(cls, binary_system: "BinarySystem"):
