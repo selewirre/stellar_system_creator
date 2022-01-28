@@ -34,6 +34,9 @@ class Color:
         if self.mode != to_mode and to_mode in ['RGBA', 'BGRA', 'RGB', 'BGR']:
             self.mode = to_mode
 
+    def __repr__(self):
+        return self.get_color().__repr__()
+
 
 class GradientColor(Color):
 

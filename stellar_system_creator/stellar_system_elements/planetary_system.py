@@ -1,5 +1,6 @@
 import copy
 import inspect
+import uuid
 from typing import List, Union
 
 from stellar_system_creator.stellar_system_elements.binary_system import BinarySystem
@@ -16,6 +17,7 @@ class PlanetarySystem:
         if trojans_list is None:
             trojans_list = []
 
+        self._uuid = str(uuid.uuid4())
         self.name = name
         self.parent = parent
         self.satellite_list = satellite_list
@@ -74,6 +76,9 @@ class PlanetarySystem:
                              if trojan != garbage_trojan]
         self.parent.remove_child(garbage_trojan)
 
+    def get_children(self):
+        return self.satellite_list + self.trojans_list
+
     def get_children_orbit_distances(self, units='au', system_plot=None):
         distances = []
         for satellite in self.satellite_list:
@@ -125,3 +130,7 @@ class PlanetarySystem:
         kwargs = {key: planetary_system.__dict__[key] for key in arg_keys}
         cls_obj = cls(**kwargs)
         return cls_obj
+
+    @property
+    def uuid(self):
+        return self._uuid
