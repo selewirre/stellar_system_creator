@@ -1,10 +1,12 @@
+import os
 from typing import Union
 
 import numpy as np
 from PyQt5.QtWidgets import QMenu, QAction, QDialog, QDialogButtonBox, QVBoxLayout, QWidget, QLineEdit, QFormLayout, \
-    QComboBox, QHBoxLayout, QRadioButton, QSizePolicy, QMessageBox
+    QComboBox, QHBoxLayout, QRadioButton, QSizePolicy, QMessageBox, QFileDialog
 from PyQt5.Qt import QStandardItem
 
+from stellar_system_creator.filing import load_ssc_light, load as load_ssc
 from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
 from stellar_system_creator.stellar_system_elements.stellar_body import MainSequenceStar, Planet, AsteroidBelt, \
     Satellite, Trojan, TrojanSatellite, BlackHole
@@ -324,6 +326,85 @@ def add_trojan_satellite(name, tree_view_item):
     tree_view_item.appendRow(new_tree_view_item)
 
 
+# def add_stellar_system_from_file(filename, tree_view_item):
+#     from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
+#         import TreeViewItemFromStellarSystemElement as tvifsse, TreeViewItemFromString
+#     tree_view_item: TreeViewItemFromString
+#
+#     if tree_view_item.ssc_parent.children is not None:
+#         if len(tree_view_item.ssc_parent.children) >= 2:
+#             message_box = QMessageBox()
+#             message_box.setIcon(QMessageBox.Information)
+#             message_box.setWindowTitle("'Add from file' has failed...")
+#             message_box.setText(f"{tree_view_item.ssc_parent.name} already has two stellar systems. "
+#                                 f"Remove at least one before trying again.")
+#             message_box.exec()
+#             return
+#
+#     new_stellar_system = load_ssc_light(filename)
+#
+#     if not isinstance(new_stellar_system, StellarSystem):
+#         message_box = QMessageBox()
+#         message_box.setIcon(QMessageBox.Information)
+#         message_box.setWindowTitle("'Add from file' has failed...")
+#         message_box.setText(f"The {filename} does not contain a Stellar System. ")
+#         message_box.exec()
+#         return
+#
+#     # tree_view_item.ssc_parent.parent.  change primary or secondary body of binary
+#     new_stellar_system.parent.__post_init__()
+#     tree_view_item.ssc_parent.add_child(new_stellar_system)
+#     tree_view_item.ssc_parent.reset_system_plot()
+#
+#     new_tree_view_item = tvifsse(new_stellar_system)
+#     tree_view_item.appendRow(new_tree_view_item)
+#     new_tree_view_item.update_text()
+#
+#     from stellar_system_creator.gui.gui_project_tree_view import set_stellar_system_tree_model_from_ssc_object
+#     set_stellar_system_tree_model_from_ssc_object(new_tree_view_item, new_stellar_system)
+#
+#     from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
+#     tree_view: ProjectTreeView = new_tree_view_item.model().parent()
+#     tree_view.expandRecursively(new_tree_view_item.index())
+
+
+def add_planetary_system_from_file(filename, tree_view_item):
+    from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
+        import TreeViewItemFromStellarSystemElement as tvifsse, TreeViewItemFromString
+    tree_view_item: TreeViewItemFromString
+
+    if filename.endswith('ssc'):
+        new_planetary_system = load_ssc(filename)
+    else:
+        new_planetary_system = load_ssc_light(filename, set_new_uuids=True)
+
+    if not isinstance(new_planetary_system, PlanetarySystem):
+        message_box = QMessageBox()
+        message_box.setIcon(QMessageBox.Information)
+        message_box.setWindowTitle("'Add from file' has failed...")
+        message_box.setText(f"The {filename} does not contain a Planetary System. ")
+        message_box.exec()
+        return
+
+    new_planetary_system.parent.parent = tree_view_item.ssc_parent.parent
+    new_planetary_system.parent.__post_init__()
+    tree_view_item.ssc_parent.add_planetary_system(new_planetary_system)
+    tree_view_item.ssc_parent.reset_system_plot()
+    if tree_view_item.ssc_parent != tree_view_item.model().parent().ssc_object:
+        tree_view_item.model().parent().ssc_object.reset_system_plot()
+
+    new_tree_view_item = tvifsse(new_planetary_system)
+    tree_view_item.appendRow(new_tree_view_item)
+    new_tree_view_item.update_text()
+
+    from stellar_system_creator.gui.gui_project_tree_view import set_planetary_system_tree_model_from_ssc_object
+    set_planetary_system_tree_model_from_ssc_object(new_tree_view_item, new_planetary_system)
+
+    from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
+    tree_view: ProjectTreeView = new_tree_view_item.model().parent()
+    tree_view.expandRecursively(new_tree_view_item.index())
+
+
 add_element_function = {'Stellar System': add_stellar_system,
                         'Stellar Binary': add_stellar_binary,
                         'Star': add_star,
@@ -346,8 +427,10 @@ class CategoryBasedTreeViewItemContextMenu(QMenu):
         if self.category.endswith('s'):
             self.category = self.category[:-1]
             self.add_element_text = f"&Add {self.category}..."
+            self.add_from_file_text = f"&Add {self.category} from file..."
         else:
             self.add_element_text = f"&Replace {self.category}..."
+            self.add_from_file_text = f"&Replace {self.category} from file..."
 
         self._create_menu_actions()
         self._connect_actions()
@@ -355,24 +438,28 @@ class CategoryBasedTreeViewItemContextMenu(QMenu):
 
     def _create_menu(self):
         self.addSection(self.parent_item.text())
-        if self.category != 'S-type Binary':
+        if self.category not in ['S-type Binary', 'Stellar System']:
             self.addAction(self.add_element_action)
+        if self.category == 'Planetary System':
+            self.addAction(self.add_from_file_action)
         self.addSeparator()
         self.addAction(self.expand_all_action)
         self.addAction(self.collapse_all_action)
         # if self.category != 'Stellar Parent':
-        if self.category != 'S-type Binary':
+        if self.category not in ['S-type Binary', 'Stellar System', 'Planetary Parent', 'Stellar Parent']:
             self.addSeparator()
             self.addAction(self.delete_all_action)
 
     def _connect_actions(self):
         self.add_element_action.triggered.connect(self.add_element_process)
+        self.add_from_file_action.triggered.connect(self.add_from_file_process)
         self.expand_all_action.triggered.connect(self.expand_all_process)
         self.collapse_all_action.triggered.connect(self.collapse_all_process)
         self.delete_all_action.triggered.connect(self.delete_all_process)
 
     def _create_menu_actions(self):
         self.add_element_action = QAction(self.add_element_text, self)
+        self.add_from_file_action = QAction(self.add_from_file_text, self)
         self.expand_all_action = QAction(f"&Expand all", self)
         self.collapse_all_action = QAction(f"&Collapse all", self)
         self.delete_all_action = QAction(f"&Delete all...", self)
@@ -383,6 +470,23 @@ class CategoryBasedTreeViewItemContextMenu(QMenu):
         if aed.category is not None:
             add_element_function[aed.category](aed.name_line_edit.text(), self.parent_item)
             self.parent_item.model().parent().update_tab_title()
+
+    def add_from_file_process(self):
+        filename = QFileDialog.getOpenFileName(self, 'Open Project(s)', '',
+                                               "All Files (*);;Stellar System Creator Light Files (*.sscl);;"
+                                               "Stellar System Creator Files (*.ssc)")[0]
+        if filename == '':
+            return
+        elif os.path.exists(filename) and (filename.endswith('.sscl') or filename.endswith('.ssc')):
+            if 'Planetary System' in self.category:
+                add_planetary_system_from_file(filename, self.parent_item)
+                self.parent_item.model().parent().update_tab_title()
+        else:
+            message_box = QMessageBox()
+            message_box.setIcon(QMessageBox.Information)
+            message_box.setWindowTitle(f"'Add {self.category} from file' has failed...")
+            message_box.setText(f"File '{filename}' is not compatible or does not exist.")
+            message_box.exec()
 
     def expand_all_process(self):
         from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView

@@ -55,17 +55,21 @@ class StellarSystem:
 
     def add_planetary_system(self, planetary_system: PlanetarySystem):
         self.planetary_systems.append(planetary_system)
+        self.sort_planetary_systems_by_distance()
 
     def add_planetary_systems(self, planetary_systems: List[PlanetarySystem]):
         for planetary_system in planetary_systems:
             self.planetary_systems.append(planetary_system)
+        self.sort_planetary_systems_by_distance()
 
     def add_asteroid_belt(self, asteroid_belt: AsteroidBelt):
         self.asteroid_belts.append(asteroid_belt)
+        self.sort_asteroid_belts_by_distance()
 
     def add_asteroid_belts(self, asteroid_belts: List[AsteroidBelt]):
         for asteroid_belt in asteroid_belts:
             self.asteroid_belts.append(asteroid_belt)
+        self.sort_asteroid_belts_by_distance()
 
     def remove_planetary_system(self, garbage_planetary_system):
         self.planetary_systems = [planetary_system for planetary_system in self.planetary_systems
@@ -76,6 +80,32 @@ class StellarSystem:
         self.asteroid_belts = [asteroid_belt for asteroid_belt in self.asteroid_belts
                                if asteroid_belt != garbage_asteroid_belt]
         self.parent.remove_child(garbage_asteroid_belt)
+
+    def sort_planetary_systems_by_distance(self):
+        if not len(self.planetary_systems):
+            return
+
+        units = self.planetary_systems[0].parent.semi_major_axis.units
+        planet_semimajor_axis = [ps.parent.semi_major_axis.to(units).m for ps in self.planetary_systems]
+
+        zipped_lists = zip(planet_semimajor_axis, self.planetary_systems)
+        sorted_pairs = sorted(zipped_lists)
+        _, self.planetary_systems = [list(tpl) for tpl in zip(*sorted_pairs)]
+
+    def sort_asteroid_belts_by_distance(self):
+        if not len(self.asteroid_belts):
+            return
+
+        units = self.asteroid_belts[0].semi_major_axis.units
+        ab_semimajor_axis = [ab.semi_major_axis.to(units).m for ab in self.asteroid_belts]
+
+        zipped_lists = zip(ab_semimajor_axis, self.asteroid_belts)
+        sorted_pairs = sorted(zipped_lists)
+        _, self.asteroid_belts = [list(tpl) for tpl in zip(*sorted_pairs)]
+
+    def sort_all_by_distance(self):
+        self.sort_planetary_systems_by_distance()
+        self.sort_asteroid_belts_by_distance()
 
     def get_children(self):
         return self.planetary_systems + self.asteroid_belts
@@ -120,6 +150,9 @@ class StellarSystem:
         from stellar_system_creator.visualization.system_plot import SystemPlot
         self.system_plot = SystemPlot(self)
 
+    def reset_system_plot(self):
+        self._set_system_plot()
+
     def clear_system_plot(self):
         self.system_plot.delete_plot()
 
@@ -153,6 +186,19 @@ class StellarSystem:
     @property
     def uuid(self):
         return self._uuid
+
+    def reset_uuid(self):
+        self._uuid = str(uuid.uuid4())
+
+    def reset_system_uuids(self):
+        self.parent.reset_uuid()
+        if isinstance(self.parent, BinarySystem):
+            self.parent.primary_body.reset_uuid()
+            self.parent.secondary_body.reset_uuid()
+        for ps in self.planetary_systems:
+            ps.reset_system_uuids()
+        for ab in self.asteroid_belts:
+            ab.reset_uuid()
 
 
 class MultiStellarSystemSType:
@@ -196,6 +242,9 @@ class MultiStellarSystemSType:
         from stellar_system_creator.visualization.system_plot import SystemMultiPlot
         self.system_plot = SystemMultiPlot(self)
 
+    def reset_system_plot(self):
+        self._set_system_plot()
+
     def clear_system_plot(self):
         self.system_plot.delete_plot()
 
@@ -230,3 +279,14 @@ class MultiStellarSystemSType:
     @property
     def uuid(self):
         return self._uuid
+
+    def reset_uuid(self):
+        self._uuid = str(uuid.uuid4())
+
+    def reset_system_uuids(self):
+        self.parent.reset_uuid()
+        if isinstance(self.parent, BinarySystem):
+            self.parent.primary_body.reset_uuid()
+            self.parent.secondary_body.reset_uuid()
+        for child in self.children:
+            child.reset_system_uuids()

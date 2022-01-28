@@ -54,10 +54,12 @@ class PlanetarySystem:
 
     def add_satellite(self, satellite: Satellite):
         self.satellite_list.append(satellite)
+        self.sort_satellites_by_distance()
 
     def add_satellites(self, satellites: List[Satellite]):
         for satellite in satellites:
             self.satellite_list.append(satellite)
+        self.sort_satellites_by_distance()
 
     def add_trojan(self, trojan: Trojan):
         self.trojans_list.append(trojan)
@@ -75,6 +77,19 @@ class PlanetarySystem:
         self.trojans_list = [trojan for trojan in self.trojans_list
                              if trojan != garbage_trojan]
         self.parent.remove_child(garbage_trojan)
+
+    def sort_satellites_by_distance(self):
+        if not len(self.satellite_list):
+            return
+        units = self.satellite_list[0].semi_major_axis.units
+        sat_semimajor_axis = [sat.semi_major_axis.to(units).m for sat in self.satellite_list]
+
+        zipped_lists = zip(sat_semimajor_axis, self.satellite_list)
+        sorted_pairs = sorted(zipped_lists)
+        _, self.satellite_list = [list(tpl) for tpl in zip(*sorted_pairs)]
+
+    def sort_all_by_distance(self):
+        self.sort_satellites_by_distance()
 
     def get_children(self):
         return self.satellite_list + self.trojans_list
@@ -100,6 +115,9 @@ class PlanetarySystem:
     def _set_system_plot(self):
         from stellar_system_creator.visualization.system_plot import SystemPlot
         self.system_plot = SystemPlot(self)
+
+    def reset_system_plot(self):
+        self._set_system_plot()
 
     def clear_system_plot(self):
         self.system_plot.delete_plot()
@@ -134,3 +152,16 @@ class PlanetarySystem:
     @property
     def uuid(self):
         return self._uuid
+
+    def reset_uuid(self):
+        self._uuid = str(uuid.uuid4())
+
+    def reset_system_uuids(self):
+        self.parent.reset_uuid()
+        if isinstance(self.parent, BinarySystem):
+            self.parent.primary_body.reset_uuid()
+            self.parent.secondary_body.reset_uuid()
+        for sat in self.satellite_list:
+            sat.reset_uuid()
+        for trojan in self.trojans_list:
+            trojan.reset_uuid()

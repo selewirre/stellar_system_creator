@@ -1,5 +1,8 @@
 from PyQt5.QtWidgets import QVBoxLayout, QTabWidget, QWidget, QFormLayout
 
+from stellar_system_creator.stellar_system_elements import PlanetarySystem
+from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem
+
 from stellar_system_creator.astrothings.radius_models.planetary_radius_model import planet_compositions
 from stellar_system_creator.stellar_system_elements.stellar_body import Planet, Planet, TrojanSatellite, Satellite, \
     Trojan, AsteroidBelt
@@ -454,6 +457,25 @@ class PlanetDetailsDialog(BasicDetailsDialog):
     def confirm_other_edit_changes(self):
         self.other_edit_init_values['Composition Type'] = self.parent_item.ssc_object.chemical_composition
         self.other_edit_init_values['Orbit Type'] = self.parent_item.ssc_object.orbit_type
+
+    def accept(self) -> None:
+        super().accept()
+
+        parent = self.parent_item
+        if self.parent_item.ssc_object.__class__ == Planet:
+            target_system = StellarSystem
+        else:
+            target_system = PlanetarySystem
+
+        from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items import \
+            TreeViewItemFromStellarSystemElement
+
+        while not parent.ssc_object.__class__ == target_system:
+            parent = parent.parent()
+            while not isinstance(parent, TreeViewItemFromStellarSystemElement):
+                parent = parent.parent()
+
+        parent.ssc_object.sort_all_by_distance()
 
 
 class SatelliteDetailsDialog(PlanetDetailsDialog):

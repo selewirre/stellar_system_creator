@@ -327,6 +327,9 @@ class StellarBody:
     def uuid(self):
         return self._uuid
 
+    def reset_uuid(self):
+        self._uuid = str(uuid.uuid4())
+
     @classmethod
     def load_with_args(cls, stellar_body: "StellarBody"):
         arg_keys = inspect.getfullargspec(cls)

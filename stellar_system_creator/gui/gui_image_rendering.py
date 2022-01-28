@@ -439,6 +439,18 @@ class RenderingSettingsDialog(QDialog):
 
         self.available_systems_drop_down.currentTextChanged.connect(self.available_system_selection_change_process)
         self.available_systems_drop_down.model().sort(0)
+        self.available_systems_drop_down.update()
+
+    def reset_available_systems_drop_down(self):
+        text_before_reset = self.available_systems_drop_down.currentText()
+        # self.available_systems_drop_down.clear()
+        old_drop_down = self.available_systems_drop_down
+        old_drop_down.deleteLater()
+        self._set_available_systems_drop_down()
+        self.options_widget.layout().replaceWidget(old_drop_down, self.available_systems_drop_down)
+        index = self.available_systems_drop_down.findText(text_before_reset)
+        if index >= 0:
+            self.available_systems_drop_down.setCurrentIndex(index)
 
     def available_system_selection_change_process(self):
         obj_name = self.available_systems_drop_down.currentText()

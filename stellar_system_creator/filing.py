@@ -241,14 +241,20 @@ def save_binary_to_json(obj: BinarySystem, target_folder: str):
         raise TypeError(f'Could not save {obj} because it not a binary system.')
 
 
-def load_ssc_light(filename: str) -> Union[StellarBody, BinarySystem,
-                                           PlanetarySystem, StellarSystem, MultiStellarSystemSType]:
+def load_ssc_light(filename: str, set_new_uuids=False) -> Union[StellarBody, BinarySystem,
+                                                                PlanetarySystem, StellarSystem,
+                                                                MultiStellarSystemSType]:
 
     allmother_filename = os.path.join(filename, '.allmother.json')
-    print(allmother_filename)
+    print('Loading', allmother_filename)
     kwargs = get_dict_from_json(allmother_filename)
 
-    return get_object_from_kwargs_uuid(kwargs['allmother_uuid'], allmother_filename)
+    obj = get_object_from_kwargs_uuid(kwargs['allmother_uuid'], allmother_filename)
+
+    if set_new_uuids:
+        obj.reset_system_uuids()
+
+    return obj
 
 
 def load_system_from_json(filename: str) -> Union[PlanetarySystem, StellarSystem, MultiStellarSystemSType]:
@@ -429,3 +435,5 @@ def list_files(directory):
         for name in files:
             r.append(os.path.join(root, name))
     return r
+
+

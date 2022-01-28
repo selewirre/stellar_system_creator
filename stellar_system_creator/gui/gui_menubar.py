@@ -326,7 +326,9 @@ class HelpDialog(QDialog):
 
 
 def new_project(parent, system_type):
-    filename: str = QFileDialog.getSaveFileName(parent, 'Save Project')[0]
+    filename: str = QFileDialog.getSaveFileName(parent, 'Save Project', '',
+                                                "All Files (*);;Stellar System Creator Light Files (*.sscl);;"
+                                                "Stellar System Creator Files (*.ssc)")[0]
     system_name = filename.split('/')[-1].split('.')[0]
     if filename != '':
         filename = add_extension_if_necessary(filename, 'sscl')
@@ -371,7 +373,9 @@ def open_project(parent):
 def save_as_project(parent):
     central_widget: CentralWidget = parent.parent().parent().central_widget
     ssc_object = central_widget.get_ssc_object_of_current_tab()
-    filename: str = QFileDialog.getSaveFileName(parent, 'Save Project')[0]
+    filename: str = QFileDialog.getSaveFileName(parent, 'Save Project', '',
+                                                "All Files (*);;Stellar System Creator Light Files (*.sscl);;"
+                                                "Stellar System Creator Files (*.ssc)")[0]
     if filename != '':
         if filename.endswith('.ssc'):
             save_ssc_object(ssc_object, filename)

@@ -46,10 +46,6 @@ class Window(QMainWindow):
 
         self._create_central_widget()
         self._create_menubar()
-        temp_files_name = '~.tempfile*'
-        temp_file_names = glob.glob(temp_files_name)
-        for file_name in temp_file_names:
-            os.remove(file_name)
 
     def _create_central_widget(self):
         self.central_widget = CentralWidget()
@@ -96,8 +92,6 @@ if __name__ == "__main__":
     else:
         filename = sys.argv[1]
         filename = os.path.abspath(filename)
-        # if len(filename.split('\\')) > 1:
-        #     filename = '/'.join(filename.split('\\'))
 
     filename = '../examples/output_files/QuezuliferhWideBinarySystem.sscl'
     main(filename)

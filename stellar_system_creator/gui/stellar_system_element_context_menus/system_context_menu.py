@@ -1,10 +1,12 @@
+import os
 from functools import partial
 
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QStandardItem
 from PyQt5.QtWidgets import QMenu, QAction, QMessageBox, QDialog, QDialogButtonBox, QVBoxLayout, QWidget, QFormLayout, \
-    QLineEdit
+    QLineEdit, QFileDialog
+from stellar_system_creator.filing import save as save_ssc_object, load_ssc_light, save_as_ssc_light, load as load_ssc
+from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem, MultiStellarSystemSType
 
 
 class SystemTreeViewItemContextMenu(QMenu):
@@ -22,16 +24,19 @@ class SystemTreeViewItemContextMenu(QMenu):
     def _create_menu(self):
         self.addSection(self.parent_item.text())
         self.addAction(self.details_action)
-        self.addSeparator()
-        self.addAction(self.delete_permanently_action)
+        self.addAction(self.save_to_file_action)
 
     def _connect_actions(self):
         self.details_action.triggered.connect(self.details_action_process)
         self.delete_permanently_action.triggered.connect(partial(self.delete_permanently_process, True))
+        self.replace_from_file_action.triggered.connect(self.replace_from_file_process)
+        self.save_to_file_action.triggered.connect(self.save_to_file_process)
 
     def _create_menu_actions(self):
         self.details_action = QAction("&Details...", self)
         self.delete_permanently_action = QAction(f"&Delete Permanently...", self)
+        self.replace_from_file_action = QAction(f"&Replace from file...", self)
+        self.save_to_file_action = QAction(f"&Save to file...", self)
 
     def details_action_process(self):
         pass
@@ -55,6 +60,29 @@ class SystemTreeViewItemContextMenu(QMenu):
                     system = parent.parent().ssc_object
                 system.remove_object(ssc)
                 parent.removeRow(i)
+
+                if parent.model() is not None:
+                    from stellar_system_creator.gui.gui_image_rendering import RenderingSettingsDialog
+                    from stellar_system_creator.gui.gui_image_rendering import SystemImageWidget
+                    rendering_dialog: RenderingSettingsDialog = parent.model().parent().parent().parent(). \
+                        findChild(SystemImageWidget).rendering_settings_dialog
+                    rendering_dialog.reset_available_systems_drop_down()
+
+    def replace_from_file_process(self):
+        pass
+
+    def save_to_file_process(self):
+        ssc_object = self.parent_item.ssc_object
+        filename: str = QFileDialog.getSaveFileName(self, 'Save Project', '',
+                                                    "All Files (*);;Stellar System Creator Light Files (*.sscl);;"
+                                                    "Stellar System Creator Files (*.ssc)")[0]
+        if filename != '':
+            if filename.endswith('.ssc'):
+                save_ssc_object(ssc_object, filename)
+            else:
+                save_as_ssc_light(ssc_object, filename)
+        else:
+            return
 
 
 # class BinarySystemTreeViewItemContextMenu(SystemTreeViewItemContextMenu):
@@ -98,6 +126,8 @@ class StellarSystemTreeViewItemContextMenu(SystemTreeViewItemContextMenu):
 
     def _create_menu(self):
         super()._create_menu()
+        self.addSeparator()
+        self.addAction(self.replace_from_file_action)
 
     def _connect_actions(self):
         super()._connect_actions()
@@ -109,6 +139,68 @@ class StellarSystemTreeViewItemContextMenu(SystemTreeViewItemContextMenu):
         self.details_dialog = SystemDetailsDialog(self.parent_item)
         self.details_dialog.show()
 
+    def replace_from_file_process(self):
+
+        filename = QFileDialog.getOpenFileName(self, 'Open Project(s)', '',
+                                               "All Files (*);;Stellar System Creator Light Files (*.sscl);;"
+                                               "Stellar System Creator Files (*.ssc)")[0]
+        if filename == '':
+            return
+        elif not os.path.exists(filename) and not (filename.endswith('.sscl') or filename.endswith('.ssc')):
+            message_box = QMessageBox()
+            message_box.setIcon(QMessageBox.Information)
+            message_box.setWindowTitle("'Replace from file' has failed...")
+            message_box.setText(f"File '{filename}' is not compatible or does not exist.")
+            message_box.exec()
+            return
+
+        if filename.endswith('ssc'):
+            new_stellar_system = load_ssc(filename)
+        else:
+            new_stellar_system = load_ssc_light(filename, set_new_uuids=True)
+
+        if not isinstance(new_stellar_system, StellarSystem):
+            message_box = QMessageBox()
+            message_box.setIcon(QMessageBox.Information)
+            message_box.setWindowTitle("'Add from file' has failed...")
+            message_box.setText(f"The {filename} does not contain a Stellar System. ")
+            message_box.exec()
+            return
+
+        from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items \
+            import TreeViewItemFromStellarSystemElement as tvifsse, TreeViewItemFromString
+        # noinspection PyTypeChecker
+        tree_view_item: TreeViewItemFromString = self.parent_item.parent()
+
+        parent_multi_stellar_system: MultiStellarSystemSType = tree_view_item.ssc_parent
+        parent_binary = parent_multi_stellar_system.parent
+        old_stellar_system = self.parent_item.ssc_object
+
+        parent_binary.remove_child(old_stellar_system.parent)
+        if parent_binary.primary_body == old_stellar_system.parent:
+            parent_binary.primary_body = new_stellar_system.parent
+        elif parent_binary.secondary_body == old_stellar_system.parent:
+            parent_binary.secondary_body = new_stellar_system.parent
+        parent_binary.__post_init__()
+
+        parent_multi_stellar_system.remove_child(old_stellar_system)
+        parent_multi_stellar_system.add_child(new_stellar_system)
+        new_stellar_system.reset_system_plot()
+        parent_multi_stellar_system.reset_system_plot()
+
+        new_tree_view_item = tvifsse(new_stellar_system)
+        tree_view_item.appendRow(new_tree_view_item)
+        new_tree_view_item.update_text()
+
+        from stellar_system_creator.gui.gui_project_tree_view import set_stellar_system_tree_model_from_ssc_object
+        set_stellar_system_tree_model_from_ssc_object(new_tree_view_item, new_stellar_system)
+
+        from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
+        tree_view: ProjectTreeView = new_tree_view_item.model().parent()
+        tree_view.expandRecursively(new_tree_view_item.index())
+
+        self.delete_permanently_process(False)
+
 
 class PlanetarySystemTreeViewItemContextMenu(SystemTreeViewItemContextMenu):
 
@@ -117,6 +209,8 @@ class PlanetarySystemTreeViewItemContextMenu(SystemTreeViewItemContextMenu):
 
     def _create_menu(self):
         super()._create_menu()
+        self.addSeparator()
+        self.addAction(self.delete_permanently_action)
 
     def _connect_actions(self):
         super()._connect_actions()
