@@ -4,7 +4,7 @@ from stellar_system_creator.stellar_system_elements.stellar_body import MainSequ
     AsteroidBelt, BlackHole
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
 from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem
-from stellar_system_creator.filing import save
+from stellar_system_creator.filing import save_as_ssc_light
 
 # creating the stars
 croomsk_star = MainSequenceStar('Croomsk', 0.8 * ureg.M_s)
@@ -52,7 +52,7 @@ ps8 = PlanetarySystem('ps8', planet8)
 # creating stellar system for visualization
 ss = StellarSystem('Viyodzorax Stellar System', viyodzorax, [ps1, ps6, ps7, ps8])
 
-save(ss, 'output_files/ViyodzoraxStellarSystem.ssc')
+save_as_ssc_light(ss, 'output_files/ViyodzoraxStellarSystem.sscl')
 
 ss.system_plot.want_tidal_locking_radius = False
 ss.system_plot.want_habitable_zones_conservative = False

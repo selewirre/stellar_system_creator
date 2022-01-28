@@ -16,6 +16,7 @@ from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QMen
     QLineEdit, QScrollArea
 
 from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
+from stellar_system_creator.gui.gui_theme import get_icon_with_theme_colors
 from stellar_system_creator.gui.stellar_system_element_context_menus.standard_items import \
     TreeViewItemFromStellarSystemElement
 from stellar_system_creator.gui.stellar_system_element_context_menus.stellar_bodies_context_menu.detail_dialog_widgets import \
@@ -37,30 +38,39 @@ class SystemRenderingWidget(QLabel):
         self.graphics_view: GraphicsView = graphics_view
         self.setMouseTracking(True)
         self.old_pos = None
-        self.temp_file_name = '~.tempfile0.png'
-        self.temp_file = None
+        # self.temp_file_name = '~.tempfile0.png'
+        # self.temp_file = None
         self.setScaledContents(True)
-        while len(glob.glob(self.temp_file_name)):
-            self.temp_file_name = self.temp_file_name[:-1] + str(int(self.temp_file_name[-1]) + 1)
+        # while len(glob.glob(self.temp_file_name)):
+        #     self.temp_file_name = self.temp_file_name[:-1] + str(int(self.temp_file_name[-1]) + 1)
 
-    def delete_temp_file(self):
-        os.remove(self.temp_file_name)
-        self.temp_file = None
+    # def delete_temp_file(self):
+    #     os.remove(self.temp_file_name)
+    #     self.temp_file = None
 
     def render_image(self, ssc_object: Union[MultiStellarSystemSType, StellarSystem, PlanetarySystem, None]):
         if ssc_object is not None:
-            if ssc_object.parent is not None and self.temp_file_name is not None:
+            if ssc_object.parent is not None:
                 self.change_draw_line_options(ssc_object)
                 self.hide()
-                save_format = 'png'
-                fd = self.temp_file_name
+                # save_format = 'png'
+                # fd = self.temp_file_name
                 if isinstance(ssc_object, MultiStellarSystemSType):
-                    ssc_object.draw_multi_stellar_system(save=True, save_temp_file=fd, save_format=save_format)
+                    ssc_object.draw_multi_stellar_system()
+                    # ssc_object.draw_multi_stellar_system(save=True, save_temp_file=fd, save_format=save_format)
                 elif isinstance(ssc_object, StellarSystem):
-                    ssc_object.draw_stellar_system(save=True, save_temp_file=fd, save_format=save_format)
+                    ssc_object.draw_stellar_system()
+                    # ssc_object.draw_stellar_system(save=True, save_temp_file=fd, save_format=save_format)
                 elif isinstance(ssc_object, PlanetarySystem):
-                    ssc_object.draw_planetary_system(save=True, save_temp_file=fd, save_format=save_format)
-                pixmap = QPixmap.fromImage(ImageQt.ImageQt(Image.open(fd)))
+                    ssc_object.draw_planetary_system()
+                    # ssc_object.draw_planetary_system(save=True, save_temp_file=fd, save_format=save_format)
+
+                self.latest_surface = ssc_object.system_plot.plot_base_surface
+                ssc_object.clear_system_plot()
+                array = get_ndarray_from_cairo_image_surface(self.latest_surface)
+                pil_image = Image.fromarray(array, 'RGBA')
+                pixmap = QPixmap.fromImage(ImageQt.ImageQt(pil_image))
+                # pixmap = QPixmap.fromImage(ImageQt.ImageQt(Image.open(fd)))
                 self.setPixmap(pixmap)
                 # self.update()
                 self.setBaseSize(pixmap.size())
@@ -219,8 +229,8 @@ class SystemImageWidget(QWidget):
         ssc_object = self.target_treeview.ssc_object
         self.system_rendering_widget.show()
         self.system_rendering_widget.latest_surface = ssc_object.system_plot.plot_base_surface
-        ssc_object.clear_system_plot()
-        self.system_rendering_widget.delete_temp_file()
+        # ssc_object.clear_system_plot()
+        # self.system_rendering_widget.delete_temp_file()
 
     def rendering_settings_process(self):
         self.rendering_settings_dialog.show()
@@ -511,7 +521,7 @@ class ImageRenderingProcess(QThread):
     def run(self):
         button_icon = self.render_button.icon()
         loading_dir = pkg_resources.resource_filename('stellar_system_creator', 'gui/gui_icons/loading.svg')
-        self.render_button.setIcon(QIcon(loading_dir))
+        self.render_button.setIcon(get_icon_with_theme_colors(loading_dir))
         self.render_button.setDisabled(True)
         try:
             self.rendering_widget.render_image(self.ssc_object)

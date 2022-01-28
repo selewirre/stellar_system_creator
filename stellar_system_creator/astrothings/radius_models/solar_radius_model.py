@@ -1,7 +1,9 @@
 import numpy as np
 
-from stellar_system_creator.astrothings.luminosity_models.solar_luminosity_model import calculate_main_sequence_luminosity
-from stellar_system_creator.astrothings.units import ureg, Q_, stefan_boltzmann_constant
+from stellar_system_creator.astrothings.luminosity_models.solar_luminosity_model import \
+    calculate_main_sequence_luminosity
+from stellar_system_creator.astrothings.units import ureg, Q_, stefan_boltzmann_constant, gravitational_constant, \
+    speed_of_light
 
 
 def calculate_main_sequence_radius_from_polynomial(mass: Q_) -> Q_:
@@ -36,3 +38,9 @@ def calculate_main_sequence_radius(mass: Q_) -> Q_:
     return radius.to('R_s')
 
 
+def calculate_blackhole_radius(mass: Q_) -> Q_:
+    """
+    More info on: https://www.vttoth.com/CMS/physics-notes/311-hawking-radiation-calculator
+    """
+    radius: Q_ = 2 * gravitational_constant / speed_of_light**2 * mass
+    return radius.to_reduced_units().to('km')

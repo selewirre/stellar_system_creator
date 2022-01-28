@@ -1,4 +1,5 @@
 import copy
+import uuid
 import warnings
 
 import inspect
@@ -40,6 +41,7 @@ class StellarBody:
                  spin_period: Q_ = np.nan * ureg.hours, age: Q_ = np.nan * ureg.solar_lifetime,
                  parent=None, image_filename: str = None) -> None:
 
+        self._uuid = str(uuid.uuid4())
         self._set_children_list()
         self.name = name
         self.mass = mass
@@ -321,6 +323,10 @@ class StellarBody:
     def children(self):
         return self._children
 
+    @property
+    def uuid(self):
+        return self._uuid
+
     @classmethod
     def load_with_args(cls, stellar_body: "StellarBody"):
         arg_keys = inspect.getfullargspec(cls)
@@ -333,8 +339,10 @@ class StellarBody:
 
 
 class Star(StellarBody):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+    def __init__(self, name, mass: Q_, radius: Q_ = np.nan * ureg.R_s, luminosity: Q_ = np.nan * ureg.L_s,
+                 spin_period: Q_ = np.nan * ureg.hours, age: Q_ = np.nan * ureg.solar_lifetime,
+                 parent=None, image_filename: str = None) -> None:
+        super().__init__(name, mass, radius, luminosity, spin_period, age, parent, image_filename)
 
     def get_mass_class(self) -> Q_:
         return get_star_mass_class(self.mass)
@@ -476,7 +484,8 @@ class Star(StellarBody):
             else:
                 self.insolation_model = InsolationBySelsis(self.temperature, self.luminosity)
         elif model_name is not None:
-            if model_name != self.insolation_model.name:
+            if model_name != self.insolation_model.name or self.temperature != self.insolation_model.star_temperature \
+                    or self.luminosity != self.insolation_model.star_luminosity:
                 if model_name == 'Kopparapu':
                     self.insolation_model = InsolationByKopparapu(self.temperature, self.luminosity)
                 else:
@@ -602,8 +611,10 @@ class Star(StellarBody):
 
 class MainSequenceStar(Star):
 
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+    def __init__(self, name, mass: Q_, radius: Q_ = np.nan * ureg.R_s, luminosity: Q_ = np.nan * ureg.L_s,
+                 spin_period: Q_ = np.nan * ureg.hours, age: Q_ = np.nan * ureg.solar_lifetime,
+                 parent=None, image_filename: str = None) -> None:
+        super().__init__(name, mass, radius, luminosity, spin_period, age, parent, image_filename)
 
     def get_luminosity_class(self) -> str:
         return 'V'
@@ -628,8 +639,10 @@ class MainSequenceStar(Star):
 
 class BlackHole(Star):
 
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+    def __init__(self, name, mass: Q_, radius: Q_ = np.nan * ureg.R_s, luminosity: Q_ = np.nan * ureg.L_s,
+                 spin_period: Q_ = np.nan * ureg.hours, age: Q_ = np.nan * ureg.solar_lifetime,
+                 parent=None, image_filename: str = None) -> None:
+        super().__init__(name, mass, radius, luminosity, spin_period, age, parent, image_filename)
 
     def get_luminosity_class(self) -> str:
         return 'Black hole'
@@ -1140,6 +1153,7 @@ class AsteroidBelt(Planet):
                          age=age, image_filename=image_filename)
 
     def __post_init__(self, want_to_update_parent=False):
+        self.relative_count = int(self.relative_count)
         if np.isnan(self.extend.m):
             self.extend = self.semi_major_axis / 8
         if self.composition == '':
@@ -1204,6 +1218,7 @@ class Trojan(Planet):
                          parent.axial_tilt, albedo, age=age, image_filename=image_filename)
 
     def __post_init__(self, want_to_update_parent=False):
+        self.relative_count = int(self.relative_count)
         if self.parent is not None:
             self.semi_major_axis = self.parent.semi_major_axis
             self.orbital_eccentricity = self.parent.orbital_eccentricity
@@ -1461,33 +1476,37 @@ class Satellite(Planet):
 
         # checking habitable zone. First we regard the s-type HZ on the system caused by another system, and then p-type
         if self.parent is not None:
-            habitable_zone_limit_keys = self.parent.parent.habitable_zone_limits.keys()
-            if 'AHZ' in habitable_zone_limit_keys:
-                relevant_zone_type = 'AHZ'
-            elif 'PHZ' in habitable_zone_limit_keys:
-                relevant_zone_type = 'PHZ'
-            elif 'RHZ' in habitable_zone_limit_keys:
-                relevant_zone_type = 'RHZ'
-            elif 'ptypeAHZ' in habitable_zone_limit_keys:
-                relevant_zone_type = 'ptypeAHZ'
-            elif 'ptypePHZ' in habitable_zone_limit_keys:
-                relevant_zone_type = 'ptypePHZ'
-            elif 'ptypeRHZ' in habitable_zone_limit_keys:
-                relevant_zone_type = 'ptypeRHZ'
+            if self.parent.parent is not None:
+                habitable_zone_limit_keys = self.parent.parent.habitable_zone_limits.keys()
+                if 'AHZ' in habitable_zone_limit_keys:
+                    relevant_zone_type = 'AHZ'
+                elif 'PHZ' in habitable_zone_limit_keys:
+                    relevant_zone_type = 'PHZ'
+                elif 'RHZ' in habitable_zone_limit_keys:
+                    relevant_zone_type = 'RHZ'
+                elif 'ptypeAHZ' in habitable_zone_limit_keys:
+                    relevant_zone_type = 'ptypeAHZ'
+                elif 'ptypePHZ' in habitable_zone_limit_keys:
+                    relevant_zone_type = 'ptypePHZ'
+                elif 'ptypeRHZ' in habitable_zone_limit_keys:
+                    relevant_zone_type = 'ptypeRHZ'
+                else:
+                    relevant_zone_type = 'SSHZ'
+
+                model = self.parent.parent.insolation_model
+                inner_limit = self.parent.parent.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name]
+                outer_limit = self.parent.parent.habitable_zone_limits[relevant_zone_type][model.relaxed_max_name]
+
+                if inner_limit > outer_limit:
+                    habitability = False
+                    habitability_violation.append('Parent lacks a proper HZ.')
+                elif not inner_limit < self.parent.semi_major_axis < outer_limit:
+                    habitability = False
+                    habitability_violation.append(
+                        'Planetary semi-major axis is not within the habitable zone of the parent.')
             else:
-                relevant_zone_type = 'SSHZ'
-
-            model = self.parent.parent.insolation_model
-            inner_limit = self.parent.parent.habitable_zone_limits[relevant_zone_type][model.relaxed_min_name]
-            outer_limit = self.parent.parent.habitable_zone_limits[relevant_zone_type][model.relaxed_max_name]
-
-            if inner_limit > outer_limit:
                 habitability = False
-                habitability_violation.append('Parent lacks a proper HZ.')
-            elif not inner_limit < self.parent.semi_major_axis < outer_limit:
-                habitability = False
-                habitability_violation.append(
-                    'Planetary semi-major axis is not within the habitable zone of the parent.')
+                habitability_violation.append("Parent's parent was not defined.")
         else:
             habitability = False
             habitability_violation.append('Parent planet was not defined.')
@@ -1640,9 +1659,9 @@ class Ring:
             basic_band_center = satellite.semi_major_axis.to('km').m
             basic_band_extend = satellite.hill_sphere.to('km').m
 
-            forbidden_bands = [[basic_band_center*resonance - basic_band_extend *
+            forbidden_bands = [[basic_band_center * resonance - basic_band_extend *
                                 (resonance / res_orders[i]) ** res_orders[i],
-                                basic_band_center*resonance + basic_band_extend *
+                                basic_band_center * resonance + basic_band_extend *
                                 (resonance / res_orders[i]) ** res_orders[i]]
                                for i, resonance in enumerate(resonances)]
             all_forbidden_bands += forbidden_bands
@@ -1678,12 +1697,13 @@ class Ring:
     def copy(self):
         return copy.deepcopy(self)
 
+
 resonances = [1]
 res_orders = [1]
 for m in range(1, 10):
     for order in range(1, 10):
         r = m / (m + order)
-        if r < 1 and r not in resonances and (r / order) ** (order+1) > 1.0E-6:
+        if r < 1 and r not in resonances and (r / order) ** (order + 1) > 1.0E-6:
             resonances.append(r)
             res_orders.append(order)
 

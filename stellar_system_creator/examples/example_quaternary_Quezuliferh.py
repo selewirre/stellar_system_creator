@@ -1,5 +1,5 @@
 
-from stellar_system_creator.filing import save, load
+from stellar_system_creator.filing import save_as_ssc_light, load_ssc_light
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
 from stellar_system_creator.stellar_system_elements.stellar_body import MainSequenceStar, Planet, AsteroidBelt, Trojan, \
     Satellite, TrojanSatellite, Ring
@@ -7,8 +7,8 @@ from stellar_system_creator.stellar_system_elements.binary_system import Stellar
 from stellar_system_creator.astrothings.units import ureg
 from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem, MultiStellarSystemSType
 
-viyodzorax_system: StellarSystem = load('output_files/ViyodzoraxStellarSystem.ssc')
-trakrunat_system: StellarSystem = load('output_files/TrakrunatStellarSystem.ssc')
+viyodzorax_system: StellarSystem = load_ssc_light('output_files/ViyodzoraxStellarSystem.sscl')
+trakrunat_system: StellarSystem = load_ssc_light('output_files/TrakrunatStellarSystem.sscl')
 
 quezuliferh = StellarBinary('Quezuliferh', viyodzorax_system.parent, trakrunat_system.parent,
                             700 * ureg.au, 0.472)
@@ -28,7 +28,7 @@ for child in quezuliferh.secondary_body.children:
 quezuliferh_system = MultiStellarSystemSType('Quezuliferh Wide Binary System', quezuliferh,
                                              [viyodzorax_system, trakrunat_system])
 
-save(quezuliferh_system, 'output_files/QuezuliferhWideBinarySystem.ssc')
+save_as_ssc_light(quezuliferh_system, 'output_files/QuezuliferhWideBinarySystem.sscl')
 
 # quezuliferh_system.system_plot.system_plots[0].want_tidal_locking_radius = False
 # quezuliferh_system.system_plot.system_plots[1].want_habitable_zones_extended = True

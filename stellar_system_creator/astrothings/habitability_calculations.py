@@ -21,12 +21,19 @@ These are rough estimates and should not be taken too seriously if you are barel
 """
 
 
+def sqrt(x: Q_):
+    if x.m < 0:
+        return np.sqrt(np.nan * x)
+    else:
+        return np.sqrt(x)
+
+
 def calculate_single_star_habitable_orbital_threshold(spectrally_weighted_luminosity: Q_) -> Q_:
     """
     Single Star Habitable zone is the simplest kind of habitable zone. It is determined solely by the star's luminosity.
     Equations 3 and 6 from Handbook of Exoplanets, Chapter 141
     """
-    return np.sqrt(spectrally_weighted_luminosity)
+    return sqrt(spectrally_weighted_luminosity)
 
 
 def calculate_stype_radiative_habitable_limit(star_swl: Q_, star_companion_swl: Q_,
@@ -40,7 +47,7 @@ def calculate_stype_radiative_habitable_limit(star_swl: Q_, star_companion_swl: 
     Ls = star_swl
     Lsc = star_companion_swl
 
-    srLs = np.sqrt(Ls)
+    srLs = sqrt(Ls)
 
     if threshold_type == 'Inner':
         denominator = (d - srLs) ** 2
@@ -70,24 +77,25 @@ def calculate_ptype_radiative_habitable_limit(primary_swl: Q_, secondary_swl: Q_
     Lpp = primary_swl
     Lsp = secondary_swl
 
-    srLtotp = np.sqrt(Lpp + Lsp) + b
-    srLtotm = np.sqrt(Lpp + Lsp) - b
+    srLtotp = sqrt(Lpp + Lsp) + b
+    srLtotm = sqrt(Lpp + Lsp) - b
 
     if threshold_type == 'Inner':
         term1 = Lpp * srLtotp / srLtotm
         term2 = Lsp * srLtotm / srLtotp
-        rhl = np.sqrt(term1 + term2 - b ** 2)
+
+        rhl = sqrt(term1 + term2 - b ** 2)
     elif threshold_type == 'Outer':
         term1 = Lpp * srLtotm / srLtotp
         term2 = Lsp * srLtotp / srLtotm
-        rhl = np.sqrt(term1 + term2 - b ** 2)
+        rhl = sqrt(term1 + term2 - b ** 2)
     else:
         term1 = Lpp * srLtotp / srLtotm
         term2 = Lsp * srLtotm / srLtotp
-        rhl_inner = np.sqrt(term1 + term2 - b ** 2)
+        rhl_inner = sqrt(term1 + term2 - b ** 2)
         term1 = Lpp * srLtotm / srLtotp
         term2 = Lsp * srLtotp / srLtotm
-        rhl_outer = np.sqrt(term1 + term2 - b ** 2)
+        rhl_outer = sqrt(term1 + term2 - b ** 2)
         rhl = (rhl_inner + rhl_outer) / 2
 
     return rhl
@@ -121,28 +129,28 @@ def calculate_stype_permanent_habitable_limit(star_swl: Q_, star_companion_swl: 
     Qp = planetary_semimajor_axis * (1 + max_planetary_eccentricity)
 
     if threshold_type == 'Inner':
-        if Lsc < (qb - np.sqrt(Ls)) ** 2:
+        if Lsc < (qb - sqrt(Ls)) ** 2:
             first_term = Ls / qp / (1 - max_planetary_eccentricity)
-            second_term = np.sqrt(Ls) * Lsc / (qp - qb) ** 2
+            second_term = sqrt(Ls) * Lsc / (qp - qb) ** 2
         else:
             first_term = Ls / Qp / (1 + max_planetary_eccentricity)
-            second_term = np.sqrt(Ls) * Lsc / (Qp - qb) ** 2
+            second_term = sqrt(Ls) * Lsc / (Qp - qb) ** 2
         phl = first_term + second_term
     elif threshold_type == 'Outer':
         first_term = Ls / Qp / (1 + max_planetary_eccentricity)
-        second_term = np.sqrt(Ls) * Lsc / (Qp - Qb) ** 2
+        second_term = sqrt(Ls) * Lsc / (Qp - Qb) ** 2
         phl = first_term + second_term
     else:
-        if Lsc < (qb - np.sqrt(Ls)) ** 2:
+        if Lsc < (qb - sqrt(Ls)) ** 2:
             first_term = Ls / qp / (1 - max_planetary_eccentricity)
-            second_term = np.sqrt(Ls) * Lsc / (qp - qb) ** 2
+            second_term = sqrt(Ls) * Lsc / (qp - qb) ** 2
         else:
             first_term = Ls / Qp / (1 + max_planetary_eccentricity)
-            second_term = np.sqrt(Ls) * Lsc / (Qp - qb) ** 2
+            second_term = sqrt(Ls) * Lsc / (Qp - qb) ** 2
         phl_inner = first_term + second_term
 
         first_term = Ls / Qp / (1 + max_planetary_eccentricity)
-        second_term = np.sqrt(Ls) * Lsc / (Qp - Qb) ** 2
+        second_term = sqrt(Ls) * Lsc / (Qp - Qb) ** 2
         phl_outer = first_term + second_term
 
         phl = (phl_inner + phl_outer) / 2
@@ -182,19 +190,19 @@ def calculate_ptype_permanent_habitable_limit(primary_swl: Q_, secondary_swl: Q_
     if threshold_type == 'Inner':
         first_term = Lpp / (qp - mu * Qb) ** 2
         second_term = Lsp / (qp + (1 - mu) * Qb) ** 2
-        phl = (first_term + second_term) * np.sqrt(Ltotp)
+        phl = (first_term + second_term) * sqrt(Ltotp)
     elif threshold_type == 'Outer':
         first_term = Lpp / (Qp + mu * Qb) ** 2
         second_term = Lsp / (Qp - (1 - mu) * Qb) ** 2
-        phl = (first_term + second_term) * np.sqrt(Ltotp)
+        phl = (first_term + second_term) * sqrt(Ltotp)
     else:
         first_term = Lpp / (qp - mu * Qb) ** 2
         second_term = Lsp / (qp + (1 - mu) * Qb) ** 2
-        phl_inner = (first_term + second_term) * np.sqrt(Ltotp)
+        phl_inner = (first_term + second_term) * sqrt(Ltotp)
 
         first_term = Lpp / (Qp + mu * Qb) ** 2
         second_term = Lsp / (Qp - (1 - mu) * Qb) ** 2
-        phl_outer = (first_term + second_term) * np.sqrt(Ltotp)
+        phl_outer = (first_term + second_term) * sqrt(Ltotp)
 
         phl = (phl_inner + phl_outer) / 2
 
@@ -228,7 +236,7 @@ def calculate_stype_average_habitable_limit(star_swl: Q_, star_companion_swl: Q_
     rpmean = planetary_semimajor_axis * (1 - epmean2) ** 0.25
 
     first_term = Ls / (rpmean * (1 - epmean2) ** 0.25)
-    second_term = np.sqrt(Ls) * Lsc / (rbmean ** 2 - rpmean ** 2)
+    second_term = sqrt(Ls) * Lsc / (rbmean ** 2 - rpmean ** 2)
 
     ahl = first_term + second_term
     return ahl
@@ -271,7 +279,7 @@ def calculate_ptype_average_habitable_limit(primary_swl: Q_, secondary_swl: Q_, 
     first_term = Lpp / (rpmean ** 2 - rbmeanprimary ** 2)
     second_term = Lsp / (rpmean ** 2 - rbmeansecondary ** 2)
 
-    ahl = (first_term + second_term) * np.sqrt(Ltotp)
+    ahl = (first_term + second_term) * sqrt(Ltotp)
     return ahl
 
 

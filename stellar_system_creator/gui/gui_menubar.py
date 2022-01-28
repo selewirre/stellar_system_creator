@@ -329,7 +329,7 @@ def new_project(parent, system_type):
     filename: str = QFileDialog.getSaveFileName(parent, 'Save Project')[0]
     system_name = filename.split('/')[-1].split('.')[0]
     if filename != '':
-        filename = add_extension_if_necessary(filename, 'ssc')
+        filename = add_extension_if_necessary(filename, 'sscl')
         if system_type == 'Multi-Stellar System':
             parent_star1 = MainSequenceStar(system_name + '1', 1 * ureg.M_s)
             parent_star2 = MainSequenceStar(system_name + '2', 1 * ureg.M_s)

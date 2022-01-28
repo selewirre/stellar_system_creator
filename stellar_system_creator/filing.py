@@ -40,7 +40,6 @@ def save(obj: Union[StellarBody, BinarySystem, PlanetarySystem, StellarSystem, M
         filename = add_extension_if_necessary(filename, 'ssc')
         pickled_data = cPickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL)  # returns data as a bytes object
         compressed_pickle = blosc.compress(pickled_data)
-
         with open(filename, 'wb') as file:
             file.write(compressed_pickle)
             # pickle.dump(obj, file)
@@ -96,7 +95,7 @@ def save_as_ssc_light(obj: Union[StellarBody, BinarySystem, PlanetarySystem, Ste
         with ZipFile(temp_zip_filename, 'w') as temp_zip_file:
             for f in os.listdir(temp_folder):
                 temp_zip_file.write(os.path.join(temp_folder, f),  # file to be compressed
-                                    os.path.join(os.path.dirname(temp_folder), f))  # making sure there is no folder in
+                                    os.path.basename(f))  # making sure there is no folder in
 
         # making temp zip permanent
         filename = add_extension_if_necessary(filename, 'sscl')
@@ -175,7 +174,7 @@ def save_stellar_body_to_json(obj: StellarBody, target_folder: str):
                     kwargs['parent_uuid'] = obj.parent._uuid
             elif key == 'image_filename':
                 image_filename = obj.image_filename
-                if image_filename is not None:
+                if not (image_filename is None or image_filename.lower() == 'none' or image_filename == ''):
                     provider: pkg_resources.DefaultProvider = pkg_resources.get_provider('stellar_system_creator')
                     ssc_module_path = provider.module_path
                     module_visualization_files = list_files(ssc_module_path)
@@ -246,6 +245,7 @@ def load_ssc_light(filename: str) -> Union[StellarBody, BinarySystem,
                                            PlanetarySystem, StellarSystem, MultiStellarSystemSType]:
 
     allmother_filename = os.path.join(filename, '.allmother.json')
+    print(allmother_filename)
     kwargs = get_dict_from_json(allmother_filename)
 
     return get_object_from_kwargs_uuid(kwargs['allmother_uuid'], allmother_filename)

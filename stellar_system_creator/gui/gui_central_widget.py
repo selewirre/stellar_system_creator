@@ -1,3 +1,4 @@
+import platform
 from typing import Union
 
 import pkg_resources
@@ -53,7 +54,11 @@ class CentralWidget(QTabWidget):
         tab_content.setSizes([1.5*left_side_widget.sizeHint().width(),
                               1.5*right_side_widget.sizeHint().width()])
 
-        tab_label = filename.split('/')[-1].split('.')[0]
+        if platform.system() == 'Windows':
+            seperator = '\\'
+        else:
+            seperator = '/'
+        tab_label = filename.split(seperator)[-1].split('.')[0]
         tab_index = self.addTab(tab_content, tab_label)
         self.setCurrentIndex(tab_index)
         # tab_content.widget(0).hide()

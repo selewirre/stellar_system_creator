@@ -1,5 +1,25 @@
 import numpy as np
-from astropy.constants import L_sun, M_earth, M_jup, M_sun, R_earth, R_jup, R_sun, au, c, h, g0, sigma_sb, G
+
+
+class FakeAstropy:
+
+    def __init__(self, value):
+        self.value = value
+
+
+L_sun = FakeAstropy(3.828e+26)
+M_earth = FakeAstropy(5.972167867791379e+24)
+M_jup = FakeAstropy(1.8981245973360505e+27)
+M_sun = FakeAstropy(1.988409870698051e+30)
+R_earth = FakeAstropy(6378100.0)
+R_jup = FakeAstropy(71492000.0)
+R_sun = FakeAstropy(695700000.0)
+au = FakeAstropy(149597870700.0)
+c = FakeAstropy(299792458.0)
+h = FakeAstropy(6.62607015e-34)
+g0 = FakeAstropy(9.80665)
+sigma_sb = FakeAstropy(5.6703744191844314e-08)
+G = FakeAstropy(6.6743e-11)
 
 
 def arithmetic_mean_radius(nominal_equatorial_radius, nominal_polar_radius):

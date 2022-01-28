@@ -67,7 +67,7 @@ def calculate_planet_radius(planet_mass: Q_, planet_composition,
     log10_radius = k1 + 1 / 3 * np.log10(scaled_mass) - k2 * scaled_mass ** k3
     radius = 10 ** log10_radius * r1
 
-    if planet_composition == 'Gasgiant' and solar_radiation_incident_flux is not None:
+    if planet_composition == 'Gasgiant' and not np.isnan(solar_radiation_incident_flux.m):
         from .hot_gasgiant_radius_model import get_hot_gas_giant_mass_class
         radius = radius * gasgiant_radius_modification(np.log10(solar_radiation_incident_flux.to('watt/m^2').magnitude),
                                                        get_hot_gas_giant_mass_class(planet_mass))

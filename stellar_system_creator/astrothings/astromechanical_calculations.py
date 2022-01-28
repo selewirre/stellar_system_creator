@@ -1,6 +1,6 @@
 import numpy as np
 
-from stellar_system_creator.astrothings.units import ureg, Q_, gravitational_constant
+from stellar_system_creator.astrothings.units import ureg, Q_, gravitational_constant, h_bar_constant, speed_of_light
 
 
 def calculate_rough_inner_orbit_limit(mass: Q_) -> Q_:
@@ -104,50 +104,39 @@ def calculate_roche_lobe(stellar_mass, companion_mass, mean_distance: Q_, eccent
 
 
 def calculate_three_body_lagrange_point_smallest_body_mass_limit(m1: Q_, m2: Q_) -> Q_:
+    """
+    Lagrange points are the equilibrium points between two masses (m1 and m2) that can potentially host object of small
+    mass m3. There are 5 such points, 3 (L1, L2, L3) of which are unstable and 2 that are semi-stable (L4, L5).
+    Points L4 and L5 can host astreroid type bodies. The rule of thumb is that such objects must be much smaller than
+    the smaller mass m2. Gascheu's equations give relatively good results for masses m1 and m2 that are similar in size,
+    however, since the m1, m2, m3 are never just by themselves, there are other orbital instabilities introduced that
+    further degrade the stability of these points. Hence we introduce a kind of hand-wavy equation to account for these
+    discrepancies. This comes from simulations of massive planets in trojan orbits around Jovian planets.
 
-    """https://hal.archives-ouvertes.fr/hal-00552502/document"""
-    # TODO: get it right
-    # probably wrong implementation
-    # https://www.wolframalpha.com/input/?i=solve+%28m1+%2B+m2+%2B+m3%29**2%2F%28m1*m2%2Bm1*m3%2Bm2*m3%29+%3E27%2C+m1%3E0%2C+m2%3E0+m3
-    element1 = 3 * np.sqrt(3) * np.sqrt(23 * m1 ** 2 + 50 * m1 * m2 + 23 * m2 ** 2)
-    element2 = 25 * (m1 + m2)
-    return (-element1 + element2).to_reduced_units() / 2
+    More info on: https://en.wikipedia.org/wiki/Trojan_(celestial_body)
+                  https://hal.archives-ouvertes.fr/hal-00552502/document (For a discussion on Gascheu's limit)
+                  https://www.aanda.org/articles/aa/abs/2007/07/aa6582-06/aa6582-06.html (For simulations)
+    Others sources:
+    - https://worldbuilding.stackexchange.com/questions/188866/is-it-possible-to-have-earth-like-planets-in-jupiter-lagrange-points
+    - https://engineering.purdue.edu/people/kathleen.howell.1/Publications/Masters/2016_VanAnderlecht.pdf
+    - https://www.aanda.org/articles/aa/pdf/2019/11/aa34486-18.pdf
+    """
 
+    if m1 < m2:
+        temp = m1
+        m1 = m2
+        m2 = temp
 
-# def calculate_earth_equivalent_orbit(luminosity: Q_) -> Q_:
-#     """
-#     The habitable zone (HZ) is the stellar zone in which life is supported. This is a very complicated designation and.
-#      there are still many questions around it. The most broadly used limits were give by Kasting et al., 1993,
-#      https://doi.org/10.1006/icar.1993.1010. These CONSERVATIVE limits are only limited to water-based life.
-#      Life based on other temperatures and volatile compounts (e.g. ammonia), will have a different (HZ)!
-#
-#     More info on: https://en.wikipedia.org/wiki/Circumstellar_habitable_zone.
-#      """
-#     return np.sqrt(luminosity.to('solar_luminosity').magnitude) * ureg.au
+    sum = m2 + m1
+    product = m2 * m1
+    delta = 621 * sum ** 2 + 108 * product
+    gascheu_limit = (25 * sum - np.sqrt(delta))/2
+    simulated_limit = (m2 * 0.6 * ureg.M_e / ureg.M_j).to_reduced_units()
+    if simulated_limit > gascheu_limit:
+        return gascheu_limit
+    else:
+        return simulated_limit
 
-
-# def calculate_habitable_zone_min(luminosity: Q_) -> Q_:
-#     """
-#     The habitable zone (HZ) is the stellar zone in which life is supported. This is a very complicated designation and.
-#      there are still many questions around it. The most broadly used limits were give by Kasting et al., 1993,
-#      https://doi.org/10.1006/icar.1993.1010. These CONSERVATIVE limits are only limited to water-based life.
-#      Life based on other temperatures and volatile compounts (e.g. ammonia), will have a different (HZ)!
-#
-#     More info on: https://en.wikipedia.org/wiki/Circumstellar_habitable_zone.
-#      """
-#     return 0.95 * np.sqrt(luminosity.to('solar_luminosity').magnitude) * ureg.au
-#
-#
-# def calculate_habitable_zone_max(luminosity: Q_) -> Q_:
-#     """
-#     The habitable zone (HZ) is the stellar zone in which life is supported. This is a very complicated designation and.
-#      there are still many questions around it. The most broadly used limits were give by Kasting et al., 1993,
-#      https://doi.org/10.1006/icar.1993.1010. These CONSERVATIVE limits are only limited to water-based life.
-#      Life based on other temperatures and volatile compounts (e.g. ammonia), will have a different (HZ)!
-#
-#     More info on: https://en.wikipedia.org/wiki/Circumstellar_habitable_zone.
-#      """
-#     return 1.37 * np.sqrt(luminosity.to('solar_luminosity').magnitude) * ureg.au
 
 def calculate_elliptic_orbit_effect_for_mean_flux(eccentricity: float):
     """
@@ -569,18 +558,21 @@ def calculate_tidal_locking_radius(parent_mass: Q_, age: Q_) -> Q_:
     return locking_radius.to('au')
 
 
-def calculate_tide_height(companion_mass: Q_, target_mass: Q_, target_radius: Q_, distance: Q_) -> Q_:
+def calculate_tide_height(companion_mass: Q_, target_mass: Q_, target_radius: Q_, distance: Q_,
+                          eccentricity: float) -> Q_:
     """
     When a celestial object rotates around another, they both exert forces on each other. When there is liquid mass
-    on top of solid, the liquid rise and fall is give from equation 20 of reference.
+    on top of solid, the liquid rise and fall is give from equation 20 of reference (modified to add eccentricity).
 
     More info on: https://www.cambridge.org/resources/0521846560/7708_Tidal%20distortion.pdf
     """
-    tide_height = 3 * target_radius ** 4 / distance ** 3 * companion_mass / target_mass
+    periapsis = distance * (1 - eccentricity)
+    base_height = target_radius ** 4 / periapsis ** 3 * companion_mass / target_mass / 2
+    tide_height = 3 * base_height
     return tide_height.to('meters')
 
 
-def     calculate_angular_diameter(target_radius: Q_, distance: Q_) -> Q_:
+def calculate_angular_diameter(target_radius: Q_, distance: Q_) -> Q_:
     """
     Angular diameter is the size of a celestial body in the sky. The angular diameter of the sun and the moon are
     similar on earth, and approximatelly ~ 0.5 degrees
@@ -610,37 +602,63 @@ def calculate_satellite_prograde_orbit_limit_factor(parent_eccentricity: float, 
     return 0.4895 * (1 - 1.0305 * parent_eccentricity - 0.2738 * child_ecentricity)
 
 
-def calculate_satellite_retrograde_orbit_limit_factor(parent_eccentricity: float, child_ecentricity: float) -> float:
+def calculate_satellite_retrograde_orbit_limit_factor(parent_eccentricity: float, child_eccentricity: float) -> float:
     """
     Within the Hill Sphere, satellites are even more limited on the maximum orbital distance they can be at.
     This is determined by the parent's eccentricity, their own eccentricity, and if the orbit is prograde or retrograde.
 
     More info on: https://www.aanda.org/articles/aa/pdf/2010/13/aa14955-10.pdf Eq. 4
     """
-    return 0.9309 * (1 - 1.0764 * parent_eccentricity - 0.9812 * child_ecentricity)
+    return 0.9309 * (1 - 1.0764 * parent_eccentricity - 0.9812 * child_eccentricity)
 
 
-def calculate_max_satellite_mass(parent_mass: Q_, parent_radius: Q_, hill_sphere: Q_, orbit_type_limit_factor: float,
+# def calculate_max_satellite_mass(parent_mass: Q_, parent_radius: Q_, hill_sphere: Q_, orbit_type_limit_factor: float,
+#                                  satellite_lifetime: Q_) -> Q_:
+#     """
+#     Satellites around planets have a limited mass dependent on their parent.
+#
+#     More info on: https://www.aanda.org/articles/aa/pdf/2010/13/aa14955-10.pdf Eq. 5
+#     """
+#     prefactor = 1000 / 0.51 / 39 / np.sqrt(gravitational_constant) * orbit_type_limit_factor ** 6.5
+#
+#     upper_mass_limit = prefactor * hill_sphere.to('m') ** 6.5 \
+#         / satellite_lifetime.to('second') / parent_radius.to('m') ** 5 * np.sqrt(parent_mass.to('kg'))
+#
+#     return upper_mass_limit.to(parent_mass.units)
+
+
+def calculate_max_satellite_mass(parent_mass: Q_, parent_radius: Q_, satellite_semi_major_axis: Q_, satellite_age: Q_,
                                  satellite_lifetime: Q_) -> Q_:
     """
     Satellites around planets have a limited mass dependent on their parent.
 
     More info on: https://www.aanda.org/articles/aa/pdf/2010/13/aa14955-10.pdf Eq. 5
     """
-    prefactor = 1000 / 0.51 / 39 / np.sqrt(gravitational_constant) * orbit_type_limit_factor ** 6.5
+    prefactor = 20000 / 0.51 / 39 / np.sqrt(gravitational_constant)
+    remaining_lifetime = satellite_lifetime - satellite_age
 
-    upper_mass_limit = prefactor * hill_sphere.to('m') ** 6.5 \
-        / satellite_lifetime.to('second') / parent_radius.to('m') ** 5 * np.sqrt(parent_mass.to('kg'))
+    upper_mass_limit = prefactor * satellite_semi_major_axis.to('m') ** 6.5 \
+        / remaining_lifetime.to('second') / parent_radius.to('m') ** 5 * np.sqrt(parent_mass.to('kg'))
 
     return upper_mass_limit.to(parent_mass.units)
 
 
-def calculate_synodic_period(period1: Q_, periond2: Q_) -> Q_:
+def calculate_synodic_period(period1: Q_, period2: Q_) -> Q_:
     """
     Synodic period is the period of time it takes for an object (sun) to appear at the same spot on another object's
     sky.
 
     More info on: https://en.wikipedia.org/wiki/Synodic_day
     """
-    return abs(1 / (1 / period1 - 1 / periond2)).to('days')
+    return abs(1 / (1 / period1 - 1 / period2)).to('days')
 
+
+def calculate_blackhole_lifetime(mass: Q_) -> Q_:
+    """
+    The life time of a Schwarzschild blackhole (no momentum, no charge) depends on its mass.
+
+    More info on: https://www.vttoth.com/CMS/physics-notes/311-hawking-radiation-calculator
+    """
+
+    lifetime = mass ** 3 * 5120 * np.pi * gravitational_constant ** 2 / (1.8083 * h_bar_constant * speed_of_light ** 4)
+    return lifetime.to_reduced_units().to(ureg.T_s)

@@ -1,6 +1,7 @@
 from functools import partial
 from typing import Union, Dict, List
 
+import cairocffi
 import cairocffi as cairo
 import pkg_resources
 from PyQt5.QtGui import QPixmap
@@ -94,7 +95,7 @@ class UnitLineEdit(QWidget):
         return self.sse.__dict__[self.value_name]
 
     def _set_unit_drop_menu(self):
-        self.unit_drop_menu = QComboBox()
+        self.unit_drop_menu = UnitComboBox()
         self.dict_pretty = bidict({})
         self.dict_pretty, unit_str = get_unit_bidict(self.value)
         self.unit_drop_menu.addItems(list(self.dict_pretty.inverse.keys()))
@@ -107,7 +108,8 @@ class UnitLineEdit(QWidget):
         # self.line_edit.inputRejected.connect(self.keep_old_text_action)
 
     def change_text_action(self, process_change=True) -> None:
-        if self.hasFocus() or self.line_edit.hasFocus():
+        if self.hasFocus() or self.line_edit.hasFocus() \
+                or self.previousInFocusChain() or self.line_edit.previousInFocusChain():
             try:
                 self.sse.__dict__[self.value_name] = \
                     Q_(float(self.line_edit.text()), self.dict_pretty.inverse[self.unit_drop_menu.currentText()])
@@ -184,7 +186,7 @@ class UnitLabel(QWidget):
             return self.sse.__dict__[self.value_name]
 
     def _set_unit_drop_menu(self):
-        self.unit_drop_menu = QComboBox()
+        self.unit_drop_menu = UnitComboBox()
         self.dict_pretty = bidict({})
         self.dict_pretty, unit_str = get_unit_bidict(self.value)
         self.unit_drop_menu.addItems(list(self.dict_pretty.inverse.keys()))
@@ -219,14 +221,18 @@ class LineEdit(QLineEdit):
         self.influenced_labels = influenced_labels
 
     def change_text_action(self, process_change=True) -> None:
-        if self.hasFocus():
+        if self.hasFocus() or self.previousInFocusChain():
             text = self.text()
             try:
                 value = float(text)
             except ValueError:
                 value = text
 
-            if not isinstance(self.sse.__dict__[self.value_name], type(value)):
+            if isinstance(value, float):
+                value_type = (float, int)
+            else:
+                value_type = type(value)
+            if not isinstance(self.sse.__dict__[self.value_name], value_type):
                 self.keep_old_text_action()
             else:
                 self.sse.__dict__[self.value_name] = value
@@ -647,6 +653,16 @@ class ComboBox(QComboBox):
                 self.influenced_labels[key].update_text()
 
 
+class UnitComboBox(QComboBox):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setFocusPolicy(Qt.StrongFocus)
+
+    def wheelEvent(self, *args, **kwargs):
+        pass
+
+
 class ImageLabel(QLabel):
 
     def __init__(self, sse: Union[Star, Planet, Satellite], *args, **kwargs):
@@ -720,16 +736,22 @@ class ImageLineEdit(QWidget):
         self.browse_button.clicked.connect(self.browse_action)
 
     def browse_action(self):
-        filename = QFileDialog.getOpenFileName(self, 'Choose Image', '', "All Files (*);;Image Files (*.jpg, *.png)")[0]
-        if filename == '':
-            filename = '/visualization/default_images/gasgiant.png'
+        old_image_dir = self.sse.image_filename
+        if old_image_dir is None or old_image_dir == 'None':
+            old_image_dir = pkg_resources.resource_filename('stellar_system_creator',
+                                                            f'visualization/default_images/'
+                                                            f'habitableworld.png')
+
+        filename = QFileDialog.getOpenFileName(self, 'Choose Image', old_image_dir,
+                                               "All Files (*);;Image Files (*.jpg, *.png)")[0]
         self.line_edit.setText(filename)
         self.line_edit.setFocus()
         self.change_text_action()
         self.line_edit.clearFocus()
 
     def change_text_action(self, process_change=True) -> None:
-        if self.hasFocus() or self.line_edit.hasFocus():
+        if self.hasFocus() or self.line_edit.hasFocus() \
+                or self.previousInFocusChain() or self.line_edit.previousInFocusChain():
             self.sse.image_filename = self.line_edit.text()
             if process_change:
                 self.sse.__post_init__()

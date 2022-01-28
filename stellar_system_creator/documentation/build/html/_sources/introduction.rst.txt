@@ -6,7 +6,7 @@ stellar systems in sci-fi settings. With minimal input, the user is able to crea
 moons, asteroid regions and other celestial bodies, with accurate physical characteristics, declare their habitability,
 extract physical characteristics and visualize them.
 
-For first-time users, reading the :ref:`graphics user interface guide <gui>` is highly suggested,
+For **first-time users**, reading the :ref:`graphics user interface guide <gui>` is highly suggested,
 as it goes quickly though the base elements of the package with an example.
 
 This documentation includes descriptions of all the :ref:`celestial bodies <celestial_bodies>`

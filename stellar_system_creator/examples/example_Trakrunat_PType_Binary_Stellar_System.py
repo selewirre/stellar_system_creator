@@ -1,5 +1,5 @@
 
-from stellar_system_creator.filing import save
+from stellar_system_creator.filing import save_as_ssc_light
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
 from stellar_system_creator.stellar_system_elements.stellar_body import MainSequenceStar, Planet, AsteroidBelt, Trojan, \
     Satellite, TrojanSatellite, Ring
@@ -91,8 +91,8 @@ ps7 = PlanetarySystem('Gas Baby System', planet7)
 ss = StellarSystem('Trakrunat Stellar System', trakrunat_binaryP, [ps1, ps2, ps3, ps4, ps5, ps6, ps7],
                    [asteroid_belt1, asteroid_belt2])
 
-save(ss, 'output_files/TrakrunatStellarSystem.ssc')
-save(ps5, 'output_files/IceballSystem.ssc')
+save_as_ssc_light(ss, 'output_files/TrakrunatStellarSystem.sscl')
+save_as_ssc_light(ps5, 'output_files/IceballSystem.sscl')
 
 ss.draw_stellar_system()
 ps5.draw_planetary_system()

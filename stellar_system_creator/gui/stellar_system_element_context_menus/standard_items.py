@@ -78,6 +78,9 @@ class TreeViewItemFromStellarSystemElement(QStandardItem):
     def _set_context_menu(self):
         self.context_menu = self.context_menu_class(self)
 
+    def update_context_menu(self):
+        self._set_context_menu()
+
     def set_stellar_system_element_icon(self):
         try:
             image_array = self.ssc_object.image_array
