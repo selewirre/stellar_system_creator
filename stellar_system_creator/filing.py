@@ -63,6 +63,8 @@ def load(filename: str) -> Union[StellarBody, BinarySystem, PlanetarySystem, Ste
     return obj
 
 
+# TODO: check for suggested values before saving, and potentially change the value to its default!!
+#  (in save_stellar_body and save_binary)
 def save_as_ssc_light(obj: Union[StellarBody, BinarySystem, PlanetarySystem, StellarSystem, MultiStellarSystemSType],
                       filename: str):
     """
@@ -246,7 +248,6 @@ def load_ssc_light(filename: str, set_new_uuids=False) -> Union[StellarBody, Bin
                                                                 MultiStellarSystemSType]:
 
     allmother_filename = os.path.join(filename, '.allmother.json')
-    print('Loading', allmother_filename)
     kwargs = get_dict_from_json(allmother_filename)
 
     obj = get_object_from_kwargs_uuid(kwargs['allmother_uuid'], allmother_filename)

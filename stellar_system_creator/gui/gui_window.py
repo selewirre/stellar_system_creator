@@ -16,17 +16,20 @@
 # example on radiobutton https://pythonbasics.org/pyqt-radiobutton/
 # example on qthread https://stackoverflow.com/questions/6783194/background-thread-with-qthread-in-pyqt
 import datetime
-import glob
 import logging
-import sys
 import os
+import sys
+from functools import partial
 
 from PyQt5 import QtGui, QtWidgets, QtCore
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtCore import QTimer
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 
-from stellar_system_creator.gui.gui_theme import get_dark_theme_pallet, get_light_theme_pallet
-from stellar_system_creator.gui.gui_menubar import MenuBar
 from stellar_system_creator.gui.gui_central_widget import CentralWidget
+from stellar_system_creator.gui.gui_fancy_loader_screen import LoadingScreenImage
+from stellar_system_creator.gui.gui_menubar import MenuBar
+from stellar_system_creator.gui.gui_theme import get_dark_theme_pallet
+
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)  # enable highdpi scaling
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)  # use highdpi icons
 
@@ -34,7 +37,7 @@ QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)  # use
 class Window(QMainWindow):
     """Main Window."""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, filename: str = None):
         """Initializer."""
         super().__init__(parent)
         self.setWindowTitle("Stellar System Creator")
@@ -44,6 +47,15 @@ class Window(QMainWindow):
         # for drag and drop events
         self.setAcceptDrops(True)
 
+        self.ls = LoadingScreenImage()
+        self.ls.show()
+
+        self.timer = QTimer()
+        self.timer.timeout.connect(partial(self.loading, filename))
+        self.timer.start(30)
+        self.counts = 0
+
+    def _setup(self):
         self._create_central_widget()
         self._create_menubar()
 
@@ -55,16 +67,55 @@ class Window(QMainWindow):
         self.menubar = MenuBar()
         self.setMenuBar(self.menubar)
 
+    def open_file(self, filename):
+        if filename is not None:
+            try:
+                if filename != '':
+                    self.central_widget.add_new_tab(filename)
+            except Exception as e:
+                print(e)
+                message_box = QMessageBox()
+                message_box.setIcon(QMessageBox.Information)
+                message_box.setWindowTitle("'Open Project' has failed...")
+                message_box.setText(f"File '{filename}' is not compatible or does not exist.")
+                message_box.exec()
+
+    def loading(self, filename: str):
+        if self.counts == 0:
+            self.ls.label.setText(f'Loading ... Initializing GUI')
+            self.ls.label.resize(self.ls.label.sizeHint())
+        elif self.counts == 1:
+            self._setup()
+            if isinstance(filename, str):
+                self.ls.label.setText(f'Loading ... Opening File {os.path.basename(filename)}')
+                self.ls.label.resize(self.ls.label.sizeHint())
+        elif self.counts == 2:
+            self.open_file(filename)
+            self.ls.close()
+            self.ls.deleteLater()
+            self.show()
+            self.timer.stop()
+        else:
+            self.ls.close()
+            self.ls.deleteLater()
+            self.show()
+            self.timer.stop()
+
+        self.counts += 1
+
+
+class Application(QApplication):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.setStyle("Fusion")
+        self.setPalette(get_dark_theme_pallet())
+
 
 def run(filename=None):
-    app = QApplication(sys.argv)
-    app.setStyle("Fusion")
-    app.setPalette(get_dark_theme_pallet())
-    win = Window()
-    if filename is not None:
-        win.central_widget.add_new_tab(filename)
-    win.show()
-    # win.showMaximized()
+    app = Application(sys.argv)
+    win = Window(filename=filename)
     sys.exit(app.exec_())
 
 
@@ -88,10 +139,10 @@ def main(filename=None, divert_errors_to_log=False):
 if __name__ == "__main__":
     # https://stackoverflow.com/questions/162291/how-to-check-if-a-process-is-running-via-a-batch-script
     if len(sys.argv) == 1:
-        filename = None
+        file_name = None
     else:
-        filename = sys.argv[1]
-        filename = os.path.abspath(filename)
+        file_name = sys.argv[1]
+        file_name = os.path.abspath(file_name)
 
-    filename = '../examples/output_files/QuezuliferhWideBinarySystem.sscl'
-    main(filename)
+    # filename = '../examples/output_files/QuezuliferhWideBinarySystem.sscl'
+    main(file_name)
