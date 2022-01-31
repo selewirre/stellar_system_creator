@@ -16,14 +16,16 @@ class Color:
         if self.alpha is not None:
             self.mode = self.mode + 'A'
 
-    def get_color(self):
+    def get_color(self, mode=None):
+        if mode is None:
+            mode = self.mode
         output = []
-        if self.mode.startswith('RGB'):
+        if mode.startswith('RGB'):
             output = [self.red, self.green, self.blue]
-        elif self.mode.startswith('BGR'):
+        elif mode.startswith('BGR'):
             output = [self.blue, self.green, self.red]
         else:
-            TypeError(f'Mode {self.mode} not recognized')
+            TypeError(f'Mode {mode} not recognized')
 
         if self.alpha is not None:
             output.append(self.alpha)
@@ -44,8 +46,8 @@ class GradientColor(Color):
         self.pos = pos
         super().__init__(red, green, blue, alpha, inverted_color_space)
 
-    def get_color(self):
-        return [self.pos] + super().get_color()
+    def get_color(self, mode=None):
+        return [self.pos] + super().get_color(mode)
 
 
 def get_text_extents(text_extents):

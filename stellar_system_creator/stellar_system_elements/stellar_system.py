@@ -120,23 +120,23 @@ class StellarSystem:
         from stellar_system_creator.visualization.system_plot import SystemPlot
         if system_plot is not None:
             system_plot: SystemPlot
-            if system_plot.want_orbit_limits:
+            if system_plot.system_rendering_preferences['want_orbit_limits']:
                 distances.append(self.parent.inner_orbit_limit.to(units).m)
                 distances.append(self.parent.outer_orbit_limit.to(units).m)
-            if system_plot.want_rock_line:
+            if system_plot.system_rendering_preferences['want_rock_line']:
                 distances.append(self.parent.rock_line.to(units).m)
-            if system_plot.want_water_frost_line:
+            if system_plot.system_rendering_preferences['want_water_frost_line']:
                 distances.append(self.parent.water_frost_line.to(units).m)
-            if system_plot.want_tidal_locking_radius:
+            if system_plot.system_rendering_preferences['want_tidal_locking_radius']:
                 distances.append(self.parent.tidal_locking_radius.to(units).m)
-            if system_plot.want_habitable_zones_extended:
+            if system_plot.system_rendering_preferences['want_habitable_zones_extended']:
                 rzt = system_plot.relevant_zone_type
                 hz = self.parent.habitable_zone_limits[rzt]
                 min_name = self.parent.insolation_model.relaxed_min_name
                 max_name = self.parent.insolation_model.relaxed_max_name
                 distances.append(hz[min_name].to(units).m)
                 distances.append(hz[max_name].to(units).m)
-            if system_plot.want_habitable_zones_conservative:
+            if system_plot.system_rendering_preferences['want_habitable_zones_conservative']:
                 rzt = system_plot.relevant_zone_type
                 hz = self.parent.habitable_zone_limits[rzt]
                 min_name = self.parent.insolation_model.conservative_min_name

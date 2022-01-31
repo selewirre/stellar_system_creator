@@ -32,7 +32,6 @@ class LoadingScreenVideo(QWidget):
 
         self.move_to_center_of_screen()
 
-        print(self.rect())
         rect = QRect(23, 20, 460, 460)
         my_region = QRegion(rect, QRegion.Ellipse)
         self.setMask(my_region)

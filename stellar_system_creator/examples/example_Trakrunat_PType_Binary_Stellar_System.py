@@ -1,3 +1,4 @@
+import pkg_resources
 
 from stellar_system_creator.filing import save_as_ssc_light
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
@@ -23,7 +24,8 @@ planet2 = Planet('Fireball', 0.32 * ureg.M_e, semi_major_axis=0.59 * ureg.au, pa
                  normalized_greenhouse=0.9)
 planet3 = Planet('Bacon Giant', 2.34 * ureg.M_j, semi_major_axis=0.93 * ureg.au, parent=trakrunat_binaryP,
                  composition='Gasgiant', albedo=0.57, normalized_greenhouse=0.2,
-                 image_filename='../visualization/more_images/bacon-world.png')
+                 image_filename=pkg_resources.resource_filename('stellar_system_creator',
+                                                                'visualization/more_images/bacon-world.png'))
 planet4 = Planet('Waterball', 3.8 * ureg.M_e, semi_major_axis=1.58 * ureg.au, parent=trakrunat_binaryP,
                  composition='Waterworld25', albedo=0.32, normalized_greenhouse=0.2,
                  orbital_eccentricity=0.0113)
@@ -33,11 +35,13 @@ planet5 = Planet('Iceball', 19 * ureg.M_e, semi_major_axis=6.4 * ureg.au, parent
 planet6 = Planet('Golden Strip', 35 * ureg.M_e, semi_major_axis=11.4 * ureg.au, parent=trakrunat_binaryP,
                  composition='Icegiant', orbital_eccentricity=0.004, albedo=0.36,
                  normalized_greenhouse=0.17,
-                 image_filename='../visualization/more_images/gold-speckle-ice-giant.png')
+                 image_filename=pkg_resources.resource_filename('stellar_system_creator',
+                                                                'visualization/more_images/gold-speckle-ice-giant.png'))
 planet7 = Planet('Gas Baby', 0.06 * ureg.M_e, semi_major_axis=23 * ureg.au, parent=trakrunat_binaryP,
                  composition='Waterworld45', orbital_eccentricity=0.22, albedo=0.43,
                  normalized_greenhouse=0.25,
-                 image_filename='../visualization/more_images/dinosaur-egg-world.png')
+                 image_filename=pkg_resources.resource_filename('stellar_system_creator',
+                                                                'visualization/more_images/dinosaur-egg-world.png'))
 
 # creating asteroid belts
 asteroid_belt1 = AsteroidBelt('Floating potatoes', semi_major_axis=3.6 * ureg.au, parent=trakrunat_binaryP,
@@ -63,7 +67,9 @@ satellite31.__post_init__()
 # creating satellite for planet4
 satellite41 = Satellite('Dark Moon', 0.01 * ureg.M_e, parent=planet4, semi_major_axis=172 * ureg.R_e,
                         orbital_eccentricity=0.06, albedo=0.12,
-                        composition='Waterworld25', image_filename='../visualization/more_images/dark-moon.png')
+                        composition='Waterworld25', image_filename=
+                        pkg_resources.resource_filename('stellar_system_creator',
+                                                        'visualization/more_images/dark-moon.png'))
 
 # creating satellite for planet5
 satellite51 = Satellite('sat1', 0.000001 * ureg.M_e, parent=planet5, semi_major_axis=10E4 * ureg.km)

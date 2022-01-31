@@ -598,6 +598,7 @@ class RingColorsWidget(QWidget):
             layout.addWidget(self.add_gradient_color_button)
 
             for gradient_color in self.sse.ring.ring_radial_gradient_colors:
+                print(gradient_color)
                 layout.addWidget(GradientColorWidget(gradient_color))
 
             layout.addStretch()

@@ -105,9 +105,9 @@ class PlanetarySystem:
         from stellar_system_creator.visualization.system_plot import SystemPlot
         if system_plot is not None:
             system_plot: SystemPlot
-            if system_plot.want_orbit_limits:
+            if system_plot.system_rendering_preferences['want_orbit_limits']:
                 distances.append(self.parent.outer_orbit_limit.to(units).m)
-            if system_plot.want_tidal_locking_radius:
+            if system_plot.system_rendering_preferences['want_tidal_locking_radius']:
                 distances.append(self.parent.tidal_locking_radius.to(units).m)
 
         return distances

@@ -1,17 +1,17 @@
-import platform
+import os.path
+from functools import partial
 from typing import Union
 
 import pkg_resources
 from PyQt5 import QtGui, QtCore
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QSplitter, QMessageBox, QDialog, QLineEdit, QFormLayout, QDialogButtonBox
-
-from stellar_system_creator.filing import load as load_ssc, load_ssc_light
-from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
-from stellar_system_creator.gui.gui_image_rendering import SystemImageWidget
 from PyQt5.Qt import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QSplitter, QMessageBox, QDialog, QLineEdit, QFormLayout, QDialogButtonBox, QApplication, \
+    QTabBar
 
+from stellar_system_creator.filing import load as load_ssc, load_ssc_light, load_system_rendering_preferences
+from stellar_system_creator.gui.gui_image_rendering import SystemImageWidget
+from stellar_system_creator.gui.gui_project_tree_view import ProjectTreeView
 from stellar_system_creator.gui.gui_theme import get_icon_with_theme_colors
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
 from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem
@@ -27,13 +27,16 @@ class CentralWidget(QTabWidget):
         self.setTabsClosable(True)
         self.tabBarDoubleClicked.connect(self.toggle_hide_tab_contents)
         self.tabCloseRequested.connect(self.close_tab)
+        self.tabBar()
 
     def add_new_tab(self, filename: str):
         tab_content = QSplitter(Qt.Horizontal)
         if filename.endswith('.ssc'):
             ssc_object = load_ssc(filename)
+            system_rendering_preferences = None
         else:
             ssc_object = load_ssc_light(filename)
+            system_rendering_preferences = load_system_rendering_preferences(filename)
         tree_view = ProjectTreeView(ssc_object, filename)
         tab_header = self.make_tab_header(tree_view.ssc_object.name, tree_view, tab_content)
 
@@ -45,7 +48,7 @@ class CentralWidget(QTabWidget):
         left_side_layout.setSpacing(0)
         left_side_widget.setLayout(left_side_layout)
 
-        right_side_widget = SystemImageWidget(tree_view)
+        right_side_widget = SystemImageWidget(tree_view, system_rendering_preferences)
 
         tab_content.addWidget(left_side_widget)
         tab_content.addWidget(right_side_widget)
@@ -54,14 +57,21 @@ class CentralWidget(QTabWidget):
         tab_content.setSizes([1.5*left_side_widget.sizeHint().width(),
                               1.5*right_side_widget.sizeHint().width()])
 
-        if platform.system() == 'Windows':
-            seperator = '\\'
-        else:
-            seperator = '/'
-        tab_label = filename.split(seperator)[-1].split('.')[0]
+        # if platform.system() == 'Windows':
+        #     seperator = '\\'
+        # else:
+        #     seperator = '/'
+        # tab_label = filename.split(seperator)[-1].split('.')[0]
+        tab_label = os.path.basename(filename).split('.')[0]
         tab_index = self.addTab(tab_content, tab_label)
         self.setCurrentIndex(tab_index)
+        self.set_tab_button(tab_index)
         # tab_content.widget(0).hide()
+
+    def set_tab_button(self, tab_index):
+        new_button = CloseTabButton()
+        new_button.pressed.connect(lambda: self.tabCloseRequested.emit(tab_index))
+        self.tabBar().setTabButton(tab_index, self.tabBar().RightSide, new_button)
 
     def make_tab_header(self, label_text, tree_view, tab_content):
         tab_header = QWidget(self)
@@ -207,5 +217,17 @@ class TabHeaderDialog(QDialog):
         super().reject()
 
 
+class CloseTabButton(QPushButton):
 
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        icon_dir = pkg_resources.resource_filename('stellar_system_creator',
+                                                   'gui/gui_icons/close.svg')
+        current_palette = QApplication.instance().palette()
+        self.setIcon(get_icon_with_theme_colors(icon_dir, current_palette))
+        # self.setContentsMargins(0, 0, 0, 0)
+        self.setCheckable(True)
+        self.setStyleSheet("QPushButton:!hover{border: none;}")
+        self.adjustSize()
 

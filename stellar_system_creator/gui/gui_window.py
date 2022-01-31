@@ -144,5 +144,5 @@ if __name__ == "__main__":
         file_name = sys.argv[1]
         file_name = os.path.abspath(file_name)
 
-    # filename = '../examples/output_files/QuezuliferhWideBinarySystem.sscl'
+    file_name = '../examples/output_files/TrakrunatStellarSystem.sscl'
     main(file_name)

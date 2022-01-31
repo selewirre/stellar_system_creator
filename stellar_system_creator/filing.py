@@ -66,7 +66,7 @@ def load(filename: str) -> Union[StellarBody, BinarySystem, PlanetarySystem, Ste
 # TODO: check for suggested values before saving, and potentially change the value to its default!!
 #  (in save_stellar_body and save_binary)
 def save_as_ssc_light(obj: Union[StellarBody, BinarySystem, PlanetarySystem, StellarSystem, MultiStellarSystemSType],
-                      filename: str):
+                      filename: str, system_rendering_preferences: Union[Dict, None] = None):
     """
     Saving object extension with .sscl.
     It is a compressed folder of json files and non-default images.
@@ -84,7 +84,7 @@ def save_as_ssc_light(obj: Union[StellarBody, BinarySystem, PlanetarySystem, Ste
         os.mkdir(temp_folder)
 
         # saving system and sub-systems
-        save_object_to_json(obj, temp_folder)
+        save_object_to_json(obj, temp_folder, system_rendering_preferences)
         with open(os.path.join(temp_folder, f".allmother.json"), "w") as outfile:
             outfile.write(json.dumps({'allmother_uuid': obj._uuid}, indent=4))
 
@@ -118,7 +118,8 @@ def save_as_ssc_light(obj: Union[StellarBody, BinarySystem, PlanetarySystem, Ste
         return False
 
 
-def save_system_to_json(obj: Union[PlanetarySystem, StellarSystem, MultiStellarSystemSType], target_folder: str):
+def save_system_to_json(obj: Union[PlanetarySystem, StellarSystem, MultiStellarSystemSType], target_folder: str,
+                        system_rendering_preferences: Union[Dict, None] = None):
     parent = obj.parent
     save_object_to_json(parent, target_folder)
 
@@ -144,18 +145,33 @@ def save_system_to_json(obj: Union[PlanetarySystem, StellarSystem, MultiStellarS
     with open(os.path.join(target_folder, f"{obj_uuid}.json"), "w") as outfile:
         outfile.write(json.dumps(kwargs, indent=4))
 
+    save_system_rendering_preferences(obj, target_folder, system_rendering_preferences)
+
+
+def save_system_rendering_preferences(obj: Union[PlanetarySystem, StellarSystem, MultiStellarSystemSType],
+                                      target_folder: str, system_rendering_preferences: Union[Dict, None] = None):
+
+    if isinstance(obj, MultiStellarSystemSType):
+        obj = obj.children[0] if obj.children[0].parent.mass >= obj.children[1].parent.mass else obj.children[1]
+    if system_rendering_preferences is None:
+        system_rendering_preferences = obj.system_plot.system_rendering_preferences
+
+    with open(os.path.join(target_folder, ".system_rendering_preferences.json"), "w") as outfile:
+        outfile.write(json.dumps(system_rendering_preferences, indent=4))
+
 
 def get_children_uuid_list(children: List[Union[StellarBody, BinarySystem, PlanetarySystem, StellarSystem]]):
     return [child._uuid for child in children]
 
 
-def save_object_to_json(obj: Union[StellarBody, BinarySystem], target_folder: str):
+def save_object_to_json(obj: Union[StellarBody, BinarySystem], target_folder: str,
+                        system_rendering_preferences: Union[Dict, None] = None):
     if isinstance(obj, StellarBody):
         save_stellar_body_to_json(obj, target_folder)
     elif isinstance(obj, BinarySystem):
         save_binary_to_json(obj, target_folder)
     elif isinstance(obj, (PlanetarySystem, StellarSystem, MultiStellarSystemSType)):
-        save_system_to_json(obj, target_folder)
+        save_system_to_json(obj, target_folder, system_rendering_preferences)
     else:
         raise TypeError(f'Could not save {obj} because it is neither a stellar body nor a binary system.')
 
@@ -191,7 +207,7 @@ def save_stellar_body_to_json(obj: StellarBody, target_folder: str):
                 if obj.has_ring:
                     ring_color_list = []
                     for gradient_color in obj.ring.ring_radial_gradient_colors:
-                        ring_color_list.append(gradient_color.get_color())
+                        ring_color_list.append(gradient_color.get_color('RGBA'))
                     kwargs['ring_radial_gradient_color'] = ring_color_list
             else:
                 value = obj.__dict__[key]
@@ -256,6 +272,14 @@ def load_ssc_light(filename: str, set_new_uuids=False) -> Union[StellarBody, Bin
         obj.reset_system_uuids()
 
     return obj
+
+
+def load_system_rendering_preferences(filename: str) -> Dict:
+
+    system_rendering_preferences_filename = os.path.join(filename, '.system_rendering_preferences.json')
+    system_rendering_preferences = get_dict_from_json(system_rendering_preferences_filename)
+
+    return system_rendering_preferences
 
 
 def load_system_from_json(filename: str) -> Union[PlanetarySystem, StellarSystem, MultiStellarSystemSType]:
@@ -329,6 +353,8 @@ def load_stellar_body_from_json(filename: str, attempt_loading_parent=True) \
 
     # getting proper values for all quantities
     kwargs = load_quantities_from_string_in_dict(kwargs)
+    if 'image_filename' in kwargs:
+        kwargs['image_filename'] = os.path.join(os.path.dirname(filename), kwargs['image_filename'])
 
     stellar_body = cls(**kwargs)
     stellar_body._uuid = os.path.basename(filename).strip('.json')

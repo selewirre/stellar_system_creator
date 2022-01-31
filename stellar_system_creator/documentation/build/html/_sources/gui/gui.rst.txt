@@ -50,15 +50,21 @@ a similar way. To modify the :ref:`planet <planet>`'s characteristics, open up t
 procedure as for a :ref:`planetary system <planetary_system>`,
 but now do it through the Asteroid Belts item list.
 
+You can also add a system (Planetary or Stellar) from a file. That is, if you worked on a subsystem you want to
+incorporate in a bigger system, you can save it to file and upload it on the bigger one. This can also
+be used as a "copy" function, which is not yet available officially. Similarly you can save subsystems as
+separate files, for the same purpose.
+
 To delete an element, simply right-click on the undesired element and choose
 Delete Permanently.
 Some elements (e.g. :ref:`planets <planet>` in :ref:`planetary systems <planetary_system>`
 or :ref:`stars <star>` in :ref:`stellar systems <stellar_system>`) are not deletable, only replaceable.
 
 To save your progress, go to Files -> Save project and choose the name under
-which you want to save the file. The files can get quite big due to saving
+which you want to save the file. SSC files can get quite big due to saving
 images for every single element. The average :ref:`stellar system <stellar_system>`
-should be less than 100 MB.
+should be less than 100 MB. **I highly suggest using the SSCL type**, which is 10-1000 times
+lighter but they take a little bit more time to load.
 
 To open an existing project in a new tab, go to files -> Open Project and
 select the project of your choice.

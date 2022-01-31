@@ -7,7 +7,7 @@ from PyQt5.QtCore import QUrl
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage
 from PyQt5.QtWidgets import QMenu, QAction, QFileDialog, QMenuBar, QMessageBox, QDialog, QVBoxLayout, QToolBar, \
-    QPushButton, QApplication, QSplitterHandle, QWidget
+    QPushButton, QApplication
 
 from stellar_system_creator.astrothings.units import ureg
 from stellar_system_creator.filing import save as save_ssc_object, save_as_ssc_light, add_extension_if_necessary
@@ -79,6 +79,8 @@ class FileMenu(QMenu):
         self.add_file_association_action.triggered.connect(partial(add_file_association, sys.argv[0]))
         self.exit_action.triggered.connect(partial(exit_application, self))
 
+        self.reset_menu_icons()
+
     def _create_menu_actions(self, menubar):
         self.new_project_submenu = QMenu("&New Project", menubar)
         self.new_project_multi_stellar_system_action = QAction("&Multi-Stellar System...", menubar)
@@ -107,6 +109,41 @@ class FileMenu(QMenu):
 
         self.exit_action = QAction(QIcon.fromTheme("application-exit"), "&Exit", menubar)
         # self.exit_action.setShortcut('Alt+F4')
+
+    def reset_menu_icons(self):
+        current_palette = QApplication.instance().palette()
+
+        mss_icon_dir = pkg_resources.resource_filename('stellar_system_creator',
+                                                       'gui/gui_icons/Multi-Stellar-System.svg')
+        self.new_project_multi_stellar_system_action.setIcon(get_icon_with_theme_colors(mss_icon_dir, current_palette))
+
+        ss_icon_dir = pkg_resources.resource_filename('stellar_system_creator',
+                                                      'gui/gui_icons/Stellar-System.svg')
+        self.new_project_stellar_system_action.setIcon(get_icon_with_theme_colors(ss_icon_dir, current_palette))
+
+        ps_icon_dir = pkg_resources.resource_filename('stellar_system_creator',
+                                                      'gui/gui_icons/Planetary-System.png')
+        self.new_project_planetary_system_action.setIcon(get_icon_with_theme_colors(ps_icon_dir, current_palette))
+
+        new_project_icon_dir = pkg_resources.resource_filename('stellar_system_creator',
+                                                               'gui/gui_icons/new-folder.svg')
+        self.new_project_submenu.setIcon(get_icon_with_theme_colors(new_project_icon_dir, current_palette))
+
+        open_project_icon_dir = pkg_resources.resource_filename('stellar_system_creator',
+                                                                'gui/gui_icons/open-folder.svg')
+        self.open_project_action.setIcon(get_icon_with_theme_colors(open_project_icon_dir, current_palette))
+
+        save_project_icon_dir = pkg_resources.resource_filename('stellar_system_creator',
+                                                                'gui/gui_icons/save.svg')
+        self.save_project_action.setIcon(get_icon_with_theme_colors(save_project_icon_dir, current_palette))
+
+        theme_icon_dir = pkg_resources.resource_filename('stellar_system_creator',
+                                                         'gui/gui_icons/color-palette.svg')
+        self.theme_submenu.setIcon(get_icon_with_theme_colors(theme_icon_dir, current_palette))
+
+        exit_icon_dir = pkg_resources.resource_filename('stellar_system_creator',
+                                                         'gui/gui_icons/shut-down.svg')
+        self.exit_action.setIcon(get_icon_with_theme_colors(exit_icon_dir, current_palette))
 
 
 class EditMenu(QMenu):
@@ -230,11 +267,20 @@ class HelpMenu(QMenu):
         self.documentation_pdf_action = QAction("&Open Documentation PDF", menubar)
         self.documentation_pdf_action.setShortcut('Ctrl+Shift+F1')
 
+        self.reset_menu_icons()
+
     def open_documentation_process(self, page_directory=None):
         if page_directory is not None:
             if page_directory:
                 self.help_dialog.loadPage(page_directory)
         self.help_dialog.show()
+
+    def reset_menu_icons(self):
+        current_palette = QApplication.instance().palette()
+
+        documentation_icon_dir = pkg_resources.resource_filename('stellar_system_creator',
+                                                                 'gui/gui_icons/help.svg')
+        self.documentation_action.setIcon(get_icon_with_theme_colors(documentation_icon_dir, current_palette))
 
 
 class HelpDialog(QDialog):
@@ -384,6 +430,12 @@ def save_as_project(parent):
     else:
         return
 
+    # updating the tab name and the project treeview name
+    central_widget.get_project_tree_view_of_current_tab().filename = filename
+    import os
+    new_tab_label = os.path.basename(filename).split('.')[0]
+    central_widget.setTabText(central_widget.currentIndex(), new_tab_label)
+
 
 def save_project(parent):
     central_widget: CentralWidget = parent.parent().parent().central_widget
@@ -392,7 +444,9 @@ def save_project(parent):
     if filename.endswith('.ssc'):
         saved = save_ssc_object(ssc_object, filename)
     else:
-        saved = save_as_ssc_light(ssc_object, filename)
+        system_rendering_preferences = central_widget.currentWidget().right_side_widget.rendering_settings_dialog.\
+            get_system_rendering_preferences()
+        saved = save_as_ssc_light(ssc_object, filename, system_rendering_preferences)
     tab_text = central_widget.tabText(central_widget.currentIndex())
     if saved and tab_text.startswith('*'):
         central_widget.setTabText(central_widget.currentIndex(), tab_text[1:])
@@ -412,14 +466,16 @@ def change_theme(parent, get_theme_pallet):
 
     menubar: MenuBar = parent.parent().parent().menubar
     helpmenu: HelpMenu = menubar.findChild(HelpMenu)
+    helpmenu.reset_menu_icons()
     helpmenu.help_dialog.reset_toolbar()
 
+    filemenu: FileMenu = menubar.findChild(FileMenu)
+    filemenu.reset_menu_icons()
+
     central_widget: CentralWidget = parent.parent().parent().central_widget
-    initial_index = central_widget.currentIndex()
     for i in range(central_widget.count()):
-        central_widget.setCurrentIndex(i)
-        central_widget.currentWidget().children()[1].children()[1].children()[0].set_minimize_icon()
-    central_widget.setCurrentIndex(initial_index)
+        central_widget.set_tab_button(i)
+        central_widget.widget(i).children()[1].children()[1].children()[0].set_minimize_icon()
 
 
 def exit_application(parent):
@@ -459,7 +515,7 @@ def open_documentation_pdf():
 
 
 def add_file_association(executable_filename):
-    import subprocess, os, platform
+    import subprocess, platform
     if platform.system() == 'Darwin':  # macOS
         message_box = QMessageBox()
         message_box.setIcon(QMessageBox.Information)

@@ -32,41 +32,36 @@ colors = {'purple': [51 / 255, 34 / 255, 136 / 255, 1],
           'navajowhite': [1, 222 / 255, 173 / 255, 1],
           }
 
+default_system_rendering_preferences = {'scale': 6,
+                                        'want_orbit_limits': True,
+                                        'want_habitable_zones_extended': True,
+                                        'want_habitable_zones_conservative': True,
+                                        'want_water_frost_line': True,
+                                        'want_rock_line': True,
+                                        'want_tidal_locking_radius': True,
+                                        'want_orbit_lines': True,
+                                        'orbit_line_width': 3,
+                                        'want_orbit_limits_labels': True,
+                                        'want_other_line_labels': True,
+                                        'want_children_orbit_labels': True,
+                                        'want_children_name_labels': True,
+                                        'want_parent_name_labels': True,
+                                        'orbit_distance_font_size': 10,
+                                        'object_name_font_size': 10,
+                                        'satellite_plot_y_step': None,
+                                        'want_satellites': True,
+                                        'want_trojans': True,
+                                        'want_asteroid_belts': True,
+                                        'want_children_objects': True,
+                                        'want_parents': True}
+
 
 class SystemPlot:
     # TODO: change ImageSurface of base surface to SVGSurface. Do not change for planet images.
     def __init__(self, ssc_object: Union[PlanetarySystem, StellarSystem]):
         self.ssc_object = ssc_object
-        self.scale = 6
 
-        # drawing options - lines // areas
-        self.want_orbit_limits = True
-        self.want_habitable_zones_extended = True
-        self.want_habitable_zones_conservative = True
-        self.want_water_frost_line = True
-        self.want_rock_line = True
-        self.want_tidal_locking_radius = True
-        self.want_orbit_lines = True
-        self.orbit_line_width = 3
-
-        # drawing options - labels
-        self.want_orbit_limits_labels = True
-        self.want_other_line_labels = True
-        self.want_children_orbit_labels = True
-        self.want_children_name_labels = True
-        self.want_parent_name_labels = True
-
-        self.orbit_distance_font_size = 10
-        self.object_name_font_size = 10
-
-        # drawing options - objects
-        self.satellite_plot_y_step = None
-        self.want_satellites = True
-        self.want_trojans = True
-        self.want_asteroid_belts = True
-        self.want_children_objects = True
-        self.want_parents = True
-
+        self.system_rendering_preferences = default_system_rendering_preferences
         self.plot_base_surface: Union[cairo.ImageSurface, None] = None
         self.plot_base_context: Union[cairo.Context, None] = None
         self._set_plot_limits()
@@ -120,8 +115,8 @@ class SystemPlot:
         orbit_distances = self.ssc_object.get_children_orbit_distances('au', self)
         self.xlims = (min(orbit_distances) / 3, max(orbit_distances) * 2)
         self.ylims = (-0.5, 0.5)
-        if self.satellite_plot_y_step is None:
-            self.satellite_plot_y_step = (self.ylims[1] - self.ylims[0]) / 10
+        if self.system_rendering_preferences['satellite_plot_y_step'] is None:
+            self.system_rendering_preferences['satellite_plot_y_step'] = (self.ylims[1] - self.ylims[0]) / 10
 
     def update_plot_limits(self):
         self._set_plot_limits()
@@ -134,7 +129,7 @@ class SystemPlot:
 
     def _render_plot(self):
         self.plot_base_surface, self.plot_base_context = create_base_surface_and_context(
-            300 * self.scale, 1100 * self.scale)
+            300 * self.system_rendering_preferences['scale'], 1100 * self.system_rendering_preferences['scale'])
 
         self.update_plot_limits()
 
@@ -147,15 +142,15 @@ class SystemPlot:
         self.add_orbit_limits()
         self.add_children_orbit()
 
-        if self.want_parents:
+        if self.system_rendering_preferences['want_parents']:
             self.add_parent()
-        if self.want_children_objects:
+        if self.system_rendering_preferences['want_children_objects']:
             self.add_children()
-        if self.want_asteroid_belts:
+        if self.system_rendering_preferences['want_asteroid_belts']:
             self.add_asteroid_belts()
-        if self.want_satellites:
+        if self.system_rendering_preferences['want_satellites']:
             self.add_satellites()
-        if self.want_trojans:
+        if self.system_rendering_preferences['want_trojans']:
             self.add_trojans()
 
         self.add_orbit_limits_labels()
@@ -173,8 +168,9 @@ class SystemPlot:
 
         value = False
         for limit in orbit_limits:
-            if self.want_orbit_limits:
-                value = draw_orbit(self, colors['navajowhite'], limit.to('au').m)
+            if self.system_rendering_preferences['want_orbit_limits']:
+                value = draw_orbit(self, colors['navajowhite'], limit.to('au').m,
+                                   line_width=self.system_rendering_preferences['orbit_line_width'])
 
         return value
 
@@ -187,9 +183,10 @@ class SystemPlot:
 
         value = False
         for limit in orbit_limits:
-            if self.want_orbit_limits_labels:
+            if self.system_rendering_preferences['want_orbit_limits_labels']:
                 value = draw_orbit_label(self, [1, 1, 1, 1], limit.to('au').m, 'bottom',
-                                         font_size=self.orbit_distance_font_size) or value
+                                         font_size=
+                                         self.system_rendering_preferences['orbit_distance_font_size']) or value
 
         return value
 
@@ -204,9 +201,10 @@ class SystemPlot:
 
         value = False
         for tobj in target_objects:
-            if self.want_orbit_lines:
+            if self.system_rendering_preferences['want_orbit_lines']:
                 value = draw_orbit(self, colors['darkviolet'], tobj.semi_major_axis.to('au').m,
-                                   tobj.periapsis.to('au').m, tobj.apoapsis.to('au').m) or value
+                                   tobj.periapsis.to('au').m, tobj.apoapsis.to('au').m,
+                                   line_width=self.system_rendering_preferences['orbit_line_width']) or value
 
     def add_children_orbit_labels(self):
         ssc_object = self.ssc_object
@@ -223,9 +221,10 @@ class SystemPlot:
 
         value = False
         for tobj in target_objects:
-            if self.want_children_orbit_labels:
+            if self.system_rendering_preferences['want_children_orbit_labels']:
                 value = draw_orbit_label(self, [1, 1, 1, 1], tobj.semi_major_axis.to('au').m, 'top', unit_label,
-                                         normalization, font_size=self.orbit_distance_font_size) or value
+                                         normalization, font_size=
+                                         self.system_rendering_preferences['orbit_distance_font_size']) or value
 
     def add_parent(self):
         ssc_object = self.ssc_object
@@ -273,17 +272,19 @@ class SystemPlot:
 
         value = False
         if isinstance(ssc_object.parent, StellarBody):
-            if self.want_parent_name_labels:
+            if self.system_rendering_preferences['want_parent_name_labels']:
                 value = draw_object_label(self, ssc_object.parent.name, [1, 1, 1, 1], parent_drawing_orbit, y0=0,
-                                          font_size=self.object_name_font_size) or value
+                                          font_size=self.system_rendering_preferences['object_name_font_size']) or value
 
         elif isinstance(ssc_object.parent, BinarySystem):
-            if self.want_parent_name_labels:
+            if self.system_rendering_preferences['want_parent_name_labels']:
                 value = draw_object_label(self, ssc_object.parent.primary_body.name, [1, 1, 1, 1], parent_drawing_orbit,
-                                          y0=-0.2, font_size=self.object_name_font_size) or value
+                                          y0=-0.2, font_size=
+                                          self.system_rendering_preferences['object_name_font_size']) or value
 
                 value = draw_object_label(self, ssc_object.parent.secondary_body.name, [1, 1, 1, 1],
-                                          parent_drawing_orbit, y0=0.7, font_size=self.object_name_font_size) or value
+                                          parent_drawing_orbit, y0=0.7, font_size=
+                                          self.system_rendering_preferences['object_name_font_size']) or value
 
         return value
 
@@ -326,17 +327,17 @@ class SystemPlot:
 
         value = False
         for tobj in target_objects:
-            if self.want_children_name_labels:
+            if self.system_rendering_preferences['want_children_name_labels']:
                 value = draw_object_label(self, tobj.name, [1, 1, 1, 1], tobj.semi_major_axis.to('au').m,
-                                          font_size=self.object_name_font_size) or value
+                                          font_size=self.system_rendering_preferences['object_name_font_size']) or value
 
         return value
 
     def add_habitable_zones(self, limit='conservative'):
         ssc_object = self.ssc_object
-        if limit == 'conservative' and not self.want_habitable_zones_conservative:
+        if limit == 'conservative' and not self.system_rendering_preferences['want_habitable_zones_conservative']:
             return False
-        if limit == 'extended' and not self.want_habitable_zones_extended:
+        if limit == 'extended' and not self.system_rendering_preferences['want_habitable_zones_extended']:
             return False
 
         if isinstance(ssc_object, StellarSystem):
@@ -384,8 +385,9 @@ class SystemPlot:
         ssc_object = self.ssc_object
         if isinstance(ssc_object, StellarSystem):
             value = False
-            if self.want_water_frost_line:
-                value = draw_orbit(self, colors['lightblue'], ssc_object.parent.water_frost_line.to('au').m)
+            if self.system_rendering_preferences['want_water_frost_line']:
+                value = draw_orbit(self, colors['lightblue'], ssc_object.parent.water_frost_line.to('au').m,
+                                   line_width=self.system_rendering_preferences['orbit_line_width'])
             return value
 
         return False
@@ -394,8 +396,9 @@ class SystemPlot:
         ssc_object = self.ssc_object
         if isinstance(ssc_object, StellarSystem):
             value = False
-            if self.want_rock_line:
-                value = draw_orbit(self, colors['bluegreen'], ssc_object.parent.rock_line.to('au').m)
+            if self.system_rendering_preferences['want_rock_line']:
+                value = draw_orbit(self, colors['bluegreen'], ssc_object.parent.rock_line.to('au').m,
+                                   line_width=self.system_rendering_preferences['orbit_line_width'])
             return value
 
         return False
@@ -403,24 +406,28 @@ class SystemPlot:
     def add_tidal_locking_radius(self):
         ssc_object = self.ssc_object
         value = False
-        if self.want_tidal_locking_radius:
-            value = draw_orbit(self, colors['purple'], ssc_object.parent.tidal_locking_radius.to('au').m)
+        if self.system_rendering_preferences['want_tidal_locking_radius']:
+            value = draw_orbit(self, colors['purple'], ssc_object.parent.tidal_locking_radius.to('au').m,
+                               line_width=self.system_rendering_preferences['orbit_line_width'])
 
         return value
 
     def add_other_line_labels(self):
         ssc_object = self.ssc_object
         value = False
-        if self.want_other_line_labels:
-            if self.want_rock_line and isinstance(ssc_object, StellarSystem):
+        if self.system_rendering_preferences['want_other_line_labels']:
+            if self.system_rendering_preferences['want_rock_line'] and isinstance(ssc_object, StellarSystem):
                 value = draw_orbit_label(self, [1, 1, 1, 1], ssc_object.parent.rock_line.to('au').m, 'bottom',
-                                         font_size=self.orbit_distance_font_size) or value
-            if self.want_water_frost_line and isinstance(ssc_object, StellarSystem):
+                                         font_size=self.system_rendering_preferences[
+                                             'orbit_distance_font_size']) or value
+            if self.system_rendering_preferences['want_water_frost_line'] and isinstance(ssc_object, StellarSystem):
                 value = draw_orbit_label(self, [1, 1, 1, 1], ssc_object.parent.water_frost_line.to('au').m, 'bottom',
-                                         font_size=self.orbit_distance_font_size) or value
-            if self.want_tidal_locking_radius:
+                                         font_size=self.system_rendering_preferences[
+                                             'orbit_distance_font_size']) or value
+            if self.system_rendering_preferences['want_tidal_locking_radius']:
                 value = draw_orbit_label(self, [1, 1, 1, 1], ssc_object.parent.tidal_locking_radius.to('au').m,
-                                         'bottom', font_size=self.orbit_distance_font_size) or value
+                                         'bottom', font_size=self.system_rendering_preferences[
+                        'orbit_distance_font_size']) or value
 
         return value
 
@@ -432,10 +439,10 @@ class SystemPlot:
                 target_objects = ps.satellite_list
                 for i, tobj in enumerate(target_objects):
                     satellite_no = i + 1
-                    if self.satellite_plot_y_step is None:
+                    if self.system_rendering_preferences['satellite_plot_y_step'] is None:
                         satellite_plot_y_step = (self.ylims[1] - self.ylims[0]) / 10
                     else:
-                        satellite_plot_y_step = self.satellite_plot_y_step
+                        satellite_plot_y_step = self.system_rendering_preferences['satellite_plot_y_step']
                     if len(target_objects) % 2:
                         y0 = (-1) ** (satellite_no - 1) * (satellite_no // 2) * satellite_plot_y_step + 0j
                     else:
@@ -643,12 +650,16 @@ def draw_object(system_plot: SystemPlot, planet_relative_radius, planet_orbit_ra
 
         context.set_source_rgba(1, 1, 1, 1)
         spacing = 0.1
-        context.set_line_width(system_plot.scale * system_plot.orbit_line_width / 2 / scale_xy)
+        context.set_line_width(
+            system_plot.system_rendering_preferences['scale'] * system_plot.system_rendering_preferences[
+                'orbit_line_width'] / 2 / scale_xy)
         context.rectangle(planet_x_position - spacing * planet_radius, planet_y_position - spacing * planet_radius,
                           planet_radius * 2 * (1 + spacing), planet_radius * 2 * (1 + spacing))
         context.stroke()
 
-        context.set_font_size(system_plot.scale * system_plot.orbit_distance_font_size / scale_xy)
+        context.set_font_size(
+            system_plot.system_rendering_preferences['scale'] * system_plot.system_rendering_preferences[
+                'orbit_distance_font_size'] / scale_xy)
         text = f"x{zoom_factor:.0g}"
         text_extents = get_text_extents(context.text_extents(text))
 
@@ -740,7 +751,7 @@ def draw_parent_ring(system_plot: SystemPlot, ring_inner_radius=None, ring_outer
     radius = get_orbit_radius(base_surface)
 
     linear_gradient = cairo.RadialGradient(0., y_edge, x_inner_edge,
-                                           -x_outer_edge, y_edge, 2*x_outer_edge)
+                                           -x_outer_edge, y_edge, 2 * x_outer_edge)
     # linear_gradient = cairo.LinearGradient(x_inner_edge, y_edge, x_outer_edge, y_edge)
     for i, color_set in enumerate(ring_color_list):
         cs = color_set.get_color()
@@ -798,7 +809,7 @@ def draw_orbit(system_plot: SystemPlot, color_rgba: list, mean_orbit_distance: [
     if mean_orbit_distance is not None and not np.isnan(mean_orbit_distance):
         context.save()
         context.set_source_rgba(*color_gbra)
-        context.set_line_width(line_width * system_plot.scale)
+        context.set_line_width(line_width * system_plot.system_rendering_preferences['scale'])
         x_edge = system_plot.transform_data_to_im(mean_orbit_distance, 'x')
         context.arc(x_edge - radius, y_edge, radius, -0.5 * np.pi, 0.5 * np.pi)
         context.stroke()
@@ -837,7 +848,7 @@ def draw_orbit_label(system_plot: SystemPlot, color_rgba: list, mean_orbit_dista
     base_surface: cairo.ImageSurface = system_plot.plot_base_surface
 
     context.save()
-    context.set_font_size(font_size * system_plot.scale)
+    context.set_font_size(font_size * system_plot.system_rendering_preferences['scale'])
     mean_orbit_distance = 1.034 * mean_orbit_distance
 
     # getting color
@@ -877,7 +888,7 @@ def draw_object_label(system_plot: SystemPlot, label_text: str, color_rgba: list
 
     context.save()
 
-    context.set_font_size(font_size * system_plot.scale)
+    context.set_font_size(font_size * system_plot.system_rendering_preferences['scale'])
 
     # getting color
     color_gbr = list(color_rgba[:-1])
@@ -914,11 +925,3 @@ def combine_system_plots_vertically(system_plots: List[SystemPlot]) -> cairo.Ima
         context.restore()
 
     return surface
-
-
-# next steps:
-# 1. test all systems and try to save them via draw in system
-# 2. test gui in general.
-# 3. change logo.
-# 4. add screenshots of gui strengths in website.
-# 5. add user pictures.

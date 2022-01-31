@@ -54,10 +54,10 @@ ss = StellarSystem('Viyodzorax Stellar System', viyodzorax, [ps1, ps6, ps7, ps8]
 
 save_as_ssc_light(ss, 'output_files/ViyodzoraxStellarSystem.sscl')
 
-ss.system_plot.want_tidal_locking_radius = False
-ss.system_plot.want_habitable_zones_conservative = False
-ss.system_plot.want_habitable_zones_extended = False
-ss.system_plot.want_rock_line = False
-ss.system_plot.want_water_frost_line = False
+ss.system_plot.system_rendering_preferences['want_tidal_locking_radius'] = False
+ss.system_plot.system_rendering_preferences['want_habitable_zones_conservative'] = False
+ss.system_plot.system_rendering_preferences['want_habitable_zones_extended'] = False
+ss.system_plot.system_rendering_preferences['want_rock_line'] = False
+ss.system_plot.system_rendering_preferences['want_water_frost_line'] = False
 ss.draw_stellar_system()
 ss.system_plot.save_image('output_files/ViyodzoraxStellarSystem.png')

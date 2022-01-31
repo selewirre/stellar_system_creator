@@ -11,7 +11,7 @@ To install this package, run:
 
 ```
 python3 setup.py sdist bdist_wheel
-pip3 install dist/stellar_system_creator-0.4.0.0.tar.gz
+pip3 install dist/stellar_system_creator-0.4.2.0.tar.gz
 ```
 
 If you want to check out the example code, look in the folder `examples/...`
@@ -46,12 +46,12 @@ What you can do with the GUI:
 7. Render the system as an image.
 8. Use Render image options to add/remove lines of interest (e.g. habitability zone, orbit, frostline, etc.), labels etc.
 9. Add celestial objects or systems from file.
+10. Make Rendering Settings permanent.
 
 What you can NOT do with the GUI just yet:
 1. Create planetary binaries.
 2. Add your own image as system background.
 3. Copy/Paste celestial objects or systems.
-4. Make Rendering Settings permanent.
 5. Change font or color of Rendered text.
 
 When loading a new system, allow the program to work through it (takes 5-10 seconds). 

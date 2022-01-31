@@ -471,9 +471,17 @@ class PlanetDetailsDialog(BasicDetailsDialog):
             TreeViewItemFromStellarSystemElement
 
         while not parent.ssc_object.__class__ == target_system:
-            parent = parent.parent()
-            while not isinstance(parent, TreeViewItemFromStellarSystemElement):
+            if parent.parent() is not None:
                 parent = parent.parent()
+            else:
+                parent = parent.model().parent()
+                break
+            while not isinstance(parent, TreeViewItemFromStellarSystemElement):
+                if parent.parent() is not None:
+                    parent = parent.parent()
+                else:
+                    parent = parent.model().parent()
+                    break
 
         parent.ssc_object.sort_all_by_distance()
 

@@ -30,8 +30,8 @@ quezuliferh_system = MultiStellarSystemSType('Quezuliferh Wide Binary System', q
 
 save_as_ssc_light(quezuliferh_system, 'output_files/QuezuliferhWideBinarySystem.sscl')
 
-# quezuliferh_system.system_plot.system_plots[0].want_tidal_locking_radius = False
-# quezuliferh_system.system_plot.system_plots[1].want_habitable_zones_extended = True
-# quezuliferh_system.system_plot.system_plots[1].want_habitable_zones_conservative = True
+# quezuliferh_system.system_plot.system_plots[0].system_rendering_preferences['want_tidal_locking_radius'] = False
+# quezuliferh_system.system_plot.system_plots[1].system_rendering_preferences['want_habitable_zones_extended'] = True
+# quezuliferh_system.system_plot.system_plots[1].system_rendering_preferences['want_habitable_zones_conservative'] = True
 quezuliferh_system.draw_multi_stellar_system()
 quezuliferh_system.system_plot.save_image('output_files/QuezuliferhWideBinarySystem.png')
