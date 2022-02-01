@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import QMenu, QAction, QFileDialog, QMenuBar, QMessageBox, 
 from stellar_system_creator.astrothings.units import ureg
 from stellar_system_creator.filing import save as save_ssc_object, save_as_ssc_light, add_extension_if_necessary
 from stellar_system_creator.gui.gui_central_widget import CentralWidget
+from stellar_system_creator.gui.gui_image_rendering import SystemImageWidget
 from stellar_system_creator.gui.gui_theme import get_icon_with_theme_colors, get_dark_theme_pallet, \
     get_light_theme_pallet
 from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
@@ -426,7 +427,9 @@ def save_as_project(parent):
         if filename.endswith('.ssc'):
             save_ssc_object(ssc_object, filename)
         else:
-            save_as_ssc_light(ssc_object, filename)
+            system_rendering_preferences = central_widget.currentWidget().findChild(SystemImageWidget). \
+                rendering_settings_dialog.get_system_rendering_preferences()
+            save_as_ssc_light(ssc_object, filename, system_rendering_preferences)
     else:
         return
 
@@ -444,8 +447,8 @@ def save_project(parent):
     if filename.endswith('.ssc'):
         saved = save_ssc_object(ssc_object, filename)
     else:
-        system_rendering_preferences = central_widget.currentWidget().right_side_widget.rendering_settings_dialog.\
-            get_system_rendering_preferences()
+        system_rendering_preferences = central_widget.currentWidget().findChild(SystemImageWidget).\
+            rendering_settings_dialog.get_system_rendering_preferences()
         saved = save_as_ssc_light(ssc_object, filename, system_rendering_preferences)
     tab_text = central_widget.tabText(central_widget.currentIndex())
     if saved and tab_text.startswith('*'):

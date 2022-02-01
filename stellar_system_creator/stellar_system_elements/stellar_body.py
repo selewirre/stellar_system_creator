@@ -151,12 +151,13 @@ class StellarBody:
     def update_children(self):
         for child in self._children:
             child.__post_init__()
+            child.update_children()
 
     def update_parent(self):
         from stellar_system_creator.stellar_system_elements.binary_system import BinarySystem
         if isinstance(self.parent, BinarySystem):
             if self.parent.primary_body == self or self.parent.secondary_body == self:
-                self.parent.__post_init__()
+                self.parent.__post_init__(True, True)
 
     def _set_parent(self, parent):
         from stellar_system_creator.stellar_system_elements.binary_system import StellarBinary
@@ -1660,12 +1661,17 @@ class Ring:
         all_forbidden_bands = []
         for satellite in self.parents_satellites:
             basic_band_center = satellite.semi_major_axis.to('km').m
-            basic_band_extend = satellite.hill_sphere.to('km').m
+            basic_band_extend = 5 * satellite.radius.to('km').m
 
-            forbidden_bands = [[basic_band_center * resonance - basic_band_extend *
-                                (resonance / res_orders[i]) ** res_orders[i],
-                                basic_band_center * resonance + basic_band_extend *
-                                (resonance / res_orders[i]) ** res_orders[i]]
+            if basic_band_center * resonances[0]**(2/3) - basic_band_extend * \
+                    (resonances[0]**(2/3) / (ms[0]+res_orders[0]) ** (ms[0]+res_orders[0])) > \
+                    self.outer_radius.to('km').m:
+                continue
+
+            forbidden_bands = [[basic_band_center * resonance**(2/3) - basic_band_extend *
+                                (resonance**(2/3) / (ms[i]+res_orders[i]) ** (ms[i]+res_orders[i])),
+                                basic_band_center * resonance**(2/3) + basic_band_extend *
+                                (resonance**(2/3) / (ms[i]+res_orders[i]) ** (ms[i]+res_orders[i]))]
                                for i, resonance in enumerate(resonances)]
             all_forbidden_bands += forbidden_bands
 
@@ -1702,21 +1708,24 @@ class Ring:
 
 
 resonances = [1]
-res_orders = [1]
+res_orders = [0]
+ms = [1]
 for m in range(1, 10):
     for order in range(1, 10):
         r = m / (m + order)
-        if r < 1 and r not in resonances and (r / order) ** (order + 1) > 1.0E-6:
+        if r < 1 and r not in resonances and (r / (m+order)) ** (order + m) > 1.0E-6:
             resonances.append(r)
             res_orders.append(order)
+            ms.append(m)
 
-zipped_lists = zip(resonances, res_orders)
+zipped_lists = zip(resonances, res_orders, ms)
 sorted_pairs = sorted(zipped_lists)
 tuples = zip(*sorted_pairs)
-resonances, res_orders = [list(tpl) for tpl in tuples]
+resonances, res_orders, ms = [list(tpl) for tpl in tuples]
 
 res_orders = np.array(res_orders)
 resonances = np.array(resonances)
+ms = np.array(ms)
 
 
 def merge_intervals(intervals):

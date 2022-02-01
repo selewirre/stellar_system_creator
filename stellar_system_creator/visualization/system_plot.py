@@ -48,7 +48,8 @@ default_system_rendering_preferences = {'scale': 6,
                                         'want_parent_name_labels': True,
                                         'orbit_distance_font_size': 10,
                                         'object_name_font_size': 10,
-                                        'satellite_plot_y_step': None,
+                                        'satellite_plot_y_step': 0.1,
+                                        'satellite_plot_mass_limit_in_parent_masses': 0.0001,
                                         'want_satellites': True,
                                         'want_trojans': True,
                                         'want_asteroid_belts': True,
@@ -184,9 +185,13 @@ class SystemPlot:
         value = False
         for limit in orbit_limits:
             if self.system_rendering_preferences['want_orbit_limits_labels']:
-                value = draw_orbit_label(self, [1, 1, 1, 1], limit.to('au').m, 'bottom',
-                                         font_size=
-                                         self.system_rendering_preferences['orbit_distance_font_size']) or value
+                if isinstance(ssc_object, StellarSystem):
+                    value = draw_orbit_label(self, [1, 1, 1, 1], limit.to('au').m, 'bottom', font_size=
+                    self.system_rendering_preferences['orbit_distance_font_size']) or value
+                else:
+                    value = draw_orbit_label(self, [1, 1, 1, 1], limit.to('au').m, 'bottom', 'Rp',
+                                             ssc_object.parent.radius.to('au').m, font_size=
+                                             self.system_rendering_preferences['orbit_distance_font_size']) or value
 
         return value
 
@@ -414,6 +419,7 @@ class SystemPlot:
 
     def add_other_line_labels(self):
         ssc_object = self.ssc_object
+
         value = False
         if self.system_rendering_preferences['want_other_line_labels']:
             if self.system_rendering_preferences['want_rock_line'] and isinstance(ssc_object, StellarSystem):
@@ -425,9 +431,15 @@ class SystemPlot:
                                          font_size=self.system_rendering_preferences[
                                              'orbit_distance_font_size']) or value
             if self.system_rendering_preferences['want_tidal_locking_radius']:
-                value = draw_orbit_label(self, [1, 1, 1, 1], ssc_object.parent.tidal_locking_radius.to('au').m,
-                                         'bottom', font_size=self.system_rendering_preferences[
-                        'orbit_distance_font_size']) or value
+                if isinstance(ssc_object, StellarSystem):
+                    value = draw_orbit_label(self, [1, 1, 1, 1], ssc_object.parent.tidal_locking_radius.to('au').m,
+                                             'bottom', font_size=self.system_rendering_preferences[
+                            'orbit_distance_font_size']) or value
+                else:
+                    value = draw_orbit_label(self, [1, 1, 1, 1], ssc_object.parent.tidal_locking_radius.to('au').m,
+                                             'bottom', 'Rp', ssc_object.parent.radius.to('au').m,
+                                             font_size=self.system_rendering_preferences['orbit_distance_font_size']) \
+                            or value
 
         return value
 
@@ -436,7 +448,11 @@ class SystemPlot:
         if isinstance(ssc_object, StellarSystem):
             value = False
             for ps in list(ssc_object.planetary_systems):
-                target_objects = ps.satellite_list
+                target_objects: List[Satellite] = []
+                for sat in ps.satellite_list:
+                    if (sat.mass / ps.parent.mass).to_reduced_units().m >= \
+                            self.system_rendering_preferences['satellite_plot_mass_limit_in_parent_masses']:
+                        target_objects.append(sat)
                 for i, tobj in enumerate(target_objects):
                     satellite_no = i + 1
                     if self.system_rendering_preferences['satellite_plot_y_step'] is None:
@@ -750,8 +766,8 @@ def draw_parent_ring(system_plot: SystemPlot, ring_inner_radius=None, ring_outer
     y_edge = base_surface.get_height() / 2
     radius = get_orbit_radius(base_surface)
 
-    linear_gradient = cairo.RadialGradient(0., y_edge, x_inner_edge,
-                                           -x_outer_edge, y_edge, 2 * x_outer_edge)
+    linear_gradient = cairo.RadialGradient(-7 * x_inner_edge, y_edge, 8 * x_inner_edge,
+                                           -7 * x_outer_edge, y_edge, 8 * x_outer_edge)
     # linear_gradient = cairo.LinearGradient(x_inner_edge, y_edge, x_outer_edge, y_edge)
     for i, color_set in enumerate(ring_color_list):
         cs = color_set.get_color()

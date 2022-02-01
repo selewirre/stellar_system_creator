@@ -133,6 +133,8 @@ class SystemRenderingWidget(QLabel):
             # drawing options - objects
             sp.system_rendering_preferences['satellite_plot_y_step'] = \
                 float(rsd.satellite_display_distance_line_edit.line_edit.text())
+            sp.system_rendering_preferences['satellite_plot_mass_limit_in_parent_masses'] = \
+                float(rsd.satellite_display_mass_limit_line_edit.line_edit.text())
             sp.system_rendering_preferences['want_satellites'] = \
                 rsd.draw_children_satellites_check_box.isChecked()
             sp.system_rendering_preferences['want_trojans'] = \
@@ -444,12 +446,17 @@ class RenderingSettingsDialog(QDialog):
         self.satellite_display_distance_line_edit = RenderingSettingsLineEdit(
             initial_system_rendering_preferences['satellite_plot_y_step'], 'Satellite display vertical distance: ')
 
+        self.satellite_display_mass_limit_line_edit = RenderingSettingsLineEdit(
+            initial_system_rendering_preferences['satellite_plot_mass_limit_in_parent_masses'],
+            'Satellite display mass limit in parent masses: ')
+
         layout.addWidget(self.draw_parents_check_box)
         layout.addWidget(self.draw_children_check_box)
         layout.addWidget(self.draw_asteroid_belt_check_box)
         layout.addWidget(self.draw_children_trojans_check_box)
         layout.addWidget(self.draw_children_satellites_check_box)
         layout.addWidget(self.satellite_display_distance_line_edit)
+        layout.addWidget(self.satellite_display_mass_limit_line_edit)
         layout.addStretch()
         self.object_groupbox.setLayout(layout)
 
@@ -600,6 +607,8 @@ class RenderingSettingsDialog(QDialog):
         # drawing options - objects
         system_rendering_preferences['satellite_plot_y_step'] = \
             float(self.satellite_display_distance_line_edit.line_edit.text())
+        system_rendering_preferences['satellite_plot_mass_limit_in_parent_masses'] = \
+            float(self.satellite_display_mass_limit_line_edit.line_edit.text())
         system_rendering_preferences['want_satellites'] = \
             self.draw_children_satellites_check_box.isChecked()
         system_rendering_preferences['want_trojans'] = \

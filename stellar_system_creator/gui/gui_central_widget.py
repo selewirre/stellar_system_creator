@@ -62,7 +62,8 @@ class CentralWidget(QTabWidget):
         # else:
         #     seperator = '/'
         # tab_label = filename.split(seperator)[-1].split('.')[0]
-        tab_label = os.path.basename(filename).split('.')[0]
+        # tab_label = os.path.basename(filename).split('.')[0]
+        tab_label = os.path.basename(filename)
         tab_index = self.addTab(tab_content, tab_label)
         self.setCurrentIndex(tab_index)
         self.set_tab_button(tab_index)

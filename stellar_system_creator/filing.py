@@ -18,6 +18,7 @@ from PIL import Image
 
 from stellar_system_creator.astrothings.units import Q_
 from stellar_system_creator.stellar_system_elements import *
+from stellar_system_creator.visualization import system_plot
 
 
 def add_extension_if_necessary(filename, extension):
@@ -154,7 +155,14 @@ def save_system_rendering_preferences(obj: Union[PlanetarySystem, StellarSystem,
     if isinstance(obj, MultiStellarSystemSType):
         obj = obj.children[0] if obj.children[0].parent.mass >= obj.children[1].parent.mass else obj.children[1]
     if system_rendering_preferences is None:
-        system_rendering_preferences = obj.system_plot.system_rendering_preferences
+        try:
+            system_rendering_preferences = obj.system_plot.system_rendering_preferences
+        except Exception:
+            system_rendering_preferences = system_plot.default_system_rendering_preferences
+
+    for key in system_plot.default_system_rendering_preferences.keys():
+        if key not in system_rendering_preferences.keys():
+            system_rendering_preferences[key] = system_plot.default_system_rendering_preferences[key]
 
     with open(os.path.join(target_folder, ".system_rendering_preferences.json"), "w") as outfile:
         outfile.write(json.dumps(system_rendering_preferences, indent=4))
@@ -271,6 +279,11 @@ def load_ssc_light(filename: str, set_new_uuids=False) -> Union[StellarBody, Bin
     if set_new_uuids:
         obj.reset_system_uuids()
 
+    if isinstance(obj, (PlanetarySystem, StellarSystem, MultiStellarSystemSType)):
+        obj.parent.update_children()
+    else:
+        obj.update_children()
+
     return obj
 
 
@@ -278,6 +291,10 @@ def load_system_rendering_preferences(filename: str) -> Dict:
 
     system_rendering_preferences_filename = os.path.join(filename, '.system_rendering_preferences.json')
     system_rendering_preferences = get_dict_from_json(system_rendering_preferences_filename)
+
+    for key in system_plot.default_system_rendering_preferences.keys():
+        if key not in system_rendering_preferences.keys():
+            system_rendering_preferences[key] = system_plot.default_system_rendering_preferences[key]
 
     return system_rendering_preferences
 

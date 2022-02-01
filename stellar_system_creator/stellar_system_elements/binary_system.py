@@ -42,7 +42,7 @@ class BinarySystem:
 
         self.__post_init__()
 
-    def __post_init__(self, want_to_update_parent=False):
+    def __post_init__(self, want_to_update_parent=False, want_to_update_children=False):
         if self.primary_body is None or self.secondary_body is None \
                 or np.isnan(self.mean_distance.m) or np.isnan(self.eccentricity):
             return
@@ -80,6 +80,9 @@ class BinarySystem:
 
         if want_to_update_parent:
             self.update_parent()
+
+        if want_to_update_children:
+            self.update_children()
 
     def __repr__(self, precision=4) -> str:
         string = ''
@@ -121,11 +124,12 @@ class BinarySystem:
     def update_children(self):
         for child in self._children:
             child.__post_init__()
+            child.update_children()
 
     def update_parent(self):
         if isinstance(self.parent, BinarySystem):
             if self.parent.primary_body == self or self.parent.secondary_body == self:
-                self.parent.__post_init__()
+                self.parent.__post_init__(True)
 
     def _set_parent(self, parent):
         self.parent: Union[Star, Planet, StellarBinary]
@@ -284,7 +288,7 @@ class StellarBinary(BinarySystem):
                  eccentricity: float = np.nan, parent: Union["StellarBinary", Star] = None) -> None:
         super().__init__(name, primary_body, secondary_body, mean_distance, eccentricity, parent)
 
-    def __post_init__(self, want_to_update_parent=False):
+    def __post_init__(self, want_to_update_parent=False, want_to_update_children=False):
         super().__post_init__()
         # self.reset_insolation_model_and_habitability_for_children()
         # self.reset_solo_habitability()
@@ -292,6 +296,9 @@ class StellarBinary(BinarySystem):
 
         if want_to_update_parent:
             self.update_parent()
+
+        if want_to_update_children:
+            self.update_children()
 
     def calculate_water_frost_lines(self):
         # setting ptype frost zone (not part of trinary/quaternary)

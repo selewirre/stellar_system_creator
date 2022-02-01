@@ -103,6 +103,42 @@ class Window(QMainWindow):
 
         self.counts += 1
 
+    def dragEnterEvent(self, e):
+        """
+        This function will detect the drag enter event from the mouse on the main window
+        """
+        if e.mimeData().hasUrls:
+            e.accept()
+        else:
+            e.ignore()
+
+    def dragMoveEvent(self, e):
+        """
+        This function will detect the drag move event on the main window
+        """
+        if e.mimeData().hasUrls:
+            e.accept()
+        else:
+            e.ignore()
+
+    def dropEvent(self, e):
+        """
+        This function will enable the drop file directly on to the
+        main window.
+        """
+        if e.mimeData().hasUrls:
+            e.setDropAction(QtCore.Qt.CopyAction)
+            e.accept()
+            filenames = []
+            for url in e.mimeData().urls():
+                filenames.append(str(url.toLocalFile()))
+            if len(filenames) > 1:
+                e.ignore()
+            else:
+                self.open_file(filenames[0])
+        else:
+            e.ignore()
+
 
 class Application(QApplication):
 
@@ -144,5 +180,5 @@ if __name__ == "__main__":
         file_name = sys.argv[1]
         file_name = os.path.abspath(file_name)
 
-    file_name = '../examples/output_files/TrakrunatStellarSystem.sscl'
+    # file_name = '../examples/output_files/TrakrunatStellarSystem.sscl'
     main(file_name)
