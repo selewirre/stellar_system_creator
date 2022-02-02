@@ -3,6 +3,8 @@ import inspect
 import uuid
 from typing import List, Union
 
+import numpy as np
+
 from stellar_system_creator.stellar_system_elements.binary_system import BinarySystem
 from stellar_system_creator.stellar_system_elements.planetary_system import PlanetarySystem
 from stellar_system_creator.stellar_system_elements.stellar_body import Star, AsteroidBelt
@@ -86,22 +88,20 @@ class StellarSystem:
             return
 
         units = self.planetary_systems[0].parent.semi_major_axis.units
-        planet_semimajor_axis = [ps.parent.semi_major_axis.to(units).m for ps in self.planetary_systems]
+        planet_semimajor_axis = np.array([ps.parent.semi_major_axis.to(units).m for ps in self.planetary_systems])
 
-        zipped_lists = zip(planet_semimajor_axis, self.planetary_systems)
-        sorted_pairs = sorted(zipped_lists)
-        _, self.planetary_systems = [list(tpl) for tpl in zip(*sorted_pairs)]
+        sorted_planetary_systems = np.array(self.planetary_systems)[planet_semimajor_axis.argsort()]
+        self.planetary_systems = list(sorted_planetary_systems)
 
     def sort_asteroid_belts_by_distance(self):
         if not len(self.asteroid_belts):
             return
 
         units = self.asteroid_belts[0].semi_major_axis.units
-        ab_semimajor_axis = [ab.semi_major_axis.to(units).m for ab in self.asteroid_belts]
+        ab_semimajor_axis = np.array([ab.semi_major_axis.to(units).m for ab in self.asteroid_belts])
 
-        zipped_lists = zip(ab_semimajor_axis, self.asteroid_belts)
-        sorted_pairs = sorted(zipped_lists)
-        _, self.asteroid_belts = [list(tpl) for tpl in zip(*sorted_pairs)]
+        sorted_asteroid_belts = np.array(self.asteroid_belts)[ab_semimajor_axis.argsort()]
+        self.asteroid_belts = list(sorted_asteroid_belts)
 
     def sort_all_by_distance(self):
         self.sort_planetary_systems_by_distance()

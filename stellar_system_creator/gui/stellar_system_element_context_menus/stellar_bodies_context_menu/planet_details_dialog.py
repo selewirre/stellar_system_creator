@@ -462,7 +462,7 @@ class PlanetDetailsDialog(BasicDetailsDialog):
         super().accept()
 
         parent = self.parent_item
-        if self.parent_item.ssc_object.__class__ == Planet:
+        if self.parent_item.ssc_object.__class__ == Planet or self.parent_item.ssc_object.__class__ == AsteroidBelt:
             target_system = StellarSystem
         else:
             target_system = PlanetarySystem

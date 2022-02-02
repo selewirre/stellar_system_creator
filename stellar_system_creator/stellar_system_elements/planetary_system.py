@@ -3,6 +3,8 @@ import inspect
 import uuid
 from typing import List, Union
 
+import numpy as np
+
 from stellar_system_creator.stellar_system_elements.binary_system import BinarySystem
 from stellar_system_creator.stellar_system_elements.stellar_body import Planet, Satellite, Trojan
 
@@ -82,11 +84,10 @@ class PlanetarySystem:
         if not len(self.satellite_list):
             return
         units = self.satellite_list[0].semi_major_axis.units
-        sat_semimajor_axis = [sat.semi_major_axis.to(units).m for sat in self.satellite_list]
+        sat_semimajor_axis = np.array([sat.semi_major_axis.to(units).m for sat in self.satellite_list])
 
-        zipped_lists = zip(sat_semimajor_axis, self.satellite_list)
-        sorted_pairs = sorted(zipped_lists)
-        _, self.satellite_list = [list(tpl) for tpl in zip(*sorted_pairs)]
+        sorted_satellite_list = np.array(self.satellite_list)[sat_semimajor_axis.argsort()]
+        self.satellite_list = list(sorted_satellite_list)
 
     def sort_all_by_distance(self):
         self.sort_satellites_by_distance()

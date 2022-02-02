@@ -245,6 +245,7 @@ class SystemPlot:
                                     parent_drawing_orbit, ssc_object.parent.image_array,
                                     normalization_factor=2.5, flip_image_horizontally=True)
                 if ssc_object.parent.has_ring:
+                    ssc_object.parent.ring.__post_init__()
                     ring = ssc_object.parent.ring
                     value = draw_parent_ring(self, ring_inner_radius=ring.inner_radius.to('au').m,
                                              ring_outer_radius=ring.outer_radius.to('au').m,
@@ -311,6 +312,7 @@ class SystemPlot:
                                     tobj.semi_major_axis.to('au').m, tobj.image_array,
                                     flip_image_horizontally=flip_image_horizontally) or value
             else:
+                tobj.ring.__post_init__()
                 value = draw_object(self, tobj.radius.to('R_e').m,
                                     tobj.semi_major_axis.to('au').m, tobj.image_array,
                                     flip_image_horizontally=flip_image_horizontally,
@@ -865,7 +867,6 @@ def draw_orbit_label(system_plot: SystemPlot, color_rgba: list, mean_orbit_dista
 
     context.save()
     context.set_font_size(font_size * system_plot.system_rendering_preferences['scale'])
-    mean_orbit_distance = 1.034 * mean_orbit_distance
 
     # getting color
     color_gbr = list(color_rgba[:-1])
@@ -877,7 +878,7 @@ def draw_orbit_label(system_plot: SystemPlot, color_rgba: list, mean_orbit_dista
     text = f"{mean_orbit_distance / numeral_normalization:.2g} {text_units}"
     text_extents = get_text_extents(context.text_extents(text))
 
-    x_edge = system_plot.transform_data_to_im(mean_orbit_distance, 'x')
+    x_edge = system_plot.transform_data_to_im(1.034 * mean_orbit_distance, 'x')
     if text_position == 'bottom':
         y_edge = base_surface.get_height() * 0.95 - text_extents.width - 2 * text_extents.x_bearing
     elif text_position == 'top':

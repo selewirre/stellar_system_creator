@@ -465,20 +465,27 @@ class RenderingSettingsDialog(QDialog):
         # noinspection PyTypeChecker
         parent: SystemImageWidget = self.parent()
         self.available_systems_drop_down.addItem(parent.tree_view.ssc_object.name)
+
         all_items = parent.tree_view.getAllRoots()
+        all_ssc_systems = []
         for child_item in all_items:
             if isinstance(child_item, TreeViewItemFromStellarSystemElement):
                 if isinstance(child_item.ssc_object, (PlanetarySystem, StellarSystem, MultiStellarSystemSType)):
-                    ssc_obj = child_item.ssc_object
-                    text = ssc_obj.name
-                    while ssc_obj.parent is not None:
-                        if not isinstance(ssc_obj, (PlanetarySystem, StellarSystem, MultiStellarSystemSType)):
-                            if ssc_obj.parent.name == parent.tree_view.ssc_object.parent.name:
-                                text = f'{parent.tree_view.ssc_object.name}/{text}'
-                            else:
-                                text = f'{ssc_obj.parent.name}/{text}'
-                        ssc_obj = ssc_obj.parent
-                    self.available_systems_drop_down.addItem(text)
+                    all_ssc_systems.append(child_item.ssc_object)
+
+        for ssc_obj in all_ssc_systems:
+            text = ssc_obj.name
+            while ssc_obj.parent is not None:
+                if not isinstance(ssc_obj, (PlanetarySystem, StellarSystem, MultiStellarSystemSType)):
+                    if ssc_obj.parent.name == parent.tree_view.ssc_object.parent.name:
+                        text = f'{parent.tree_view.ssc_object.name}/{text}'
+                    else:
+                        for ssc_system in all_ssc_systems:
+                            if ssc_obj.parent.name == ssc_system.parent.name:
+                                text = f'{ssc_system.name}/{text}'
+                                break
+                ssc_obj = ssc_obj.parent
+            self.available_systems_drop_down.addItem(text)
 
         self.available_systems_drop_down.currentTextChanged.connect(self.available_system_selection_change_process)
         self.available_systems_drop_down.model().sort(0)
@@ -502,7 +509,14 @@ class RenderingSettingsDialog(QDialog):
         if obj_name == parent.tree_view.ssc_object.name:
             parent.target_treeview = parent.tree_view
             return
+
         all_items = parent.tree_view.getAllRoots()
+        all_ssc_systems = []
+        for child_item in all_items:
+            if isinstance(child_item, TreeViewItemFromStellarSystemElement):
+                if isinstance(child_item.ssc_object, (PlanetarySystem, StellarSystem, MultiStellarSystemSType)):
+                    all_ssc_systems.append(child_item.ssc_object)
+
         for child_item in all_items:
             if isinstance(child_item, TreeViewItemFromStellarSystemElement):
                 if isinstance(child_item.ssc_object, (PlanetarySystem, StellarSystem, MultiStellarSystemSType)):
@@ -513,7 +527,10 @@ class RenderingSettingsDialog(QDialog):
                             if ssc_obj.parent.name == parent.tree_view.ssc_object.parent.name:
                                 text = f'{parent.tree_view.ssc_object.name}/{text}'
                             else:
-                                text = f'{ssc_obj.parent.name}/{text}'
+                                for ssc_system in all_ssc_systems:
+                                    if ssc_obj.parent.name == ssc_system.parent.name:
+                                        text = f'{ssc_system.name}/{text}'
+                                        break
                         ssc_obj = ssc_obj.parent
 
                     if text == obj_name:
@@ -527,14 +544,25 @@ class RenderingSettingsDialog(QDialog):
             return
         text = ssc_obj.name
         old_text = old_child_name
+
+        all_items = tree_view.getAllRoots()
+        all_ssc_systems = []
+        for child_item in all_items:
+            if isinstance(child_item, TreeViewItemFromStellarSystemElement):
+                if isinstance(child_item.ssc_object, (PlanetarySystem, StellarSystem, MultiStellarSystemSType)):
+                    all_ssc_systems.append(child_item.ssc_object)
+
         while ssc_obj.parent is not None:
             if not isinstance(ssc_obj, (PlanetarySystem, StellarSystem, MultiStellarSystemSType)):
                 if ssc_obj.parent.name == tree_view.ssc_object.parent.name:
                     text = f'{tree_view.ssc_object.name}/{text}'
                     old_text = f'{tree_view.ssc_object.name}/{old_text}'
                 else:
-                    text = f'{ssc_obj.parent.name}/{text}'
-                    old_text = f'{ssc_obj.parent.name}/{old_text}'
+                    for ssc_system in all_ssc_systems:
+                        if ssc_obj.parent.name == ssc_system.parent.name:
+                            text = f'{ssc_system.name}/{text}'
+                            old_text = f'{ssc_system.name}/{old_text}'
+                            break
             ssc_obj = ssc_obj.parent
         old_text_index = self.available_systems_drop_down.findText(old_text)
         if old_text_index >= 0:
