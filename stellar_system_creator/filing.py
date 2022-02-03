@@ -6,6 +6,7 @@ import pickle
 import shutil
 import uuid
 import zipfile
+from pprint import pprint
 from typing import Union, Dict, List
 from zipfile import ZipFile
 
@@ -16,9 +17,13 @@ import numpy as np
 import pkg_resources
 from PIL import Image
 
+from stellar_system_creator.astrothings.insolation_models.insolation_models import InsolationThresholdModel, \
+    BinaryInsolationModel
 from stellar_system_creator.astrothings.units import Q_
 from stellar_system_creator.stellar_system_elements import *
+from stellar_system_creator.stellar_system_elements.stellar_body import Ring
 from stellar_system_creator.visualization import system_plot
+from stellar_system_creator.visualization.drawing_tools import GradientColor, Color
 
 
 def add_extension_if_necessary(filename, extension):
@@ -59,7 +64,14 @@ def load(filename: str) -> Union[StellarBody, BinarySystem, PlanetarySystem, Ste
         compressed_pickle = f.read()
 
     depressed_pickle = blosc.decompress(compressed_pickle)
-    obj = cPickle.loads(depressed_pickle)  # turn bytes object back into data
+    obj: Union[StellarBody, BinarySystem, PlanetarySystem, StellarSystem,
+               MultiStellarSystemSType] = cPickle.loads(depressed_pickle)  # turn bytes object back into data
+
+    if '_uuid' not in obj.__dict__.keys():
+        temp_filename = os.path.join(os.path.dirname(filename), '.~'+os.path.basename(filename))
+        save_as_ssc_light(obj, temp_filename)
+        obj = load_ssc_light(temp_filename, set_new_uuids=True)
+        os.remove(temp_filename)
 
     return obj
 
@@ -436,7 +448,6 @@ def get_object_from_kwargs_uuid(obj_uuid: str, requesters_filename: str, attempt
         potential_parent_name = os.path.join(os.path.dirname(requesters_filename), f"{obj_uuid}.json")
         obj = load_object_from_json(potential_parent_name, attempt_loading_parent)
 
-
     return obj
 
 
@@ -481,3 +492,66 @@ def list_files(directory):
     return r
 
 
+def export_object_to_json(obj: Union[StellarBody, BinarySystem, PlanetarySystem,
+                                     StellarSystem, MultiStellarSystemSType],
+                          filename, precision: int = 4):
+    exportable_list_of_dicts = get_exportable_object(obj, precision)
+
+    filename = add_extension_if_necessary(filename, 'json')
+    with open(filename, "w") as outfile:
+        outfile.write(json.dumps(exportable_list_of_dicts, indent=4))
+
+
+def get_exportable_object(obj, precision: int = 4):
+    exportable_list = [get_exportable_dict(obj, precision)]
+    if isinstance(obj, (PlanetarySystem, StellarSystem, MultiStellarSystemSType)):
+        for child in obj.get_children():
+            exportable_item = get_exportable_object(child, precision)
+            exportable_list = exportable_list + exportable_item
+    elif isinstance(obj, BinarySystem):
+        exportable_item = get_exportable_object(obj.primary_body, precision)
+        exportable_list = exportable_list + exportable_item
+        exportable_item = get_exportable_object(obj.secondary_body, precision)
+        exportable_list = exportable_list + exportable_item
+
+    return exportable_list
+
+
+def get_exportable_dict(obj, precision: int = 4):
+    obj_dict = obj.__dict__
+    output_dict = {}
+    for key, item in obj_dict.items():
+        if key == 'image_array' or key == 'system_plot':
+            continue
+        else:
+            output_dict[key] = get_exportable_item(item, precision)
+
+    return output_dict
+
+
+def get_exportable_item(item, precision: int = 4):
+    if isinstance(item, (StellarBody, BinarySystem, PlanetarySystem, StellarSystem, MultiStellarSystemSType)):
+        return item.name, item.uuid
+    elif isinstance(item, (InsolationThresholdModel, BinaryInsolationModel)):
+        return item.name
+    elif isinstance(item, Ring):
+        return get_exportable_item(item.__dict__, precision)
+    elif isinstance(item, Color):
+        return item.get_color('RGBA')
+    elif isinstance(item, bool):
+        return item
+    elif isinstance(item, (int, float)):
+        return f'{item:.{precision}g}'
+    elif isinstance(item, Q_):
+        return f'{item:.{precision}g}'
+    elif isinstance(item, list):
+        return [get_exportable_item(it, precision) for it in item]
+    elif isinstance(item, dict):
+        return {key: get_exportable_item(item[key], precision) for key in item.keys()}
+    else:
+        print(type(item))
+        return item
+
+
+# mysystem = load_ssc_light('../../WorldBuildingProject/StellarSystems/mysystem.sscl')
+# export_object_to_json(mysystem, 'patates')
