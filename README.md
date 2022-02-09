@@ -62,7 +62,7 @@ Rendering might also take some time.
 GNU GPL v3 license.
 
 # Copyright
-Copyright (C) 2022 Selewirre Iskvary
+Copyright (C) 2021-2022 Selewirre Iskvary
 
 # User Support
 I would greatly appreciate it if users clearly state that their illustrations and calculations were made 
