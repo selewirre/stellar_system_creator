@@ -18,7 +18,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 setuptools.setup(
     name="stellar_system_creator",
-    version='0.4.3.2',
+    version='0.4.3.3',
     author="Selewirre Iskvary",
     author_email="selewirre@gmail.com",
     description="A tool for creating custom, scientifically plausible stellar systems.",
@@ -37,6 +37,7 @@ setuptools.setup(
                       'blosc',
                       'bs4',
                       'cairocffi',
+                      'fpdf2',
                       'numpy',
                       'pandas',
                       'pillow',

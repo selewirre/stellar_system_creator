@@ -16,6 +16,7 @@ import _pickle as cPickle
 import numpy as np
 import pkg_resources
 from PIL import Image
+from fpdf import FPDF
 
 from stellar_system_creator.astrothings.insolation_models.insolation_models import InsolationThresholdModel, \
     BinaryInsolationModel
@@ -23,7 +24,7 @@ from stellar_system_creator.astrothings.units import Q_
 from stellar_system_creator.stellar_system_elements import *
 from stellar_system_creator.stellar_system_elements.stellar_body import Ring
 from stellar_system_creator.visualization import system_plot
-from stellar_system_creator.visualization.drawing_tools import GradientColor, Color
+from stellar_system_creator.visualization.drawing_tools import Color
 
 
 def add_extension_if_necessary(filename, extension):
@@ -495,26 +496,38 @@ def list_files(directory):
 def export_object_to_json(obj: Union[StellarBody, BinarySystem, PlanetarySystem,
                                      StellarSystem, MultiStellarSystemSType],
                           filename, precision: int = 4):
-    exportable_list_of_dicts = get_exportable_object(obj, precision)
+    exportable_dict_of_dicts = get_exportable_object(obj, precision)
 
     filename = add_extension_if_necessary(filename, 'json')
     with open(filename, "w") as outfile:
-        outfile.write(json.dumps(exportable_list_of_dicts, indent=4))
+        outfile.write(json.dumps(exportable_dict_of_dicts, indent=4))
 
 
-def get_exportable_object(obj, precision: int = 4):
-    exportable_list = [get_exportable_dict(obj, precision)]
+def get_exportable_object(obj, precision: int = 4, entry_level: str = '', part_of_multi_system=False):
+    if entry_level == '':
+        multi_dict_key = obj.name
+    elif not isinstance(obj, StellarBody) and not (isinstance(obj, BinarySystem) and part_of_multi_system):
+        multi_dict_key = f'{entry_level}.0: Summary'
+        entry_level = f'{entry_level}.'
+    else:
+        return get_exportable_dict(obj, precision)
+    exportable_multi_dict = {multi_dict_key: get_exportable_dict(obj, precision)}
     if isinstance(obj, (PlanetarySystem, StellarSystem, MultiStellarSystemSType)):
-        for child in obj.get_children():
-            exportable_item = get_exportable_object(child, precision)
-            exportable_list = exportable_list + exportable_item
-    elif isinstance(obj, BinarySystem):
-        exportable_item = get_exportable_object(obj.primary_body, precision)
-        exportable_list = exportable_list + exportable_item
-        exportable_item = get_exportable_object(obj.secondary_body, precision)
-        exportable_list = exportable_list + exportable_item
+        parent_level = f'{entry_level}{1}'
+        exportable_item = get_exportable_object(obj.parent, precision, parent_level,
+                                                isinstance(obj, MultiStellarSystemSType))
+        exportable_multi_dict[f'{parent_level}: {obj.parent.name}'] = exportable_item
+        for i, child in enumerate(obj.get_children()):
+            child_level = f'{entry_level}{i+2}'
+            exportable_item = get_exportable_object(child, precision, child_level)
+            exportable_multi_dict[f'{child_level}: {child.name}'] = exportable_item
+    elif isinstance(obj, BinarySystem) and not part_of_multi_system:
+        exportable_item = get_exportable_object(obj.primary_body, precision, f'{entry_level}{1}')
+        exportable_multi_dict[f'{entry_level}{1}: {obj.primary_body.name}'] = exportable_item
+        exportable_item = get_exportable_object(obj.secondary_body, precision, f'{entry_level}{2}')
+        exportable_multi_dict[f'{entry_level}{2}: {obj.secondary_body.name}'] = exportable_item
 
-    return exportable_list
+    return exportable_multi_dict
 
 
 def get_exportable_dict(obj, precision: int = 4):
@@ -549,9 +562,201 @@ def get_exportable_item(item, precision: int = 4):
     elif isinstance(item, dict):
         return {key: get_exportable_item(item[key], precision) for key in item.keys()}
     else:
-        print(type(item))
         return item
 
 
-# mysystem = load_ssc_light('../../WorldBuildingProject/StellarSystems/mysystem.sscl')
-# export_object_to_json(mysystem, 'patates')
+class MyPDF(FPDF):
+    # https://pyfpdf.github.io/fpdf2/Tutorial.html
+    BASE_TEXT_SIZE = 14
+    BASE_TEXT_HEIGHT = 6
+
+    def __init__(self, dict_info: Dict):
+        self.dict_info = dict_info
+        self.title = list(dict_info.keys())[0]
+        self.section_links = {}
+        self.header_exception_pages = [1, 2]
+        super().__init__(format='letter')
+        self.set_document()
+
+    def header(self):
+        if self.page in self.header_exception_pages:
+            return
+        self.set_text_color(0, 0, 0)
+        self.set_font("helvetica", "B", 15)  # Setting font: helvetica bold 15
+        width = self.get_string_width(self.title) + 6  # Calculating width of title and setting cursor position:
+        self.set_x((210 - width) / 2)
+        self.cell(width, 9, self.title, 0, 1, "C")
+        self.ln(10)
+
+    def footer(self):
+        if self.page in self.header_exception_pages:
+            return
+        self.set_y(-15)  # Setting position at 1.5 cm from bottom
+        self.set_font("helvetica", "I", 8)  # Setting font: helvetica italic 8
+        self.set_text_color(128)  # Setting text color to gray
+        prev_y = self.y
+        self.cell(0, 10, 'Powered by "Caelian Assistants: Stellar System Creator"', 0, 0, "L")  # Printing page number
+        self.set_y(prev_y)
+        self.cell(0, 10, f"Page {self.page_no()}", 0, 0, "R")  # Printing page number
+
+    def set_document(self):
+        self.set_title_page()
+        self.add_page()
+        self.set_contents_page()
+        self.set_all_sections()
+
+    def set_title_page(self):
+        self.add_page()
+        self.set_text_color(0, 0, 0)
+        self.set_font("helvetica", "B", 30)
+        self.set_x(self.w/2)
+        self.set_y(self.h/4)
+        self.cell(0, 9, self.title, 0, 1, "C")
+        self.ln(10)
+        self.set_font("helvetica", "", 13)
+        self.set_y(3*self.h / 4)
+        self.cell(0, self.BASE_TEXT_HEIGHT, 'Powered by', 0, 1, "C")
+        self.set_font("helvetica", "i", 13)
+        self.cell(0, self.BASE_TEXT_HEIGHT, 'Caelian Assistants: Stellar System Creator', 0, 1, "C")
+        self.add_page()
+
+    def set_contents_page(self):
+        self.set_font("helvetica", "b", 25)
+        self.cell(0, int(self.BASE_TEXT_HEIGHT * 1.5), 'Contents', 0, 1, "L")
+        self.ln()
+        self.set_zero_section_content_item()
+        self.set_content_item(self.dict_info)
+        # self.header_exception_pages.append(self.page + 1)
+
+    def set_zero_section_content_item(self):
+        self.set_font("helvetica", "", self.BASE_TEXT_SIZE)
+        self.set_text_color(40, 20, 140)
+        title_for_display = 'About System'
+        self.section_links['About System'] = self.add_link()
+        self.cell(0, int(self.BASE_TEXT_HEIGHT*1.5), title_for_display, 0, 1, "L", link=self.section_links['About System'])
+        self.set_text_color(0, 0, 0)
+
+    def set_content_item(self, dictionary, level=0):
+        for key, item in dictionary.items():
+            if is_numeral(key[0]):
+                self.set_font("helvetica", "", self.BASE_TEXT_SIZE)
+                self.set_text_color(40, 20, 140)
+                title_for_display = level*'    ' + key.replace(':', '\t', 1)
+                self.section_links[key] = self.add_link()
+                self.cell(0, int(self.BASE_TEXT_HEIGHT*1.5), title_for_display, 0, 1, "L", link=self.section_links[key])
+                self.set_content_item(item, level+1)
+        self.set_text_color(0, 0, 0)
+
+    def set_all_sections(self):
+        self.set_zero_section()
+        self.get_dict_contents(self.dict_info)
+
+    def set_zero_section(self):
+        zero_section_key = list(self.dict_info.keys())[0]
+        zero_section_item = self.dict_info[zero_section_key]
+        self.set_section_title('About System')
+        self.set_section_body(zero_section_item)
+
+    def set_section_title(self, title: str):
+        title_number: str = title.split(':')[0]
+        level = title_number.count('.')
+        if level == 0:
+            self.add_page()
+        title_font = int(22 - 2 * level)
+        if title_font < self.BASE_TEXT_SIZE:
+            title_font = self.BASE_TEXT_SIZE
+        self.set_font("helvetica", "b", title_font)
+        title_for_display = title.replace(':', '\t', 1)
+        if title in self.section_links:
+            self.set_link(self.section_links[title], self.y - self.BASE_TEXT_HEIGHT)
+        self.cell(0, self.BASE_TEXT_HEIGHT, title_for_display, 0, 1, "L")
+        self.ln(8 - level)
+
+    def set_section_body(self, dictionary: Dict):
+        exception_keys = ['semi_major_axis_distribution', 'radius_distribution', 'mass_distribution', 'has_ring',
+                          'image_filename', 'size', 'name']
+        has_variables = False
+        for key, item in dictionary.items():
+            if not is_numeral(key[0]) and key not in exception_keys:
+                has_variables = True
+
+        if not has_variables:
+            return
+
+        column_width_1 = 70
+        column_width_2 = 0
+        self.set_font("helvetica", "b", self.BASE_TEXT_SIZE)
+        self.cell(column_width_1, self.BASE_TEXT_HEIGHT, 'Quantity')
+        self.cell(column_width_2, self.BASE_TEXT_HEIGHT, 'Value')
+        self.ln()
+        self.ln()
+        for key, item in dictionary.items():
+            if not is_numeral(key[0]):
+                if key in exception_keys or (key == 'ring' and not dictionary['has_ring']):
+                    continue
+                self.set_font("helvetica", "", self.BASE_TEXT_SIZE)
+                self.cell(column_width_1, self.BASE_TEXT_HEIGHT, get_pdf_file_variable_name(key))
+                self.multi_cell(column_width_2, self.BASE_TEXT_HEIGHT, get_pdf_file_value_string(item),
+                                max_line_height=self.BASE_TEXT_SIZE)
+                self.set_y(self.y - self.BASE_TEXT_HEIGHT)
+                self.ln()
+        self.ln(8)
+
+    def get_dict_contents(self, dictionary: Dict):
+        for key, item in dictionary.items():
+            if is_numeral(key[0]):
+                self.set_section_title(key)
+                self.set_section_body(item)
+                self.get_dict_contents(item)
+
+
+def is_numeral(string: str):
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False
+
+
+def get_pdf_file_variable_name(key: str):
+    if key.startswith('_'):
+        variable_name = key.replace('_', '', 1)
+    else:
+        variable_name = key
+    return variable_name.replace('_', ' ')
+
+
+def get_pdf_file_value_string(item, spaces=0):
+    if isinstance(item, (bool, type(None))):
+        return str(item)
+    elif isinstance(item, str):
+        return item
+    elif isinstance(item, dict):
+        out_string = ''
+        for k, it in item.items():
+            if len(out_string):
+                out_string += spaces * '   ' + f'{k}:\n' + (spaces + 1) * '   ' + \
+                              get_pdf_file_value_string(it, spaces + 1) + '\n\n'
+            else:
+                out_string += (spaces - 1) * '   ' + f'{k}:\n' + (spaces + 1) * '   ' + \
+                              get_pdf_file_value_string(it, spaces + 1) + '\n\n'
+        return out_string[:-2]
+    elif isinstance(item, list):
+        out_string = '('
+        if len(item) == 2:
+            if isinstance(item[1], str):
+                if len(item[1]) == 36 and item[1].count('-') == 4:
+                    return str(item[0])
+        for it in item:
+            out_string += get_pdf_file_value_string(it, spaces + 1) + ', '
+
+        if len(out_string) > 2:
+            return out_string[:-2] + ')'
+        else:
+            return out_string + ')'
+    elif isinstance(item, str):
+        return item
+    elif isinstance(item, (int, float)):
+        return str(item)
+    else:
+        return ''
