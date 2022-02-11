@@ -11,7 +11,7 @@ To install this package, run:
 
 ```
 python3 setup.py sdist bdist_wheel
-pip3 install dist/stellar_system_creator-0.4.3.3.tar.gz
+pip3 install dist/stellar_system_creator-0.4.4.0.tar.gz
 ```
 
 If you want to check out the example code, look in the folder `examples/...`

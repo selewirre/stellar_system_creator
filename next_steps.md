@@ -29,12 +29,7 @@
 11. add dwarfs?
 
 # Plotting:
-1. try to plot in processing instead of cairo?
-    - https://github.com/jdf/processing-py-site
-    - https://py.processing.org/
-    - https://py.processing.org/tutorials/gettingstarted/
-    - https://discourse.processing.org/t/writing-a-python-script-that-runs-a-processing-program/16456/2
-2. add an automatic script creator for celestia simulators https://celestia.space/guides.html, https://celestia.space/docs/CELScriptingGuide/Cel_Script_Guide_v1_0g.htm
+1. add an automatic script creator for celestia simulators https://celestia.space/guides.html, https://celestia.space/docs/CELScriptingGuide/Cel_Script_Guide_v1_0g.htm
 
 
 # GUI:
@@ -43,8 +38,6 @@
    3. make loading image rotate.
 2. Add right-click functionalities for tree view
     - make "details" process run if you double-click?
-    - add save as file (for planetary and stellar systems)
-    - add load from file (for planetary and stellar systems)
 3. fix p-type binary so that it will include both S-type and P-type in one (maybe not?)
 
 # Miscellaneous:

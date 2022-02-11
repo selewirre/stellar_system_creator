@@ -5,7 +5,8 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMenu, QAction, QMessageBox, QDialog, QDialogButtonBox, QVBoxLayout, QWidget, QFormLayout, \
     QLineEdit, QFileDialog
-from stellar_system_creator.filing import save as save_ssc_object, load_ssc_light, save_as_ssc_light, load as load_ssc
+from stellar_system_creator.filing import save as save_ssc_object, load_ssc_light, save_as_ssc_light, load as load_ssc, \
+    export_object_to_pdf, export_object_to_csv, export_object_to_json
 from stellar_system_creator.stellar_system_elements.stellar_system import StellarSystem, MultiStellarSystemSType
 
 
@@ -25,18 +26,21 @@ class SystemTreeViewItemContextMenu(QMenu):
         self.addSection(self.parent_item.text())
         self.addAction(self.details_action)
         self.addAction(self.save_to_file_action)
+        self.addAction(self.export_to_file_action)
 
     def _connect_actions(self):
         self.details_action.triggered.connect(self.details_action_process)
         self.delete_permanently_action.triggered.connect(partial(self.delete_permanently_process, True))
         self.replace_from_file_action.triggered.connect(self.replace_from_file_process)
         self.save_to_file_action.triggered.connect(self.save_to_file_process)
+        self.export_to_file_action.triggered.connect(self.export_to_file_process)
 
     def _create_menu_actions(self):
         self.details_action = QAction("&Details...", self)
         self.delete_permanently_action = QAction(f"&Delete Permanently...", self)
         self.replace_from_file_action = QAction(f"&Replace from file...", self)
         self.save_to_file_action = QAction(f"&Save to file...", self)
+        self.export_to_file_action = QAction(f"&Export to file...", self)
 
     def details_action_process(self):
         pass
@@ -74,13 +78,38 @@ class SystemTreeViewItemContextMenu(QMenu):
     def save_to_file_process(self):
         ssc_object = self.parent_item.ssc_object
         filename: str = QFileDialog.getSaveFileName(self, 'Save Project', '',
-                                                    "All Files (*);;Stellar System Creator Light Files (*.sscl);;"
-                                                    "Stellar System Creator Files (*.ssc)")[0]
+                                                    "Stellar System Creator Light Files (*.sscl);;"
+                                                    "Stellar System Creator Files (*.ssc);;"
+                                                    "All Files (*);;")[0]
         if filename != '':
             if filename.endswith('.ssc'):
                 save_ssc_object(ssc_object, filename)
             else:
                 save_as_ssc_light(ssc_object, filename)
+        else:
+            return
+
+    def export_to_file_process(self):
+        ssc_object = self.parent_item.ssc_object
+        filename: str = QFileDialog.getSaveFileName(self, 'Save Project', '',
+                                                    "Portable Document Files (*.pdf);;"
+                                                    "Comma-Separated Values (*.csv);;"
+                                                    "JavaScript Open Notation (*.json);;"
+                                                    "All Files (*)")[0]
+
+        if filename != '':
+            if filename.endswith('.pdf'):
+                export_object_to_pdf(ssc_object, filename)
+            elif filename.endswith('.csv'):
+                export_object_to_csv(ssc_object, filename)
+            elif filename.endswith('.json'):
+                export_object_to_json(ssc_object, filename)
+            else:
+                message_box = QMessageBox()
+                message_box.setIcon(QMessageBox.Information)
+                message_box.setWindowTitle("'Export Project As' has failed...")
+                message_box.setText(f"File '{filename}' does not end in .pdf, .csv, or .json.")
+                message_box.exec()
         else:
             return
 
@@ -267,7 +296,3 @@ class SystemDetailsDialog(QDialog):
 
     def reject(self) -> None:
         super().reject()
-
-
-
-

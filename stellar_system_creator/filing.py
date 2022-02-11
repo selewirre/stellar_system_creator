@@ -14,6 +14,7 @@ import blosc
 import _pickle as cPickle
 # https://stackoverflow.com/questions/57983431/whats-the-most-space-efficient-way-to-compress-serialized-python-data
 import numpy as np
+import pandas as pd
 import pkg_resources
 from PIL import Image
 from fpdf import FPDF
@@ -741,7 +742,7 @@ def get_pdf_file_value_string(item, spaces=0):
                 out_string += (spaces - 1) * '   ' + f'{k}:\n' + (spaces + 1) * '   ' + \
                               get_pdf_file_value_string(it, spaces + 1) + '\n\n'
         return out_string[:-2]
-    elif isinstance(item, list):
+    elif isinstance(item, (list, tuple)):
         out_string = '('
         if len(item) == 2:
             if isinstance(item[1], str):
@@ -760,3 +761,82 @@ def get_pdf_file_value_string(item, spaces=0):
         return str(item)
     else:
         return ''
+
+
+def export_object_to_pdf(obj: Union[StellarBody, BinarySystem, PlanetarySystem, StellarSystem, MultiStellarSystemSType],
+                         filename: str):
+    exportable_dict = get_exportable_object(obj)
+    pdf_object = MyPDF(exportable_dict)
+
+    filename = add_extension_if_necessary(filename, 'pdf')
+    pdf_object.output(filename)
+
+
+def export_object_to_csv(obj: Union[StellarBody, BinarySystem, PlanetarySystem, StellarSystem, MultiStellarSystemSType],
+                         filename: str):
+    obj_list = [obj] + get_obj_children(obj)
+
+    exclusion_list = ['ring', 'image_array', 'mass_distribution', 'radius_distribution', 'semi_major_axis_distribution',
+                      'system_plot', 'name', '_children', 'size']
+    single_obj_exclusion_condition_list = ['parent', 'insolation_model', 'farthest_parent', 'primary_body',
+                                           'secondary_body']
+    list_of_obj_exclusion_condition_list = ['children', 'planetary_systems', 'asteroid_belts', 'satellite_list',
+                                            'trojans_list']
+
+    cumulative_attribute_list = []
+    for o in obj_list:
+        attributes = list(o.__dict__.keys())
+        for atr in attributes:
+            if atr not in cumulative_attribute_list and atr not in exclusion_list:
+                cumulative_attribute_list.append(atr)
+
+    # print(cumulative_attribute_list)
+    # print([o.name for o in obj_list])
+
+    complete_dict = {}
+    for o in obj_list:
+        list_of_attrs = []
+        for atr in cumulative_attribute_list:
+            try:
+                if atr in single_obj_exclusion_condition_list:
+                    list_of_attrs.append(o.__dict__[atr].name)
+                elif atr in list_of_obj_exclusion_condition_list:
+                    if atr == 'children':
+                        list_of_attrs.append([item.name for item in o.children])
+                    else:
+                        list_of_attrs.append([item.name for item in o.__dict__[atr]])
+                else:
+                    list_of_attrs.append(o.__dict__[atr])
+            except (KeyError, AttributeError):
+                list_of_attrs.append('')
+        complete_dict[o.name] = list_of_attrs
+
+    df_index = []
+    for el in cumulative_attribute_list:
+        if el.startswith('_'):
+            el = el[1:]
+        el = el.replace('_', ' ')
+        df_index.append(el)
+
+    filename = add_extension_if_necessary(filename, 'csv')
+    df = pd.DataFrame(complete_dict, index=df_index).T
+    df.to_csv(filename)
+
+
+def get_obj_children(obj: Union[StellarBody, BinarySystem, PlanetarySystem, StellarSystem, MultiStellarSystemSType]):
+    if isinstance(obj, (PlanetarySystem, StellarSystem, MultiStellarSystemSType)):
+        obj_list = obj.get_children() + [obj.parent]
+        children_list = obj.get_children() + [obj.parent]
+    else:
+        obj_list = obj.children
+        children_list = obj.children
+
+    for child in children_list:
+        obj_list += get_obj_children(child)
+
+    trimmed_obj_list = []
+    for o in obj_list:
+        if o not in trimmed_obj_list:
+            trimmed_obj_list.append(o)
+
+    return trimmed_obj_list

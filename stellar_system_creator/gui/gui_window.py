@@ -139,6 +139,12 @@ class Window(QMainWindow):
         else:
             e.ignore()
 
+    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+        from stellar_system_creator.gui.gui_menubar import HelpMenu
+        help_menu: HelpMenu = self.menubar.findChild(HelpMenu)
+        help_menu.help_dialog.close()
+        super().closeEvent(a0)
+
 
 class Application(QApplication):
 
@@ -180,5 +186,4 @@ if __name__ == "__main__":
         file_name = sys.argv[1]
         file_name = os.path.abspath(file_name)
 
-    # file_name = '../examples/output_files/TrakrunatStellarSystem.sscl'
     main(file_name)

@@ -3,14 +3,16 @@ import sys
 from functools import partial
 
 import pkg_resources
-from PyQt5.QtCore import QUrl
+from PyQt5 import QtGui
+from PyQt5.QtCore import QUrl, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage
 from PyQt5.QtWidgets import QMenu, QAction, QFileDialog, QMenuBar, QMessageBox, QDialog, QVBoxLayout, QToolBar, \
-    QPushButton, QApplication
+    QPushButton, QApplication, QSizePolicy
 
 from stellar_system_creator.astrothings.units import ureg
-from stellar_system_creator.filing import save as save_ssc_object, save_as_ssc_light, add_extension_if_necessary
+from stellar_system_creator.filing import save as save_ssc_object, save_as_ssc_light, add_extension_if_necessary, \
+    export_object_to_pdf, export_object_to_json, export_object_to_csv
 from stellar_system_creator.gui.gui_central_widget import CentralWidget
 from stellar_system_creator.gui.gui_image_rendering import SystemImageWidget
 from stellar_system_creator.gui.gui_theme import get_icon_with_theme_colors, get_dark_theme_pallet, \
@@ -53,15 +55,16 @@ class FileMenu(QMenu):
         self.addAction(self.open_project_action)
         self.addAction(self.save_project_action)
         self.addAction(self.save_as_project_action)
+        self.addAction(self.export_as_project_action)
         self.addSeparator()
         self.addMenu(self.theme_submenu)
         self.theme_submenu.addAction(self.dark_theme_action)
         self.theme_submenu.addAction(self.light_theme_action)
         self.addSeparator()
         # self.addAction(self.settings_action)
-        if platform.system() == 'Windows':
-            self.addAction(self.add_file_association_action)
-            self.addSeparator()
+        # if platform.system() == 'Windows':
+        #     self.addAction(self.add_file_association_action)
+        #     self.addSeparator()
         self.addAction(self.exit_action)
 
     def _connect_actions(self):
@@ -73,6 +76,7 @@ class FileMenu(QMenu):
         self.open_project_action.triggered.connect(partial(open_project, self))
         self.save_project_action.triggered.connect(partial(save_project, self))
         self.save_as_project_action.triggered.connect(partial(save_as_project, self))
+        self.export_as_project_action.triggered.connect(partial(export_as_project, self))
 
         self.dark_theme_action.triggered.connect(partial(change_theme, self, get_dark_theme_pallet))
         self.light_theme_action.triggered.connect(partial(change_theme, self, get_light_theme_pallet))
@@ -96,6 +100,9 @@ class FileMenu(QMenu):
 
         self.save_as_project_action = QAction(QIcon.fromTheme("document-save"), "&Save Project As...", menubar)
         self.save_as_project_action.setShortcut('Ctrl+Alt+S')
+
+        self.export_as_project_action = QAction("Export Project As...", menubar)
+        self.export_as_project_action.setShortcut('Ctrl+E')
 
         self.settings_action = QAction("&Settings...", menubar)
 
@@ -137,6 +144,10 @@ class FileMenu(QMenu):
         save_project_icon_dir = pkg_resources.resource_filename('stellar_system_creator',
                                                                 'gui/gui_icons/save.svg')
         self.save_project_action.setIcon(get_icon_with_theme_colors(save_project_icon_dir, current_palette))
+
+        export_project_icon_dir = pkg_resources.resource_filename('stellar_system_creator',
+                                                                  'gui/gui_icons/export-to.svg')
+        self.export_as_project_action.setIcon(get_icon_with_theme_colors(export_project_icon_dir, current_palette))
 
         theme_icon_dir = pkg_resources.resource_filename('stellar_system_creator',
                                                          'gui/gui_icons/color-palette.svg')
@@ -288,10 +299,10 @@ class HelpDialog(QDialog):
     """Source: https://zetcode.com/pyqt/qwebengineview/"""
 
     def __init__(self, parent):
-        super().__init__(parent)
+        super().__init__()
         self.setWindowTitle('Documentation')
         self.setModal(False)
-        self.setFixedSize(600, 450)
+        self.resize(600, 450)
 
         self._set_web_engine_view()
         self._set_toolbar()
@@ -300,6 +311,9 @@ class HelpDialog(QDialog):
         layout.addWidget(self.web_engine_view)
         layout.addStretch()
         self.setLayout(layout)
+
+        self.setWindowFlags(Qt.Window)
+        self.setWindowFlag(Qt.WindowStaysOnTopHint, False)
 
     def reset_toolbar(self):
         old_toolbar = self.toolbar
@@ -371,11 +385,18 @@ class HelpDialog(QDialog):
     def homing_process(self):
         self.loadPage()
 
+    def resizeEvent(self, a0: QtGui.QResizeEvent) -> None:
+        super().resizeEvent(a0)
+        new_web_engine_view_height = self.height() - self.toolbar.size().height() - self.layout().spacing() \
+            - self.layout().contentsMargins().bottom() - self.layout().contentsMargins().top()
+        self.web_engine_view.resize(self.web_engine_view.width(), new_web_engine_view_height)
+
 
 def new_project(parent, system_type):
     filename: str = QFileDialog.getSaveFileName(parent, 'Save Project', '',
-                                                "All Files (*);;Stellar System Creator Light Files (*.sscl);;"
-                                                "Stellar System Creator Files (*.ssc)")[0]
+                                                "Stellar System Creator Light Files (*.sscl);;"
+                                                "Stellar System Creator Files (*.ssc);;"
+                                                "All Files (*)")[0]
     system_name = filename.split('/')[-1].split('.')[0]
     if filename != '':
         filename = add_extension_if_necessary(filename, 'sscl')
@@ -421,8 +442,9 @@ def save_as_project(parent):
     central_widget: CentralWidget = parent.parent().parent().central_widget
     ssc_object = central_widget.get_ssc_object_of_current_tab()
     filename: str = QFileDialog.getSaveFileName(parent, 'Save Project', '',
-                                                "All Files (*);;Stellar System Creator Light Files (*.sscl);;"
-                                                "Stellar System Creator Files (*.ssc)")[0]
+                                                "Stellar System Creator Light Files (*.sscl);;"
+                                                "Stellar System Creator Files (*.ssc);;"
+                                                "All Files (*)")[0]
     if filename != '':
         if filename.endswith('.ssc'):
             save_ssc_object(ssc_object, filename)
@@ -453,6 +475,31 @@ def save_project(parent):
     tab_text = central_widget.tabText(central_widget.currentIndex())
     if saved and tab_text.startswith('*'):
         central_widget.setTabText(central_widget.currentIndex(), tab_text[1:])
+
+
+def export_as_project(parent):
+    central_widget: CentralWidget = parent.parent().parent().central_widget
+    ssc_object = central_widget.get_ssc_object_of_current_tab()
+    filename: str = QFileDialog.getSaveFileName(parent, 'Save Project', '',
+                                                "Portable Document Files (*.pdf);;"
+                                                "Comma-Separated Values (*.csv);;"
+                                                "JavaScript Open Notation (*.json);;"
+                                                "All Files (*)")[0]
+    if filename != '':
+        if filename.endswith('.pdf'):
+            export_object_to_pdf(ssc_object, filename)
+        elif filename.endswith('.csv'):
+            export_object_to_csv(ssc_object, filename)
+        elif filename.endswith('.json'):
+            export_object_to_json(ssc_object, filename)
+        else:
+            message_box = QMessageBox()
+            message_box.setIcon(QMessageBox.Information)
+            message_box.setWindowTitle("'Export Project As' has failed...")
+            message_box.setText(f"File '{filename}' does not end in .pdf, .csv, or .json.")
+            message_box.exec()
+    else:
+        return
 
 
 def change_theme(parent, get_theme_pallet):
