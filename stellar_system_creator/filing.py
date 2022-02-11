@@ -309,6 +309,8 @@ def load_system_rendering_preferences(filename: str) -> Dict:
     for key in system_plot.default_system_rendering_preferences.keys():
         if key not in system_rendering_preferences.keys():
             system_rendering_preferences[key] = system_plot.default_system_rendering_preferences[key]
+        elif system_rendering_preferences[key] is None:
+            system_rendering_preferences[key] = system_plot.default_system_rendering_preferences[key]
 
     return system_rendering_preferences
 

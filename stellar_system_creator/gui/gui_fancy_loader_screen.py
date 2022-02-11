@@ -1,5 +1,6 @@
 import os
 
+import pkg_resources
 from PyQt5 import QtGui
 from PyQt5.QtCore import QUrl, QFileInfo, Qt, QRect
 from PyQt5.QtGui import QRegion, QPixmap
@@ -58,7 +59,8 @@ class LoadingScreenImage(QDialog):
         self.setAttribute(Qt.WA_TranslucentBackground)
 
         self.image_widget = QLabel()
-        pixmap = QPixmap(os.path.abspath('brand_image_fancy.png'))
+        loading_image_path_name = pkg_resources.resource_filename('stellar_system_creator', 'gui/brand_image_fancy.png')
+        pixmap = QPixmap(os.path.abspath(loading_image_path_name))
         self.image_widget.setPixmap(pixmap)
         self.resize(self.image_widget.sizeHint())
 
