@@ -248,7 +248,7 @@ class SystemImageWidget(QWidget):
     def thread_finished_process(self):
         ssc_object = self.target_treeview.ssc_object
         self.system_rendering_widget.show()
-        self.system_rendering_widget.latest_surface = ssc_object.system_plot.plot_base_surface
+        # self.system_rendering_widget.latest_surface = ssc_object.system_plot.plot_base_surface
         # ssc_object.clear_system_plot()
         # self.system_rendering_widget.delete_temp_file()
 
