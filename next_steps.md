@@ -1,4 +1,7 @@
 
+I will no longer be updating this repository.
+There are plans for a revamp of this project, but it will take a while.
+
 # Main code:
 1. Add planetary binaries.
 2. Semi-major axis minimum limit should take into account the gas giant radius expansion with the roche limit.

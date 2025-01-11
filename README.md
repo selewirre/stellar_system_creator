@@ -6,6 +6,11 @@ Check out the [website](https://sites.google.com/view/caelian-assistants/stellar
 the [YouTube Channel](https://www.youtube.com/channel/UCWAz_u7tOu2IIIBqjZzY9gA), and the 
 [documentation](https://raw.githubusercontent.com/selewirre/stellar_system_creator/master/stellar_system_creator/documentation/build/latex/stellarsystemcreator.pdf)
 
+# Announcement
+
+I will no longer be updating this repository, unless it is for minute bug fixes.
+There are plans for a revamp of this project, but it will take a while.
+
 # Installation
 To install this package, run:
 
